@@ -2,6 +2,16 @@
 
 This application was generated using JHipster 6.2.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v6.2.0](https://www.jhipster.tech/documentation-archive/v6.2.0).
 
+## Usage
+
+### Registration
+
+Users can either register with an existing lab code or provide all the necessary information to register their lab.
+When providing a lab code, the users will be lab members of the specific lab.
+Users registering a new lab will be considered as PI of the particular lab.
+
+Newly registered users are deactivated and must be activated by either the admin, workshop chair or PI of the respective lab.
+
 ## Development
 
 Before you can build this project, you must install and configure the following dependencies on your machine:

@@ -36,6 +36,10 @@
     "form": {
       "username.label": "Username",
       "username.placeholder": "Your username",
+      "firstName.label": "First name",
+      "firstName.placeholder": "First name",
+      "lastName.label": "Last name",
+      "lastName.placeholder": "Last name",
       "currentpassword.label": "Current password",
       "currentpassword.placeholder": "Current password",
       "newpassword.label": "New password",
@@ -43,7 +47,38 @@
       "confirmpassword.label": "New password confirmation",
       "confirmpassword.placeholder": "Confirm the new password",
       "email.label": "Email",
-      "email.placeholder": "Your email"
+      "email.placeholder": "Your email",
+      "existinglab.label": "Do you already have a labcode?",
+      "labCode.label": "Labcode",
+      "labCode.placeholder": "Labcode",
+      "title.label": "Name of your lab",
+      "title.placeholder": "Lab",
+      "director.label": "Director of your lab",
+      "director.placeholder": "Director",
+      "department.label": "Department of your lab",
+      "department.placeholder": "Department",
+      "institution.label": "Institution of your lab",
+      "institution.placeholder": "Institution",
+      "address1.label": "Address (1) of your lab",
+      "address1.placeholder": "Address",
+      "address2.label": "Address (2) of your lab",
+      "address2.placeholder": "Address",
+      "city.label": "City of your lab",
+      "city.placeholder": "City",
+      "state.label": "State of your lab",
+      "state.placeholder": "State",
+      "zip.label": "Zip code of your lab",
+      "zip.placeholder": "Zip",
+      "country.label": "Country of your lab",
+      "country.placeholder": "Country",
+      "phone.label": "Phone number of your lab",
+      "phone.placeholder": "Phone",
+      "fax.label": "Fax number of your lab",
+      "fax.placeholder": "Fax",
+      "url.label": "Website of your lab",
+      "url.placeholder": "Website",
+      "labEmail.label": "Central e-mail address of your lab",
+      "labEmail.placeholder": "Lab e-mail"
     },
     "messages": {
       "info": {
@@ -77,6 +112,9 @@
           "invalid": "Your email is invalid.",
           "minlength": "Your email is required to be at least 5 characters.",
           "maxlength": "Your email cannot be longer than 50 characters."
+        },
+        "labcode": {
+          "required": "Your labcode is required."
         }
       }
     },

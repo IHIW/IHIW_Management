@@ -2,8 +2,12 @@ package org.ihiw.management.service;
 
 import org.ihiw.management.config.Constants;
 import org.ihiw.management.domain.Authority;
+import org.ihiw.management.domain.IhiwLab;
+import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.User;
 import org.ihiw.management.repository.AuthorityRepository;
+import org.ihiw.management.repository.IhiwLabRepository;
+import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
@@ -11,6 +15,7 @@ import org.ihiw.management.service.dto.UserDTO;
 import org.ihiw.management.service.util.RandomUtil;
 import org.ihiw.management.web.rest.errors.*;
 
+import org.ihiw.management.web.rest.vm.ManagedUserVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,14 +43,20 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final IhiwUserRepository ihiwUserRepository;
+
+    private final IhiwLabRepository ihiwLabRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final AuthorityRepository authorityRepository;
 
     private final CacheManager cacheManager;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, CacheManager cacheManager) {
+    public UserService(UserRepository userRepository, IhiwUserRepository ihiwUserRepository, IhiwLabRepository ihiwLabRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, CacheManager cacheManager) {
         this.userRepository = userRepository;
+        this.ihiwLabRepository = ihiwLabRepository;
+        this.ihiwUserRepository = ihiwUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
@@ -87,14 +99,14 @@ public class UserService {
             });
     }
 
-    public User registerUser(UserDTO userDTO, String password) {
-        userRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).ifPresent(existingUser -> {
+    public User registerUser(ManagedUserVM managedUserVM, String password) {
+        userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(existingUser -> {
             boolean removed = removeNonActivatedUser(existingUser);
             if (!removed) {
                 throw new LoginAlreadyUsedException();
             }
         });
-        userRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).ifPresent(existingUser -> {
+        userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(existingUser -> {
             boolean removed = removeNonActivatedUser(existingUser);
             if (!removed) {
                 throw new EmailAlreadyUsedException();
@@ -102,23 +114,107 @@ public class UserService {
         });
         User newUser = new User();
         String encryptedPassword = passwordEncoder.encode(password);
-        newUser.setLogin(userDTO.getLogin().toLowerCase());
+        newUser.setLogin(managedUserVM.getLogin().toLowerCase());
         // new user gets initially a generated password
         newUser.setPassword(encryptedPassword);
-        newUser.setFirstName(userDTO.getFirstName());
-        newUser.setLastName(userDTO.getLastName());
-        newUser.setEmail(userDTO.getEmail().toLowerCase());
-        newUser.setImageUrl(userDTO.getImageUrl());
-        newUser.setLangKey(userDTO.getLangKey());
+        newUser.setFirstName(managedUserVM.getFirstName());
+        newUser.setLastName(managedUserVM.getLastName());
+        newUser.setEmail(managedUserVM.getEmail().toLowerCase());
+        newUser.setImageUrl(managedUserVM.getImageUrl());
+        newUser.setLangKey(managedUserVM.getLangKey());
         // new user is not active
         newUser.setActivated(false);
         // new user gets registration key
         newUser.setActivationKey(RandomUtil.generateActivationKey());
         Set<Authority> authorities = new HashSet<>();
         authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        if (managedUserVM.isExistingLab()){
+            authorityRepository.findById(AuthoritiesConstants.LAB_MEMBER).ifPresent(authorities::add);
+        } else {
+            authorityRepository.findById(AuthoritiesConstants.PI).ifPresent(authorities::add);
+        }
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
         this.clearUserCaches(newUser);
+
+        IhiwUser ihiwUser = new IhiwUser();
+        ihiwUser.setUser(newUser);
+        ihiwUser.setPhone(managedUserVM.getPhone());
+        ihiwUser = ihiwUserRepository.save(ihiwUser);
+
+        IhiwLab lab;
+        if (managedUserVM.isExistingLab() ){
+            if (managedUserVM.getLabCode() == null || managedUserVM.getLabCode().isEmpty()){
+                throw new LabDoesNotExistException();
+            }
+            Optional<IhiwLab> theLab = ihiwLabRepository.findByLabCode(managedUserVM.getLabCode());
+            if (theLab.isPresent()){
+                lab = theLab.get();
+            }
+            else {
+                throw new LabDoesNotExistException();
+            }
+        } else {
+            lab = new IhiwLab();
+            if (managedUserVM.getTitle() != null && !managedUserVM.getTitle().isEmpty()){
+                lab.setTitle(managedUserVM.getTitle());
+            }
+            if (managedUserVM.getFirstName() != null && !managedUserVM.getFirstName().isEmpty()){
+                lab.setFirstName(managedUserVM.getFirstName());
+            }
+            if (managedUserVM.getLastName() != null && !managedUserVM.getLastName().isEmpty()){
+                lab.setLastName(managedUserVM.getLastName());
+            }
+            if (managedUserVM.getDepartment() != null && !managedUserVM.getDepartment().isEmpty()){
+                lab.setDepartment(managedUserVM.getDepartment());
+            }
+            if (managedUserVM.getInstitution() != null && !managedUserVM.getInstitution().isEmpty()){
+                lab.setInstitution(managedUserVM.getInstitution());
+            }
+            if (managedUserVM.getAddress1() != null && !managedUserVM.getAddress1().isEmpty()){
+                lab.setAddress1(managedUserVM.getAddress1());
+            }
+            if (managedUserVM.getAddress2() != null && !managedUserVM.getAddress2().isEmpty()){
+                lab.setAddress2(managedUserVM.getAddress1());
+            }
+            if (managedUserVM.getZip() != null && !managedUserVM.getZip().isEmpty()){
+                lab.setZip(managedUserVM.getZip());
+            }
+            if (managedUserVM.getCountry() != null && !managedUserVM.getCountry().isEmpty()){
+                lab.setCountry(managedUserVM.getCountry());
+            }
+            if (managedUserVM.getState() != null && !managedUserVM.getState().isEmpty()){
+                lab.setState(managedUserVM.getState());
+            }
+            if (managedUserVM.getPhone() != null && !managedUserVM.getPhone().isEmpty()){
+                lab.setPhone(managedUserVM.getPhone());
+            }
+            if (managedUserVM.getFax() != null && !managedUserVM.getFax().isEmpty()){
+                lab.setFax(managedUserVM.getFax());
+            }
+            if (managedUserVM.getDirector() != null && !managedUserVM.getDirector().isEmpty()){
+                lab.setDirector(managedUserVM.getDirector());
+            }
+            if (managedUserVM.getCity() != null && !managedUserVM.getCity().isEmpty()){
+                lab.setCity(managedUserVM.getCity());
+            }
+            if (managedUserVM.getUrl() != null && !managedUserVM.getUrl().isEmpty()){
+                lab.setUrl(managedUserVM.getUrl());
+            }
+            if (managedUserVM.getLabEmail() != null && !managedUserVM.getLabEmail().isEmpty()){
+                lab.setEmail(managedUserVM.getLabEmail());
+            }
+            if (managedUserVM.getTitle() != null && !managedUserVM.getTitle().isEmpty()){
+                lab.setLabCode(managedUserVM.getCountry() + managedUserVM.getDepartment().replace(" ", ""));
+            }
+
+            lab.setCreatedAt(ZonedDateTime.now());
+
+            ihiwLabRepository.save(lab);
+        }
+        ihiwUser.setLab(lab);
+        ihiwUserRepository.save(ihiwUser);
+
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }

@@ -28,7 +28,6 @@
         <div class="col-md-8">
             <form name="form" role="form" (ngSubmit)="register()" [formGroup]="registerForm" *ngIf="!success">
                 <div class="form-group">
-
                     <label class="form-control-label" for="login" jhiTranslate="global.form.username.label">Username</label>
                     <input type="text" class="form-control" id="login" name="login" placeholder="{{'global.form.username.placeholder' | translate}}"
                            formControlName="login">
@@ -47,6 +46,26 @@
                         <small class="form-text text-danger" *ngIf="registerForm.get('login').errors.pattern"
                                jhiTranslate="register.messages.validate.login.pattern">
                             Your username can only contain letters and digits.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="firstName" jhiTranslate="global.form.firstName.label">First name</label>
+                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="{{'global.form.firstName.placeholder' | translate}}"
+                           formControlName="firstName">
+                    <div *ngIf="registerForm.get('firstName').invalid && (registerForm.get('firstName').dirty || registerForm.get('firstName').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('firstName').errors.required" jhiTranslate="register.messages.validate.firstName.required">
+                            Your first name is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="lastName" jhiTranslate="global.form.lastName.label">Last name</label>
+                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="{{'global.form.lastName.placeholder' | translate}}"
+                           formControlName="lastName">
+                    <div *ngIf="registerForm.get('lastName').invalid && (registerForm.get('lastName').dirty || registerForm.get('lastName').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('lastName').errors.required" jhiTranslate="register.messages.validate.lastName.required">
+                            Your last name is required.
                         </small>
                     </div>
                 </div>
@@ -109,6 +128,154 @@
                         <small class="form-text text-danger" *ngIf="registerForm.get('confirmPassword').errors.maxlength"
                                jhiTranslate="global.messages.validate.confirmpassword.maxlength">
                             Your confirmation password cannot be longer than 50 characters.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" for="true" jhiTranslate="global.form.existinglab.label">Do you already have a labcode?</label>
+
+                    <div>
+                        <input id="true" type="radio" value="true" name="existingLab" formControlName="existingLab">
+                        <label for="true">Yes</label>
+                    </div>
+
+                    <div>
+                        <input id="false" type="radio" value="false" name="existingLab" formControlName="existingLab">
+                        <label for="false">No</label>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'true'">
+                    <label class="form-control-label" for="labCode" jhiTranslate="global.form.labCode.label">Labcode</label>
+                    <input type="text" class="form-control" id="labCode" name="labCode" placeholder="{{'global.form.labCode.placeholder' | translate}}"
+                           formControlName="labCode">
+                    <div *ngIf="registerForm.get('labCode').invalid && (registerForm.get('labCode').dirty || registerForm.get('labCode').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('labCode').errors.required"
+                               jhiTranslate="global.messages.validate.labCode.required">
+                            Your labcode is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="title" jhiTranslate="global.form.title.label">Name of your lab</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="{{'global.form.title.placeholder' | translate}}"
+                           formControlName="title">
+                    <div *ngIf="registerForm.get('title').invalid && (registerForm.get('title').dirty || registerForm.get('title').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('title').errors.required"
+                               jhiTranslate="global.messages.validate.title.required">
+                            Your lab's name is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="director" jhiTranslate="global.form.director.label">Director of your lab</label>
+                    <input type="text" class="form-control" id="director" name="director" placeholder="{{'global.form.director.placeholder' | translate}}"
+                           formControlName="director">
+                    <div *ngIf="registerForm.get('director').invalid && (registerForm.get('director').dirty || registerForm.get('director').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('director').errors.required"
+                               jhiTranslate="global.messages.validate.director.required">
+                            Your lab's director is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="department" jhiTranslate="global.form.department.label">Department of your lab</label>
+                    <input type="text" class="form-control" id="department" name="department" placeholder="{{'global.form.department.placeholder' | translate}}"
+                           formControlName="department">
+                    <div *ngIf="registerForm.get('department').invalid && (registerForm.get('department').dirty || registerForm.get('department').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('department').errors.required"
+                               jhiTranslate="global.messages.validate.department.required">
+                            Your lab's department is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="institution" jhiTranslate="global.form.institution.label">Institution of your lab</label>
+                    <input type="text" class="form-control" id="institution" name="institution" placeholder="{{'global.form.institution.placeholder' | translate}}"
+                           formControlName="institution">
+                    <div *ngIf="registerForm.get('institution').invalid && (registerForm.get('institution').dirty || registerForm.get('institution').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('institution').errors.required"
+                               jhiTranslate="global.messages.validate.institution.required">
+                            Your lab's institution is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="address1" jhiTranslate="global.form.address1.label">Address (1) of your lab</label>
+                    <input type="text" class="form-control" id="address1" name="address1" placeholder="{{'global.form.address1.placeholder' | translate}}"
+                           formControlName="address1">
+                    <div *ngIf="registerForm.get('address1').invalid && (registerForm.get('address1').dirty || registerForm.get('address1').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('address1').errors.required"
+                               jhiTranslate="global.messages.validate.address1.required">
+                            Your lab's address required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="address2" jhiTranslate="global.form.address2.label">Address (2) of your lab</label>
+                    <input type="text" class="form-control" id="address2" name="address2" placeholder="{{'global.form.address2.placeholder' | translate}}"
+                           formControlName="address2">
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="city" jhiTranslate="global.form.city.label">City of your lab</label>
+                    <input type="text" class="form-control" id="city" name="city" placeholder="{{'global.form.city.placeholder' | translate}}"
+                           formControlName="city">
+                    <div *ngIf="registerForm.get('city').invalid && (registerForm.get('city').dirty || registerForm.get('city').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('city').errors.required"
+                               jhiTranslate="global.messages.validate.city.required">
+                            Your lab's city is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="state" jhiTranslate="global.form.state.label">State of your lab</label>
+                    <input type="text" class="form-control" id="state" name="state" placeholder="{{'global.form.state.placeholder' | translate}}"
+                    formControlName="state">
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="zip" jhiTranslate="global.form.zip.label">Zip code of your lab</label>
+                    <input type="text" class="form-control" id="zip" name="zip" placeholder="{{'global.form.zip.placeholder' | translate}}"
+                           formControlName="zip">
+                    <div *ngIf="registerForm.get('zip').invalid && (registerForm.get('zip').dirty || registerForm.get('zip').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('zip').errors.required"
+                               jhiTranslate="global.messages.validate.zip.required">
+                            Your lab's zip code is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="country" jhiTranslate="global.form.country.label">Country of your lab</label>
+                    <input type="text" class="form-control" id="country" name="country" placeholder="{{'global.form.country.placeholder' | translate}}"
+                           formControlName="country">
+                    <div *ngIf="registerForm.get('country').invalid && (registerForm.get('country').dirty || registerForm.get('country').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('country').errors.required"
+                               jhiTranslate="global.messages.validate.country.required">
+                            Your lab's country is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="phone" jhiTranslate="global.form.phone.label">Phone number of your lab</label>
+                    <input type="text" class="form-control" id="phone" name="phone" placeholder="{{'global.form.phone.placeholder' | translate}}"
+                           formControlName="phone">
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="fax" jhiTranslate="global.form.fax.label">Fax number of your lab</label>
+                    <input type="text" class="form-control" id="fax" name="fax" placeholder="{{'global.form.fax.placeholder' | translate}}"
+                           formControlName="fax">
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="url" jhiTranslate="global.form.url.label">Website of your lab</label>
+                    <input type="text" class="form-control" id="url" name="url" placeholder="{{'global.form.url.placeholder' | translate}}"
+                           formControlName="url">
+                </div>
+                <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
+                    <label class="form-control-label" for="labEmail" jhiTranslate="global.form.labEmail.label">Central e-mail address of your lab</label>
+                    <input type="text" class="form-control" id="labEmail" name="labEmail" placeholder="{{'global.form.labEmail.placeholder' | translate}}"
+                           formControlName="labEmail">
+                    <div *ngIf="registerForm.get('labEmail').invalid && (registerForm.get('labEmail').dirty || registerForm.get('labEmail').touched)">
+                        <small class="form-text text-danger" *ngIf="registerForm.get('labEmail').errors.required"
+                               jhiTranslate="global.messages.validate.labEmail.required">
+                            Your lab's e-mail address is required.
                         </small>
                     </div>
                 </div>

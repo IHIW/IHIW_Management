@@ -57,7 +57,25 @@ describe('Component Tests', () => {
           email: '',
           password: 'password',
           login: '',
-          langKey: 'en'
+          langKey: 'en',
+          address1: '',
+          address2: '',
+          city: '',
+          country: '',
+          department: '',
+          director: '',
+          existingLab: 'true',
+          fax: '',
+          firstName: '',
+          institution: '',
+          labCode: '',
+          labEmail: '',
+          lastName: '',
+          phone: '',
+          state: '',
+          title: '',
+          url: '',
+          zip: ''
         });
         expect(comp.success).toEqual(true);
         expect(mockTranslate.getCurrentSpy).toHaveBeenCalled();

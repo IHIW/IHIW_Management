@@ -1,0 +1,72 @@
+/** Management microservice entities */
+entity Project {
+	name String required
+    description String
+	createdAt ZonedDateTime
+    modifiedAt ZonedDateTime
+}
+
+entity Upload {
+	type FileType
+    createdAt ZonedDateTime
+    modifiedAt ZonedDateTime
+    fileName String
+    valid Boolean
+    enabled Boolean
+}
+
+entity IhiwLab {
+	labCode String required
+    title String
+    firstName String required
+    lastName String required
+    director String
+    department String
+    institution String
+    address1 String
+    address2 String
+    sAddress1 String
+    sAddress String
+    city String
+    state String
+    zip String
+    country String
+    phone String
+    fax String
+    email String required
+    url String
+    oldLabCode String
+    sName String
+    sPhone String
+    sEmail String
+    dName String
+    dEmail String
+    dPhone String
+    createdAt ZonedDateTime
+}
+
+entity IhiwUser {
+	phone String
+}
+
+relationship OneToOne {
+	IhiwUser{user} to User{ihiwUser}
+}
+
+relationship OneToMany {
+	IhiwUser to Upload{createdBy}
+}
+
+relationship ManyToOne {
+	IhiwUser{lab} to IhiwLab
+    Project{createdBy} to IhiwUser
+    Project{modifiedBy} to IhiwUser
+}
+
+relationship ManyToMany {
+	Project{lab} to IhiwLab{project}
+}
+
+enum FileType {
+	HAML, HML
+}

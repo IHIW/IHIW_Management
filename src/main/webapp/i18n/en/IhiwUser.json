@@ -1,0 +1,20 @@
+{
+  "ihiwManagementApp": {
+    "ihiwUser": {
+      "home": {
+        "title": "IHIW Users",
+        "createLabel": "Create a new IHIW user",
+        "createOrEditLabel": "Create or edit a IHIW user"
+      },
+      "created": "A new IHIW user is created with identifier {{ param }}",
+      "updated": "A IHIW user is updated with identifier {{ param }}",
+      "deleted": "A IHIW user is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete IHIW user {{ id }}?"
+      },
+      "detail": {
+        "title": "IHIW User"
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "ihiwManagementApp": {
+    "project": {
+      "home": {
+        "title": "Projects",
+        "createLabel": "Create a new project",
+        "createOrEditLabel": "Create or edit a project"
+      },
+      "created": "A new project is created with identifier {{ param }}",
+      "updated": "A project is updated with identifier {{ param }}",
+      "deleted": "A project is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete project {{ id }}?"
+      },
+      "detail": {
+        "title": "Project"
+      }
+    }
+  }
+}

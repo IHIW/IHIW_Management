@@ -1,0 +1,20 @@
+{
+  "ihiwManagementApp": {
+    "ihiwLab": {
+      "home": {
+        "title": "Labs",
+        "createLabel": "Create a new lab",
+        "createOrEditLabel": "Create or edit a lab"
+      },
+      "created": "A new lab is created with identifier {{ param }}",
+      "updated": "A lab is updated with identifier {{ param }}",
+      "deleted": "A lab is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete lab {{ id }}?"
+      },
+      "detail": {
+        "title": "Lab"
+      }
+    }
+  }
+}

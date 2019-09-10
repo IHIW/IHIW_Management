@@ -1,0 +1,20 @@
+{
+  "ihiwManagementApp": {
+    "upload": {
+      "home": {
+        "title": "Uploads",
+        "createLabel": "Create a new upload",
+        "createOrEditLabel": "Create or edit a upload"
+      },
+      "created": "A new upload is created with identifier {{ param }}",
+      "updated": "A upload is updated with identifier {{ param }}",
+      "deleted": "A upload is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete upload {{ id }}?"
+      },
+      "detail": {
+        "title": "Upload"
+      }
+    }
+  }
+}

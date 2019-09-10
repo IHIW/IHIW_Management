@@ -1,0 +1,131 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="ihiwLab">
+            <h2><span jhiTranslate="ihiwManagementApp.ihiwLab.detail.title">Ihiw Lab</span> {{ihiwLab.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.labCode">Lab Code</span></dt>
+                <dd>
+                    <span>{{ihiwLab.labCode}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.title">Title</span></dt>
+                <dd>
+                    <span>{{ihiwLab.title}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.firstName">First Name</span></dt>
+                <dd>
+                    <span>{{ihiwLab.firstName}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.lastName">Last Name</span></dt>
+                <dd>
+                    <span>{{ihiwLab.lastName}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.director">Director</span></dt>
+                <dd>
+                    <span>{{ihiwLab.director}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.department">Department</span></dt>
+                <dd>
+                    <span>{{ihiwLab.department}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.institution">Institution</span></dt>
+                <dd>
+                    <span>{{ihiwLab.institution}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.address1">Address 1</span></dt>
+                <dd>
+                    <span>{{ihiwLab.address1}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.address2">Address 2</span></dt>
+                <dd>
+                    <span>{{ihiwLab.address2}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sAddress1">S Address 1</span></dt>
+                <dd>
+                    <span>{{ihiwLab.sAddress1}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sAddress">S Address</span></dt>
+                <dd>
+                    <span>{{ihiwLab.sAddress}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.city">City</span></dt>
+                <dd>
+                    <span>{{ihiwLab.city}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.state">State</span></dt>
+                <dd>
+                    <span>{{ihiwLab.state}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.zip">Zip</span></dt>
+                <dd>
+                    <span>{{ihiwLab.zip}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.country">Country</span></dt>
+                <dd>
+                    <span>{{ihiwLab.country}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.phone">Phone</span></dt>
+                <dd>
+                    <span>{{ihiwLab.phone}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.fax">Fax</span></dt>
+                <dd>
+                    <span>{{ihiwLab.fax}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.email">Email</span></dt>
+                <dd>
+                    <span>{{ihiwLab.email}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.url">Url</span></dt>
+                <dd>
+                    <span>{{ihiwLab.url}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.oldLabCode">Old Lab Code</span></dt>
+                <dd>
+                    <span>{{ihiwLab.oldLabCode}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sName">S Name</span></dt>
+                <dd>
+                    <span>{{ihiwLab.sName}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sPhone">S Phone</span></dt>
+                <dd>
+                    <span>{{ihiwLab.sPhone}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sEmail">S Email</span></dt>
+                <dd>
+                    <span>{{ihiwLab.sEmail}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dName">D Name</span></dt>
+                <dd>
+                    <span>{{ihiwLab.dName}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dEmail">D Email</span></dt>
+                <dd>
+                    <span>{{ihiwLab.dEmail}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dPhone">D Phone</span></dt>
+                <dd>
+                    <span>{{ihiwLab.dPhone}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.createdAt">Created At</span></dt>
+                <dd>
+                    <span>{{ihiwLab.createdAt}}</span>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/ihiw-lab', ihiwLab.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+            </button>
+        </div>
+    </div>
+</div>

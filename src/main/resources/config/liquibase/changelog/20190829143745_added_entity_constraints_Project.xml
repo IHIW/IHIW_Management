@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <!--
+        Added the constraints for entity Project.
+    -->
+    <changeSet id="20190829143745-2" author="jhipster">
+        
+        <addForeignKeyConstraint baseColumnNames="created_by_id"
+                                 baseTableName="project"
+                                 constraintName="fk_project_created_by_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ihiw_user"/>
+
+        <addForeignKeyConstraint baseColumnNames="modified_by_id"
+                                 baseTableName="project"
+                                 constraintName="fk_project_modified_by_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ihiw_user"/>
+
+        <addForeignKeyConstraint baseColumnNames="project_id"
+                                 baseTableName="project_lab"
+                                 constraintName="fk_project_lab_project_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="project"/>
+
+        <addForeignKeyConstraint baseColumnNames="lab_id"
+                                 baseTableName="project_lab"
+                                 constraintName="fk_project_lab_lab_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ihiw_lab"/>
+        
+    </changeSet>
+</databaseChangeLog>

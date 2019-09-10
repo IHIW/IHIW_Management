@@ -1,0 +1,57 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="project">
+            <h2><span jhiTranslate="ihiwManagementApp.project.detail.title">Project</span> {{project.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="ihiwManagementApp.project.name">Name</span></dt>
+                <dd>
+                    <span>{{project.name}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.project.description">Description</span></dt>
+                <dd>
+                    <span>{{project.description}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.project.createdAt">Created At</span></dt>
+                <dd>
+                    <span>{{project.createdAt}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.project.modifiedAt">Modified At</span></dt>
+                <dd>
+                    <span>{{project.modifiedAt}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.project.createdBy">Created By</span></dt>
+                <dd>
+                    <div *ngIf="project.createdBy">
+                        <a [routerLink]="['/ihiw-user', project.createdBy?.id, 'view']">{{project.createdBy?.id}}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.project.modifiedBy">Modified By</span></dt>
+                <dd>
+                    <div *ngIf="project.modifiedBy">
+                        <a [routerLink]="['/ihiw-user', project.modifiedBy?.id, 'view']">{{project.modifiedBy?.id}}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.project.lab">Lab</span></dt>
+                <dd>
+                    <span *ngFor="let lab of project.labs; let last = last">
+                        <a [routerLink]="['/ihiw-lab', lab?.id, 'view' ]">{{lab.id}}</a>{{last ? '' : ', '}}
+                    </span>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/project', project.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+            </button>
+        </div>
+    </div>
+</div>

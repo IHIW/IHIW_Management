@@ -1,0 +1,53 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <div *ngIf="upload">
+            <h2><span jhiTranslate="ihiwManagementApp.upload.detail.title">Upload</span> {{upload.id}}</h2>
+            <hr>
+            <jhi-alert-error></jhi-alert-error>
+            <dl class="row-md jh-entity-details">
+                <dt><span jhiTranslate="ihiwManagementApp.upload.type">Type</span></dt>
+                <dd>
+                    <span jhiTranslate="{{'ihiwManagementApp.FileType.' + upload.type}}">{{upload.type}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.createdAt">Created At</span></dt>
+                <dd>
+                    <span>{{upload.createdAt}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.modifiedAt">Modified At</span></dt>
+                <dd>
+                    <span>{{upload.modifiedAt}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.fileName">File Name</span></dt>
+                <dd>
+                    <span>{{upload.fileName}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.valid">Valid</span></dt>
+                <dd>
+                    <span class="badge badge-info">{{upload.valid}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.enabled">Enabled</span></dt>
+                <dd>
+                    <span class="badge badge-info">{{upload.enabled}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.createdBy">Created By</span></dt>
+                <dd>
+                    <div *ngIf="upload.createdBy">
+                        <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view']">{{upload.createdBy?.id}}</a>
+                    </div>
+                </dd>
+            </dl>
+
+            <button type="submit"
+                    (click)="previousState()"
+                    class="btn btn-info">
+                <fa-icon [icon]="'arrow-left'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back"> Back</span>
+            </button>
+
+            <button type="button"
+                    [routerLink]="['/upload', upload.id, 'edit']"
+                    class="btn btn-primary">
+                <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
+            </button>
+        </div>
+    </div>
+</div>

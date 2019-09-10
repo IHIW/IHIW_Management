@@ -9,6 +9,14 @@ public final class AuthoritiesConstants {
 
     public static final String USER = "ROLE_USER";
 
+    public static final String LAB_MEMBER = "LabMember";
+    public static final String PI = "PI";
+    public static final String PROJECT_AFFILIATE = "ProjectAffiliate";
+    public static final String PROJECT_LEADER = "ProjectLeader";
+    public static final String COMPONENT_AFFILIATE = "ComponentAffiliate";
+    public static final String COMPONENT_CHAIR = "ComponentChair";
+    public static final String WORKSHOP_CHAIR = "WorkshopChair";
+
     public static final String ANONYMOUS = "ROLE_ANONYMOUS";
 
     private AuthoritiesConstants() {

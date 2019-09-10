@@ -1,0 +1,41 @@
+{
+    "name": "IhiwUser",
+    "fields": [
+        {
+            "fieldName": "phone",
+            "fieldType": "String"
+        }
+    ],
+    "relationships": [
+        {
+            "relationshipType": "one-to-one",
+            "otherEntityName": "user",
+            "otherEntityRelationshipName": "ihiwUser",
+            "relationshipName": "user",
+            "otherEntityField": "id",
+            "ownerSide": true
+        },
+        {
+            "relationshipType": "one-to-many",
+            "otherEntityName": "upload",
+            "otherEntityRelationshipName": "createdBy",
+            "relationshipName": "upload"
+        },
+        {
+            "relationshipType": "many-to-one",
+            "otherEntityName": "ihiwLab",
+            "otherEntityRelationshipName": "ihiwUser",
+            "relationshipName": "lab",
+            "otherEntityField": "id"
+        }
+    ],
+    "changelogDate": "20190829143748",
+    "entityTableName": "ihiw_user",
+    "dto": "no",
+    "pagination": "no",
+    "service": "no",
+    "jpaMetamodelFiltering": false,
+    "fluentMethods": true,
+    "clientRootFolder": "",
+    "applications": "*"
+}

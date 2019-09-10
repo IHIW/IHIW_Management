@@ -29,7 +29,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
       // set below to true to make alerts look like toast
       alertAsToast: false,
       alertTimeout: 5000,
-      i18nEnabled: true,
+      i18nEnabled: false,
       defaultI18nLang: 'en'
     }),
     IhiwManagementSharedModule.forRoot(),

@@ -54,7 +54,13 @@ management:
     web:
       server:
         auto-time-requests: true
-
+logging:
+  use-json-format: false # By default, logs are not in Json format
+  logstash:
+    enabled: false
+    host:
+    port:
+    queue-size:
 spring:
   application:
     name: ihiwManagement
@@ -150,3 +156,8 @@ jhipster:
 # ===================================================================
 
 # application:
+aws:
+  s3:
+    region:
+    timeout: 30000
+    bucket:

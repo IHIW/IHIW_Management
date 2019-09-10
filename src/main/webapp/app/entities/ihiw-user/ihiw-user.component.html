@@ -1,0 +1,67 @@
+<div>
+    <h2 id="page-heading">
+        <span jhiTranslate="ihiwManagementApp.ihiwUser.home.title">Ihiw Users</span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-ihiw-user" [routerLink]="['/ihiw-user/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
+            <span  jhiTranslate="ihiwManagementApp.ihiwUser.home.createLabel">
+            Create a new Ihiw User
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <br/>
+    <div class="alert alert-warning" *ngIf="ihiwUsers?.length === 0">
+        <span jhiTranslate="ihiwManagementApp.ihiwUser.home.notFound">No ihiwUsers found</span>
+    </div>
+    <div class="table-responsive" *ngIf="ihiwUsers?.length > 0">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+            <th><span jhiTranslate="global.field.id">ID</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwUser.phone">Phone</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwUser.user">User</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwUser.lab">Lab</span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let ihiwUser of ihiwUsers ;trackBy: trackId">
+                <td><a [routerLink]="['/ihiw-user', ihiwUser.id, 'view' ]">{{ihiwUser.id}}</a></td>
+                <td>{{ihiwUser.phone}}</td>
+                <td>
+                    {{ihiwUser.user?.firstName}} {{ihiwUser.user?.lastName}}
+                </td>
+                <td>
+                    <div *ngIf="ihiwUser.lab">
+                        <a [routerLink]="['/ihiw-lab', ihiwUser.lab?.id, 'view' ]" >{{ihiwUser.lab?.labCode}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <button type="submit"
+                                [routerLink]="['/ihiw-user', ihiwUser.id, 'view' ]"
+                                class="btn btn-info btn-sm">
+                            <fa-icon [icon]="'eye'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/ihiw-user', ihiwUser.id, 'edit']"
+                                class="btn btn-primary btn-sm">
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/ihiw-user', { outlets: { popup: ihiwUser.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <fa-icon [icon]="'times'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

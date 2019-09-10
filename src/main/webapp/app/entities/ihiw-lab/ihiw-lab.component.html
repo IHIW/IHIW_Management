@@ -1,0 +1,109 @@
+<div>
+    <h2 id="page-heading">
+        <span jhiTranslate="ihiwManagementApp.ihiwLab.home.title">Ihiw Labs</span>
+        <button id="jh-create-entity" class="btn btn-primary float-right jh-create-entity create-ihiw-lab" [routerLink]="['/ihiw-lab/new']">
+            <fa-icon [icon]="'plus'"></fa-icon>
+            <span  jhiTranslate="ihiwManagementApp.ihiwLab.home.createLabel">
+            Create a new Ihiw Lab
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <br/>
+    <div class="alert alert-warning" *ngIf="ihiwLabs?.length === 0">
+        <span jhiTranslate="ihiwManagementApp.ihiwLab.home.notFound">No ihiwLabs found</span>
+    </div>
+    <div class="table-responsive" *ngIf="ihiwLabs?.length > 0">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+            <th><span jhiTranslate="global.field.id">ID</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.labCode">Lab Code</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.title">Title</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.firstName">First Name</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.lastName">Last Name</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.director">Director</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.department">Department</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.institution">Institution</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.address1">Address 1</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.address2">Address 2</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.sAddress1">S Address 1</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.sAddress">S Address</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.city">City</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.state">State</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.zip">Zip</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.country">Country</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.phone">Phone</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.fax">Fax</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.email">Email</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.url">Url</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.oldLabCode">Old Lab Code</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.sName">S Name</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.sPhone">S Phone</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.sEmail">S Email</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.dName">D Name</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.dEmail">D Email</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.dPhone">D Phone</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.createdAt">Created At</span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let ihiwLab of ihiwLabs ;trackBy: trackId">
+                <td><a [routerLink]="['/ihiw-lab', ihiwLab.id, 'view' ]">{{ihiwLab.id}}</a></td>
+                <td>{{ihiwLab.labCode}}</td>
+                <td>{{ihiwLab.title}}</td>
+                <td>{{ihiwLab.firstName}}</td>
+                <td>{{ihiwLab.lastName}}</td>
+                <td>{{ihiwLab.director}}</td>
+                <td>{{ihiwLab.department}}</td>
+                <td>{{ihiwLab.institution}}</td>
+                <td>{{ihiwLab.address1}}</td>
+                <td>{{ihiwLab.address2}}</td>
+                <td>{{ihiwLab.sAddress1}}</td>
+                <td>{{ihiwLab.sAddress}}</td>
+                <td>{{ihiwLab.city}}</td>
+                <td>{{ihiwLab.state}}</td>
+                <td>{{ihiwLab.zip}}</td>
+                <td>{{ihiwLab.country}}</td>
+                <td>{{ihiwLab.phone}}</td>
+                <td>{{ihiwLab.fax}}</td>
+                <td>{{ihiwLab.email}}</td>
+                <td>{{ihiwLab.url}}</td>
+                <td>{{ihiwLab.oldLabCode}}</td>
+                <td>{{ihiwLab.sName}}</td>
+                <td>{{ihiwLab.sPhone}}</td>
+                <td>{{ihiwLab.sEmail}}</td>
+                <td>{{ihiwLab.dName}}</td>
+                <td>{{ihiwLab.dEmail}}</td>
+                <td>{{ihiwLab.dPhone}}</td>
+                <td>{{ihiwLab.createdAt | date:'medium'}}</td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <button type="submit"
+                                [routerLink]="['/ihiw-lab', ihiwLab.id, 'view' ]"
+                                class="btn btn-info btn-sm">
+                            <fa-icon [icon]="'eye'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/ihiw-lab', ihiwLab.id, 'edit']"
+                                class="btn btn-primary btn-sm">
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/ihiw-lab', { outlets: { popup: ihiwLab.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <fa-icon [icon]="'times'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

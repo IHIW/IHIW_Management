@@ -1,0 +1,178 @@
+<div class="row justify-content-center">
+    <div class="col-8">
+        <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+            <h2 id="jhi-ihiw-lab-heading" jhiTranslate="ihiwManagementApp.ihiwLab.home.createOrEditLabel">Create or edit a Ihiw Lab</h2>
+            <div>
+                <jhi-alert-error></jhi-alert-error>
+                <div class="form-group" [hidden]="!editForm.get('id').value">
+                    <label for="id" jhiTranslate="global.field.id">ID</label>
+                    <input type="text" class="form-control" id="id" name="id" formControlName="id"
+                        readonly />
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.labCode" for="field_labCode">Lab Code</label>
+                    <input type="text" class="form-control" name="labCode" id="field_labCode"
+                           formControlName="labCode"/>
+                    <div *ngIf="editForm.get('labCode').invalid && (editForm.get('labCode').dirty || editForm.get('labCode').touched)">
+                        <small class="form-text text-danger"
+                               *ngIf="editForm.get('labCode').errors.required" jhiTranslate="entity.validation.required">
+                        This field is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.title" for="field_title">Title</label>
+                    <input type="text" class="form-control" name="title" id="field_title"
+                           formControlName="title"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.firstName" for="field_firstName">First Name</label>
+                    <input type="text" class="form-control" name="firstName" id="field_firstName"
+                           formControlName="firstName"/>
+                    <div *ngIf="editForm.get('firstName').invalid && (editForm.get('firstName').dirty || editForm.get('firstName').touched)">
+                        <small class="form-text text-danger"
+                               *ngIf="editForm.get('firstName').errors.required" jhiTranslate="entity.validation.required">
+                        This field is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.lastName" for="field_lastName">Last Name</label>
+                    <input type="text" class="form-control" name="lastName" id="field_lastName"
+                           formControlName="lastName"/>
+                    <div *ngIf="editForm.get('lastName').invalid && (editForm.get('lastName').dirty || editForm.get('lastName').touched)">
+                        <small class="form-text text-danger"
+                               *ngIf="editForm.get('lastName').errors.required" jhiTranslate="entity.validation.required">
+                        This field is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.director" for="field_director">Director</label>
+                    <input type="text" class="form-control" name="director" id="field_director"
+                           formControlName="director"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.department" for="field_department">Department</label>
+                    <input type="text" class="form-control" name="department" id="field_department"
+                           formControlName="department"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.institution" for="field_institution">Institution</label>
+                    <input type="text" class="form-control" name="institution" id="field_institution"
+                           formControlName="institution"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.address1" for="field_address1">Address 1</label>
+                    <input type="text" class="form-control" name="address1" id="field_address1"
+                           formControlName="address1"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.address2" for="field_address2">Address 2</label>
+                    <input type="text" class="form-control" name="address2" id="field_address2"
+                           formControlName="address2"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.sAddress1" for="field_sAddress1">S Address 1</label>
+                    <input type="text" class="form-control" name="sAddress1" id="field_sAddress1"
+                           formControlName="sAddress1"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.sAddress" for="field_sAddress">S Address</label>
+                    <input type="text" class="form-control" name="sAddress" id="field_sAddress"
+                           formControlName="sAddress"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.city" for="field_city">City</label>
+                    <input type="text" class="form-control" name="city" id="field_city"
+                           formControlName="city"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.state" for="field_state">State</label>
+                    <input type="text" class="form-control" name="state" id="field_state"
+                           formControlName="state"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.zip" for="field_zip">Zip</label>
+                    <input type="text" class="form-control" name="zip" id="field_zip"
+                           formControlName="zip"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.country" for="field_country">Country</label>
+                    <input type="text" class="form-control" name="country" id="field_country"
+                           formControlName="country"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.phone" for="field_phone">Phone</label>
+                    <input type="text" class="form-control" name="phone" id="field_phone"
+                           formControlName="phone"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.fax" for="field_fax">Fax</label>
+                    <input type="text" class="form-control" name="fax" id="field_fax"
+                           formControlName="fax"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.email" for="field_email">Email</label>
+                    <input type="text" class="form-control" name="email" id="field_email"
+                           formControlName="email"/>
+                    <div *ngIf="editForm.get('email').invalid && (editForm.get('email').dirty || editForm.get('email').touched)">
+                        <small class="form-text text-danger"
+                               *ngIf="editForm.get('email').errors.required" jhiTranslate="entity.validation.required">
+                        This field is required.
+                        </small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.url" for="field_url">Url</label>
+                    <input type="text" class="form-control" name="url" id="field_url"
+                           formControlName="url"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.oldLabCode" for="field_oldLabCode">Old Lab Code</label>
+                    <input type="text" class="form-control" name="oldLabCode" id="field_oldLabCode"
+                           formControlName="oldLabCode"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.sName" for="field_sName">S Name</label>
+                    <input type="text" class="form-control" name="sName" id="field_sName"
+                           formControlName="sName"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.sPhone" for="field_sPhone">S Phone</label>
+                    <input type="text" class="form-control" name="sPhone" id="field_sPhone"
+                           formControlName="sPhone"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.sEmail" for="field_sEmail">S Email</label>
+                    <input type="text" class="form-control" name="sEmail" id="field_sEmail"
+                           formControlName="sEmail"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.dName" for="field_dName">D Name</label>
+                    <input type="text" class="form-control" name="dName" id="field_dName"
+                           formControlName="dName"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.dEmail" for="field_dEmail">D Email</label>
+                    <input type="text" class="form-control" name="dEmail" id="field_dEmail"
+                           formControlName="dEmail"/>
+                </div>
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.ihiwLab.dPhone" for="field_dPhone">D Phone</label>
+                    <input type="text" class="form-control" name="dPhone" id="field_dPhone"
+                           formControlName="dPhone"/>
+                </div>
+
+            </div>
+            <div>
+                <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
+                    <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
+                </button>
+                <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
+                    <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

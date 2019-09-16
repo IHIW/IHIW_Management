@@ -4,6 +4,7 @@ import org.ihiw.management.domain.*;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.repository.UserRepository;
+import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -57,11 +59,13 @@ public class ProjectResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/projects")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\", \"" + AuthoritiesConstants.PROJECT_LEADER + "\")")
     public ResponseEntity<Project> createProject(@Valid @RequestBody Project project) throws URISyntaxException {
         log.debug("REST request to save Project : {}", project);
         if (project.getId() != null) {
             throw new BadRequestAlertException("A new project cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         if (project.getCreatedBy() == null){
             project.setCreatedBy(ihiwUserRepository.findByUserIsCurrentUser());
             if (project.getCreatedAt() == null){
@@ -93,10 +97,17 @@ public class ProjectResource {
         if (project.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        Project result = projectRepository.save(project);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, project.getId().toString()))
-            .body(result);
+        Project projectFromDB = projectRepository.getOne(project.getId());
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            projectFromDB.getCreatedBy().equals(currentIhiwUser)) {
+            Project result = projectRepository.save(project);
+            return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, project.getId().toString()))
+                .body(result);
+        }
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, project.getId().toString())).build();
     }
 
     /**
@@ -110,7 +121,8 @@ public class ProjectResource {
         log.debug("REST request to get all Projects");
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR))){
+            currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR)) ||
+            currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))){
             return projectRepository.findAllWithEagerRelationships();
         }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
@@ -127,7 +139,11 @@ public class ProjectResource {
     public ResponseEntity<Project> getProject(@PathVariable Long id) {
         log.debug("REST request to get Project : {}", id);
         Optional<Project> project = projectRepository.findOneWithEagerRelationships(id);
-        return ResponseUtil.wrapOrNotFound(project);
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        if (project.get().getLabs().contains(currentIhiwUser.getLab())){
+            return ResponseUtil.wrapOrNotFound(project);
+        }
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 
     /**
@@ -137,8 +153,17 @@ public class ProjectResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/projects/{id}")
+    @PreAuthorize("hasAnyRole(\"" + AuthoritiesConstants.ADMIN + "\", \"" + AuthoritiesConstants.PROJECT_LEADER + "\")")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         log.debug("REST request to delete Project : {}", id);
+        Optional<Project> project = projectRepository.findOneWithEagerRelationships(id);
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (!currentUser.get().getAuthorities().contains(new Authority(ADMIN))){
+            if (!project.get().getCreatedBy().equals(currentIhiwUser)){
+                return ResponseEntity.badRequest().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+            }
+        }
         projectRepository.deleteById(id);
         return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }

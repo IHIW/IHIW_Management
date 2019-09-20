@@ -3,6 +3,8 @@ package org.ihiw.management.web.rest;
 import org.ihiw.management.IhiwManagementApp;
 import org.ihiw.management.domain.IhiwLab;
 import org.ihiw.management.repository.IhiwLabRepository;
+import org.ihiw.management.repository.IhiwUserRepository;
+import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -124,6 +126,12 @@ public class IhiwLabResourceIT {
     private IhiwLabRepository ihiwLabRepository;
 
     @Autowired
+    private IhiwUserRepository ihiwUserRepository;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -145,7 +153,7 @@ public class IhiwLabResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final IhiwLabResource ihiwLabResource = new IhiwLabResource(ihiwLabRepository);
+        final IhiwLabResource ihiwLabResource = new IhiwLabResource(ihiwLabRepository, ihiwUserRepository, userService);
         this.restIhiwLabMockMvc = MockMvcBuilders.standaloneSetup(ihiwLabResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -409,7 +417,7 @@ public class IhiwLabResourceIT {
             .andExpect(jsonPath("$.[*].dPhone").value(hasItem(DEFAULT_D_PHONE.toString())))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(sameInstant(DEFAULT_CREATED_AT))));
     }
-    
+
     @Test
     @Transactional
     public void getIhiwLab() throws Exception {

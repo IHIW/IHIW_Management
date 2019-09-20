@@ -2,6 +2,7 @@ package org.ihiw.management.web.rest;
 
 import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.repository.IhiwUserRepository;
+import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -46,6 +48,7 @@ public class IhiwUserResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/ihiw-users")
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<IhiwUser> createIhiwUser(@RequestBody IhiwUser ihiwUser) throws URISyntaxException {
         log.debug("REST request to save IhiwUser : {}", ihiwUser);
         if (ihiwUser.getId() != null) {
@@ -67,6 +70,7 @@ public class IhiwUserResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/ihiw-users")
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<IhiwUser> updateIhiwUser(@RequestBody IhiwUser ihiwUser) throws URISyntaxException {
         log.debug("REST request to update IhiwUser : {}", ihiwUser);
         if (ihiwUser.getId() == null) {
@@ -85,6 +89,7 @@ public class IhiwUserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of ihiwUsers in body.
      */
     @GetMapping("/ihiw-users")
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public List<IhiwUser> getAllIhiwUsers() {
         log.debug("REST request to get all IhiwUsers");
         return ihiwUserRepository.findAll();
@@ -97,6 +102,7 @@ public class IhiwUserResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the ihiwUser, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/ihiw-users/{id}")
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<IhiwUser> getIhiwUser(@PathVariable Long id) {
         log.debug("REST request to get IhiwUser : {}", id);
         Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(id);
@@ -110,6 +116,7 @@ public class IhiwUserResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/ihiw-users/{id}")
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteIhiwUser(@PathVariable Long id) {
         log.debug("REST request to delete IhiwUser : {}", id);
         ihiwUserRepository.deleteById(id);

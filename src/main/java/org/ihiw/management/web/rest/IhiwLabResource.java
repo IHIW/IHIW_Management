@@ -1,7 +1,13 @@
 package org.ihiw.management.web.rest;
 
+import org.ihiw.management.domain.Authority;
 import org.ihiw.management.domain.IhiwLab;
+import org.ihiw.management.domain.IhiwUser;
+import org.ihiw.management.domain.User;
 import org.ihiw.management.repository.IhiwLabRepository;
+import org.ihiw.management.repository.IhiwUserRepository;
+import org.ihiw.management.security.AuthoritiesConstants;
+import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -10,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,8 +24,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
+import static org.ihiw.management.security.AuthoritiesConstants.PI;
+import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.IhiwLab}.
@@ -36,8 +48,14 @@ public class IhiwLabResource {
 
     private final IhiwLabRepository ihiwLabRepository;
 
-    public IhiwLabResource(IhiwLabRepository ihiwLabRepository) {
+    private final IhiwUserRepository ihiwUserRepository;
+
+    private final UserService userService;
+
+    public IhiwLabResource(IhiwLabRepository ihiwLabRepository, IhiwUserRepository ihiwUserRepository, UserService userService) {
         this.ihiwLabRepository = ihiwLabRepository;
+        this.ihiwUserRepository = ihiwUserRepository;
+        this.userService = userService;
     }
 
     /**
@@ -48,6 +66,7 @@ public class IhiwLabResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/ihiw-labs")
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<IhiwLab> createIhiwLab(@Valid @RequestBody IhiwLab ihiwLab) throws URISyntaxException {
         log.debug("REST request to save IhiwLab : {}", ihiwLab);
         if (ihiwLab.getId() != null) {
@@ -76,6 +95,15 @@ public class IhiwLabResource {
         if (ihiwLab.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
+        IhiwLab databaseLab = ihiwLabRepository.getOne(ihiwLab.getId());
+
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (!currentUser.get().getAuthorities().contains(new Authority(ADMIN)) &&
+            !currentUser.get().getAuthorities().contains(new Authority(PI)) &&
+            !currentIhiwUser.getLab().getId().equals(databaseLab)){
+            return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, ihiwLab.getId().toString())).build();
+        }
         IhiwLab result = ihiwLabRepository.save(ihiwLab);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, ihiwLab.getId().toString()))
@@ -91,6 +119,15 @@ public class IhiwLabResource {
     @GetMapping("/ihiw-labs")
     public List<IhiwLab> getAllIhiwLabs() {
         log.debug("REST request to get all IhiwLabs");
+
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (!currentUser.get().getAuthorities().contains(new Authority(ADMIN)) &&
+            !currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))){
+            List<IhiwLab> result = new ArrayList<>();
+            result.add(currentIhiwUser.getLab());
+            return result;
+        }
         return ihiwLabRepository.findAll();
     }
 
@@ -104,6 +141,12 @@ public class IhiwLabResource {
     public ResponseEntity<IhiwLab> getIhiwLab(@PathVariable Long id) {
         log.debug("REST request to get IhiwLab : {}", id);
         Optional<IhiwLab> ihiwLab = ihiwLabRepository.findById(id);
+
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        if (!currentIhiwUser.getLab().getId().equals(id)){
+            return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, id.toString())).build();
+        }
         return ResponseUtil.wrapOrNotFound(ihiwLab);
     }
 
@@ -114,6 +157,7 @@ public class IhiwLabResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/ihiw-labs/{id}")
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteIhiwLab(@PathVariable Long id) {
         log.debug("REST request to delete IhiwLab : {}", id);
         ihiwLabRepository.deleteById(id);

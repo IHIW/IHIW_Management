@@ -1,7 +1,10 @@
 package org.ihiw.management.web.rest;
 
 import org.ihiw.management.config.Constants;
+import org.ihiw.management.domain.Authority;
+import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.User;
+import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.service.MailService;
@@ -23,6 +26,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -31,6 +36,9 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+
+import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
+import static org.ihiw.management.security.AuthoritiesConstants.PI;
 
 /**
  * REST controller for managing users.
@@ -69,13 +77,16 @@ public class UserResource {
 
     private final UserRepository userRepository;
 
+    private final IhiwUserRepository ihiwUserRepository;
+
     private final MailService mailService;
 
-    public UserResource(UserService userService, UserRepository userRepository, MailService mailService) {
+    public UserResource(UserService userService, UserRepository userRepository, MailService mailService, IhiwUserRepository ihiwUserRepository) {
 
         this.userService = userService;
         this.userRepository = userRepository;
         this.mailService = mailService;
+        this.ihiwUserRepository = ihiwUserRepository;
     }
 
     /**
@@ -145,7 +156,14 @@ public class UserResource {
      */
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUsers(Pageable pageable) {
-        final Page<UserDTO> page = userService.getAllManagedUsers(pageable);
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        Page<UserDTO> page = null;
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))){
+            page = userService.getAllManagedUsers(pageable);
+        } else if (currentUser.get().getAuthorities().contains(new Authority(PI))){
+            IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+            page = userService.getMyManagedUsers(pageable, currentIhiwUser.getLab());
+        }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -155,7 +173,7 @@ public class UserResource {
      * @return a string list of all roles.
      */
     @GetMapping("/users/authorities")
-    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasRole('" + AuthoritiesConstants.ADMIN + "')")
     public List<String> getAuthorities() {
         return userService.getAuthorities();
     }
@@ -181,7 +199,7 @@ public class UserResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/users/{login:" + Constants.LOGIN_REGEX + "}")
-    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasRole('" + AuthoritiesConstants.ADMIN + "')")
     public ResponseEntity<Void> deleteUser(@PathVariable String login) {
         log.debug("REST request to delete User: {}", login);
         userService.deleteUser(login);

@@ -346,6 +346,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Page<UserDTO> getMyManagedUsers(Pageable pageable, IhiwLab ihiwLab) {
+        List<IhiwUser> users = ihiwUserRepository.findByLab(ihiwLab);
+        List<Long> ids = new ArrayList<>();
+        for (IhiwUser user : users){
+            ids.add(user.getUser().getId());
+        }
+        return userRepository.findByUserInIds(pageable, ids).map(UserDTO::new);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
         return userRepository.findOneWithAuthoritiesByLogin(login);
     }

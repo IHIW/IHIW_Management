@@ -3,6 +3,7 @@ package org.ihiw.management.web.rest;
 import org.ihiw.management.IhiwManagementApp;
 import org.ihiw.management.domain.Authority;
 import org.ihiw.management.domain.User;
+import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.service.MailService;
@@ -67,6 +68,9 @@ public class UserResourceIT {
     private UserRepository userRepository;
 
     @Autowired
+    private IhiwUserRepository ihiwUserRepository;
+
+    @Autowired
     private MailService mailService;
 
     @Autowired
@@ -98,7 +102,7 @@ public class UserResourceIT {
     public void setup() {
         cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).clear();
         cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).clear();
-        UserResource userResource = new UserResource(userService, userRepository, mailService);
+        UserResource userResource = new UserResource(userService, userRepository, mailService, ihiwUserRepository);
 
         this.restUserMockMvc = MockMvcBuilders.standaloneSetup(userResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)

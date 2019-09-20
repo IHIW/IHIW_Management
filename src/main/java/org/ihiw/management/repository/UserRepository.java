@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -53,4 +54,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select user from User user where user.login = ?#{principal.username}")
     Optional<User> findByUserIsCurrentUser();
+
+    @Query("select user from User user WHERE user.id in (:ids)")
+    Page<User> findByUserInIds(Pageable pageable, @Param("ids")List<Long> ids);
 }

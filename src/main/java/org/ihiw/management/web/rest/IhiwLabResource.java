@@ -99,15 +99,15 @@ public class IhiwLabResource {
 
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
-        if (!currentUser.get().getAuthorities().contains(new Authority(ADMIN)) &&
-            !currentUser.get().getAuthorities().contains(new Authority(PI)) &&
-            !currentIhiwUser.getLab().getId().equals(databaseLab)){
-            return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, ihiwLab.getId().toString())).build();
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            (currentUser.get().getAuthorities().contains(new Authority(PI)) &&
+            currentIhiwUser.getLab().getId().equals(databaseLab.getId()))){
+            IhiwLab result = ihiwLabRepository.save(ihiwLab);
+            return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, ihiwLab.getId().toString()))
+                .body(result);
         }
-        IhiwLab result = ihiwLabRepository.save(ihiwLab);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, ihiwLab.getId().toString()))
-            .body(result);
+        return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, ihiwLab.getId().toString())).build();
     }
 
     /**
@@ -143,8 +143,11 @@ public class IhiwLabResource {
         Optional<IhiwLab> ihiwLab = ihiwLabRepository.findById(id);
 
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        Optional<User> currentUser = userService.getUserWithAuthorities();
 
-        if (!currentIhiwUser.getLab().getId().equals(id)){
+        if (!currentIhiwUser.getLab().getId().equals(id) &&
+            !currentUser.get().getAuthorities().contains(new Authority(ADMIN)) &&
+            !currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))){
             return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, id.toString())).build();
         }
         return ResponseUtil.wrapOrNotFound(ihiwLab);

@@ -156,14 +156,13 @@ public class UserService {
             }
         } else {
             lab = new IhiwLab();
+            String labCode = "";
+
             if (managedUserVM.getTitle() != null && !managedUserVM.getTitle().isEmpty()){
                 lab.setTitle(managedUserVM.getTitle());
             }
             if (managedUserVM.getFirstName() != null && !managedUserVM.getFirstName().isEmpty()){
                 lab.setFirstName(managedUserVM.getFirstName());
-            }
-            if (managedUserVM.getLastName() != null && !managedUserVM.getLastName().isEmpty()){
-                lab.setLastName(managedUserVM.getLastName());
             }
             if (managedUserVM.getDepartment() != null && !managedUserVM.getDepartment().isEmpty()){
                 lab.setDepartment(managedUserVM.getDepartment());
@@ -182,9 +181,22 @@ public class UserService {
             }
             if (managedUserVM.getCountry() != null && !managedUserVM.getCountry().isEmpty()){
                 lab.setCountry(managedUserVM.getCountry());
+                if (lab.getCountry().equals("USA")){
+                    labCode += "U";
+                }
+                else {
+                    labCode += lab.getCountry().trim().substring(0,3);
+                }
             }
             if (managedUserVM.getState() != null && !managedUserVM.getState().isEmpty()){
                 lab.setState(managedUserVM.getState());
+                if (lab.getCountry().equals("USA")){
+                    labCode += lab.getState().trim().substring(0,2);
+                }
+            }
+            if (managedUserVM.getLastName() != null && !managedUserVM.getLastName().isEmpty()){
+                lab.setLastName(managedUserVM.getLastName());
+                labCode += lab.getLastName().trim().substring(0,3);
             }
             if (managedUserVM.getPhone() != null && !managedUserVM.getPhone().isEmpty()){
                 lab.setPhone(managedUserVM.getPhone());
@@ -205,8 +217,10 @@ public class UserService {
                 lab.setEmail(managedUserVM.getLabEmail());
             }
             if (managedUserVM.getTitle() != null && !managedUserVM.getTitle().isEmpty()){
-                lab.setLabCode(managedUserVM.getCountry() + managedUserVM.getDepartment().replace(" ", ""));
+                lab.setTitle(managedUserVM.getTitle());
             }
+
+            lab.setLabCode(labCode.replace(" ", "").toUpperCase());
 
             lab.setCreatedAt(ZonedDateTime.now());
 

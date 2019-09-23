@@ -19,7 +19,6 @@ import { IhiwUserService } from 'app/entities/ihiw-user';
 export class UploadUpdateComponent implements OnInit {
   isSaving: boolean;
   file: File;
-  ihiwusers: IIhiwUser[];
 
   editForm = this.fb.group({
     id: [],
@@ -35,7 +34,6 @@ export class UploadUpdateComponent implements OnInit {
   constructor(
     protected jhiAlertService: JhiAlertService,
     protected uploadService: UploadService,
-    protected ihiwUserService: IhiwUserService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}
@@ -45,13 +43,6 @@ export class UploadUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ upload }) => {
       this.updateForm(upload);
     });
-    this.ihiwUserService
-      .query()
-      .pipe(
-        filter((mayBeOk: HttpResponse<IIhiwUser[]>) => mayBeOk.ok),
-        map((response: HttpResponse<IIhiwUser[]>) => response.body)
-      )
-      .subscribe((res: IIhiwUser[]) => (this.ihiwusers = res), (res: HttpErrorResponse) => this.onError(res.message));
   }
 
   updateForm(upload: IUpload) {

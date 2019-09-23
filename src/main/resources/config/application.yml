@@ -161,3 +161,5 @@ aws:
     region:
     timeout: 30000
     bucket:
+mail:
+  activation-email: admin@localhost

@@ -145,3 +145,5 @@ aws:
     region:
     timeout:
     bucket:
+mail:
+  activation-email:

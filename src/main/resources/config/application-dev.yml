@@ -128,3 +128,5 @@ aws:
     region: eu-central-1
     timeout: 30000
     bucket: pirche-ihiw-test
+mail:
+  activation-email:

@@ -50,7 +50,8 @@
                             <fa-icon [icon]="'pencil-alt'"></fa-icon>
                             <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
                         </button>
-                        <button type="submit"
+                        <button *jhiHasAnyAuthority="['ROLE_ADMIN']"
+                                type="submit"
                                 [routerLink]="['/ihiw-user', { outlets: { popup: ihiwUser.id + '/delete'} }]"
                                 replaceUrl="true"
                                 queryParamsHandling="merge"

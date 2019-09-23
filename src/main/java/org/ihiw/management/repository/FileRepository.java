@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
@@ -17,7 +18,7 @@ public class FileRepository {
 
     private final Logger log = LoggerFactory.getLogger(FileRepository.class);
 
-    public FileRepository(AmazonS3 s3, String bucket) {
+    public FileRepository(AmazonS3 s3, @Qualifier("s3bucket") String bucket) {
         this.s3 = s3;
         this.bucket = bucket;
     }

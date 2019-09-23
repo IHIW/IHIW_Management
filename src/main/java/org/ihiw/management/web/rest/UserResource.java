@@ -131,21 +131,29 @@ public class UserResource {
      * @throws LoginAlreadyUsedException {@code 400 (Bad Request)} if the login is already in use.
      */
     @PutMapping("/users")
-    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UserDTO userDTO) {
         log.debug("REST request to update User : {}", userDTO);
-        Optional<User> existingUser = userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
-        if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
-            throw new EmailAlreadyUsedException();
-        }
-        existingUser = userRepository.findOneByLogin(userDTO.getLogin().toLowerCase());
-        if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
-            throw new LoginAlreadyUsedException();
-        }
-        Optional<UserDTO> updatedUser = userService.updateUser(userDTO);
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        Optional<User> existingUser = userRepository.findById(userDTO.getId());
+        IhiwUser updateIhiwUser = ihiwUserRepository.findByUser(existingUser.get());
 
-        return ResponseUtil.wrapOrNotFound(updatedUser,
-            HeaderUtil.createAlert(applicationName, "userManagement.updated", userDTO.getLogin()));
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            (currentUser.get().getAuthorities().contains(new Authority(PI)) && currentIhiwUser.getLab().equals(updateIhiwUser.getLab()))) {
+
+            if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
+                throw new EmailAlreadyUsedException();
+            }
+            existingUser = userRepository.findOneByLogin(userDTO.getLogin().toLowerCase());
+            if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
+                throw new LoginAlreadyUsedException();
+            }
+            Optional<UserDTO> updatedUser = userService.updateUser(userDTO);
+
+            return ResponseUtil.wrapOrNotFound(updatedUser,
+                HeaderUtil.createAlert(applicationName, "userManagement.updated", userDTO.getLogin()));
+        }
+        return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, "USER", userDTO.getLogin())).build();
     }
 
     /**
@@ -173,7 +181,6 @@ public class UserResource {
      * @return a string list of all roles.
      */
     @GetMapping("/users/authorities")
-    @PreAuthorize("hasRole('" + AuthoritiesConstants.ADMIN + "')")
     public List<String> getAuthorities() {
         return userService.getAuthorities();
     }

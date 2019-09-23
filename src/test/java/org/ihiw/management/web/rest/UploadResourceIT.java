@@ -5,6 +5,7 @@ import org.ihiw.management.domain.Upload;
 import org.ihiw.management.repository.FileRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UploadRepository;
+import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.ExceptionTranslator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -85,6 +86,9 @@ public class UploadResourceIT {
     @Autowired
     private Validator validator;
 
+    @Autowired
+    private UserService userService;
+
     private MockMvc restUploadMockMvc;
 
     private Upload upload;
@@ -92,7 +96,7 @@ public class UploadResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final UploadResource uploadResource = new UploadResource(uploadRepository, fileRepository, ihiwUserRepository);
+        final UploadResource uploadResource = new UploadResource(uploadRepository, fileRepository, ihiwUserRepository, userService);
         this.restUploadMockMvc = MockMvcBuilders.standaloneSetup(uploadResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

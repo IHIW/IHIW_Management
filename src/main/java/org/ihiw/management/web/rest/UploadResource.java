@@ -1,10 +1,13 @@
 package org.ihiw.management.web.rest;
 
+import org.ihiw.management.domain.Authority;
 import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.Upload;
+import org.ihiw.management.domain.User;
 import org.ihiw.management.repository.FileRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UploadRepository;
+import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -24,6 +27,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
+import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
+
 /**
  * REST controller for managing {@link org.ihiw.management.domain.Upload}.
  */
@@ -41,11 +47,13 @@ public class UploadResource {
     private final UploadRepository uploadRepository;
     private final FileRepository fileRepository;
     private final IhiwUserRepository ihiwUserRepository;
+    private final UserService userService;
 
-    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository) {
+    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, UserService userService) {
         this.uploadRepository = uploadRepository;
         this.fileRepository = fileRepository;
         this.ihiwUserRepository = ihiwUserRepository;
+        this.userService = userService;
     }
 
     /**
@@ -97,10 +105,21 @@ public class UploadResource {
         if (upload.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        Upload result = uploadRepository.save(upload);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))
-            .body(result);
+
+        Optional<Upload> dbUpload = uploadRepository.findById(upload.getId());
+
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+
+            Upload result = uploadRepository.save(upload);
+            return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))
+                .body(result);
+        }
+        return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
     }
 
     /**
@@ -112,8 +131,14 @@ public class UploadResource {
     @GetMapping("/uploads")
     public List<Upload> getAllUploads() {
         log.debug("REST request to get all Uploads");
-        IhiwUser currentUser = ihiwUserRepository.findByUserIsCurrentUser();
-        List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentUser.getLab());
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentIhiwUser.getLab());
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
+            return uploadRepository.findAll();
+        }
 
         return uploadRepository.findByCreatedByIn(colleages);
     }
@@ -128,7 +153,16 @@ public class UploadResource {
     public ResponseEntity<Upload> getUpload(@PathVariable Long id) {
         log.debug("REST request to get Upload : {}", id);
         Optional<Upload> upload = uploadRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(upload);
+
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER)) ||
+            upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+            return ResponseUtil.wrapOrNotFound(upload);
+        }
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 
     /**
@@ -140,7 +174,16 @@ public class UploadResource {
     @DeleteMapping("/uploads/{id}")
     public ResponseEntity<Void> deleteUpload(@PathVariable Long id) {
         log.debug("REST request to delete Upload : {}", id);
-        uploadRepository.deleteById(id);
-        return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        Optional<Upload> upload = uploadRepository.findById(id);
+
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+            uploadRepository.deleteById(id);
+            return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        }
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 }

@@ -75,11 +75,13 @@ public class MailServiceIT {
 
     private MailService mailService;
 
+    private static final String adminEmail = "admin@localhost";
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
         doNothing().when(javaMailSender).send(any(MimeMessage.class));
-        mailService = new MailService(jHipsterProperties, javaMailSender, messageSource, templateEngine);
+        mailService = new MailService(jHipsterProperties, javaMailSender, messageSource, templateEngine, adminEmail);
     }
 
     @Test
@@ -148,7 +150,7 @@ public class MailServiceIT {
         user.setLogin("john");
         user.setEmail("john.doe@example.com");
         user.setLangKey("en");
-        mailService.sendEmailFromTemplate(user, "mail/testEmail", "email.test.title");
+        mailService.sendEmailFromTemplate(user, "mail/testEmail", "email.test.title", adminEmail);
         verify(javaMailSender).send(messageCaptor.capture());
         MimeMessage message = messageCaptor.getValue();
         assertThat(message.getSubject()).isEqualTo("test title");
@@ -216,7 +218,7 @@ public class MailServiceIT {
         user.setEmail("john.doe@example.com");
         for (String langKey : languages) {
             user.setLangKey(langKey);
-            mailService.sendEmailFromTemplate(user, "mail/testEmail", "email.test.title");
+            mailService.sendEmailFromTemplate(user, "mail/testEmail", "email.test.title", adminEmail);
             verify(javaMailSender, atLeastOnce()).send(messageCaptor.capture());
             MimeMessage message = messageCaptor.getValue();
 

@@ -145,12 +145,11 @@ public class IhiwLabResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
 
-        if (!currentIhiwUser.getLab().getId().equals(id) &&
-            !currentUser.get().getAuthorities().contains(new Authority(ADMIN)) &&
-            !currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))){
-            return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, id.toString())).build();
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            (currentIhiwUser.getLab() != null && currentIhiwUser.getLab().getId().equals(id) && currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER)))){
+            return ResponseUtil.wrapOrNotFound(ihiwLab);
         }
-        return ResponseUtil.wrapOrNotFound(ihiwLab);
+        return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, id.toString())).build();
     }
 
     /**

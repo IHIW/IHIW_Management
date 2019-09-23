@@ -15,7 +15,7 @@ import { AccountService, Account } from 'app/core';
   templateUrl: './home.component.html',
   styleUrls: ['home.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   account: Account;
   authenticationError: boolean;
 

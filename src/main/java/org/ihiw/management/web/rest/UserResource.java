@@ -135,16 +135,16 @@ public class UserResource {
         log.debug("REST request to update User : {}", userDTO);
         Optional<User> currentUser = userService.getUserWithAuthorities();
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        Optional<User> existingUser = userRepository.findById(userDTO.getId());
+        Optional<User> existingUser = userService.getUserWithAuthorities(userDTO.getId());
         IhiwUser updateIhiwUser = ihiwUserRepository.findByUser(existingUser.get());
 
+        //only admins and PIs can update users, but PIs only the users of their own lab
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             (currentUser.get().getAuthorities().contains(new Authority(PI)) && currentIhiwUser.getLab().equals(updateIhiwUser.getLab()))) {
 
             if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
                 throw new EmailAlreadyUsedException();
             }
-            existingUser = userRepository.findOneByLogin(userDTO.getLogin().toLowerCase());
             if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
                 throw new LoginAlreadyUsedException();
             }

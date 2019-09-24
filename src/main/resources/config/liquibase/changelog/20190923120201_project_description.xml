@@ -10,7 +10,7 @@
         <modifyDataType
                         columnName="description"
                         newDataType="text"
-                        schemaName="ihiwManagement"
+                        schemaName="ihiwmanagementprod"
                         tableName="project"/>
     </changeSet>
 

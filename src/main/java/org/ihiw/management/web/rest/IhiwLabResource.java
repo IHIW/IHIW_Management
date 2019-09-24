@@ -1,11 +1,9 @@
 package org.ihiw.management.web.rest;
 
-import org.ihiw.management.domain.Authority;
-import org.ihiw.management.domain.IhiwLab;
-import org.ihiw.management.domain.IhiwUser;
-import org.ihiw.management.domain.User;
+import org.ihiw.management.domain.*;
 import org.ihiw.management.repository.IhiwLabRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
+import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
@@ -50,11 +48,14 @@ public class IhiwLabResource {
 
     private final IhiwUserRepository ihiwUserRepository;
 
+    private final ProjectRepository projectRepository;
+
     private final UserService userService;
 
-    public IhiwLabResource(IhiwLabRepository ihiwLabRepository, IhiwUserRepository ihiwUserRepository, UserService userService) {
+    public IhiwLabResource(IhiwLabRepository ihiwLabRepository, IhiwUserRepository ihiwUserRepository, ProjectRepository projectRepository, UserService userService) {
         this.ihiwLabRepository = ihiwLabRepository;
         this.ihiwUserRepository = ihiwUserRepository;
+        this.projectRepository = projectRepository;
         this.userService = userService;
     }
 
@@ -122,13 +123,30 @@ public class IhiwLabResource {
 
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
-        if (!currentUser.get().getAuthorities().contains(new Authority(ADMIN)) &&
-            !currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))){
-            List<IhiwLab> result = new ArrayList<>();
-            result.add(currentIhiwUser.getLab());
-            return result;
+        List<IhiwLab> result = new ArrayList<>();
+
+        //if it is an admin, return all labs
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
+            return ihiwLabRepository.findAll();
         }
-        return ihiwLabRepository.findAll();
+
+        //if it is a project leader, add all his projects' labs to the list
+        if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
+            List<Project> projectsOfUser = projectRepository.findByCreatedBy(currentIhiwUser);
+            for (Project project : projectsOfUser){
+                for (IhiwLab lab : project.getLabs()){
+                    if (!result.contains(lab)){
+                        result.add(lab);
+                    }
+                }
+            }
+        }
+
+        //and finally add the lab of the current user
+        if (!result.contains(currentIhiwUser.getLab())){
+            result.add(currentIhiwUser.getLab());
+        }
+        return result;
     }
 
     /**
@@ -145,9 +163,19 @@ public class IhiwLabResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
 
+        //admins get every lab and every user gets his own lab
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            (currentIhiwUser.getLab() != null && currentIhiwUser.getLab().getId().equals(id) && currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER)))){
+            (currentIhiwUser.getLab() != null && currentIhiwUser.getLab().getId().equals(id))){
             return ResponseUtil.wrapOrNotFound(ihiwLab);
+        }
+        //project leaders can see all labs that are part of the projects they lead
+        if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))){
+            List<Project> projectsOfUser = projectRepository.findByCreatedBy(currentIhiwUser);
+            for (Project project : projectsOfUser){
+                if (project.getLabs().contains(ihiwLab.get())){
+                    return ResponseUtil.wrapOrNotFound(ihiwLab);
+                }
+            }
         }
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, id.toString())).build();
     }

@@ -26,7 +26,7 @@
                            formControlName="description"/>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']">
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.createdBy" for="field_createdBy">Created By</label>
                     <select class="form-control" id="field_createdBy" name="createdBy" formControlName="createdBy">
                         <option [ngValue]="null"></option>

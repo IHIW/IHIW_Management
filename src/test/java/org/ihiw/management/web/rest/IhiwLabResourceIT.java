@@ -4,6 +4,7 @@ import org.ihiw.management.IhiwManagementApp;
 import org.ihiw.management.domain.IhiwLab;
 import org.ihiw.management.repository.IhiwLabRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
+import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.ExceptionTranslator;
 
@@ -129,6 +130,9 @@ public class IhiwLabResourceIT {
     private IhiwUserRepository ihiwUserRepository;
 
     @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
@@ -153,7 +157,7 @@ public class IhiwLabResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final IhiwLabResource ihiwLabResource = new IhiwLabResource(ihiwLabRepository, ihiwUserRepository, userService);
+        final IhiwLabResource ihiwLabResource = new IhiwLabResource(ihiwLabRepository, ihiwUserRepository, projectRepository, userService);
         this.restIhiwLabMockMvc = MockMvcBuilders.standaloneSetup(ihiwLabResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

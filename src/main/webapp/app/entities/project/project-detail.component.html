@@ -11,7 +11,9 @@
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.project.description">Description</span></dt>
                 <dd>
-                    <span>{{project.description}}</span>
+                    <markdown ngPreserveWhitespaces>
+                        {{project.description}}
+                    </markdown>
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.project.createdAt">Created At</span></dt>
                 <dd>

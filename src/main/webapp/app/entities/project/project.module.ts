@@ -2,7 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { JhiLanguageService } from 'ng-jhipster';
 import { JhiLanguageHelper } from 'app/core';
-
+import { MarkdownModule } from 'ngx-markdown';
 import { IhiwManagementSharedModule } from 'app/shared';
 import {
   ProjectComponent,
@@ -17,7 +17,7 @@ import {
 const ENTITY_STATES = [...projectRoute, ...projectPopupRoute];
 
 @NgModule({
-  imports: [IhiwManagementSharedModule, RouterModule.forChild(ENTITY_STATES)],
+  imports: [IhiwManagementSharedModule, RouterModule.forChild(ENTITY_STATES), MarkdownModule.forChild()],
   declarations: [
     ProjectComponent,
     ProjectDetailComponent,

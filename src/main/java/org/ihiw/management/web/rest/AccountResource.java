@@ -1,8 +1,12 @@
 package org.ihiw.management.web.rest;
 
 
+import org.ihiw.management.domain.Authority;
+import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.User;
+import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UserRepository;
+import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
 import org.ihiw.management.service.MailService;
 import org.ihiw.management.service.UserService;
@@ -15,6 +19,7 @@ import org.ihiw.management.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,15 +44,21 @@ public class AccountResource {
 
     private final UserRepository userRepository;
 
+    private final IhiwUserRepository ihiwUserRepository;
+
     private final UserService userService;
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    private final String activationEmail;
+
+    public AccountResource(UserRepository userRepository, IhiwUserRepository ihiwUserRepository, UserService userService, MailService mailService, @Qualifier("activationEmail") String activationEmail) {
 
         this.userRepository = userRepository;
+        this.ihiwUserRepository = ihiwUserRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.activationEmail = activationEmail;
     }
 
     /**
@@ -65,7 +76,25 @@ public class AccountResource {
             throw new InvalidPasswordException();
         }
         User user = userService.registerUser(managedUserVM, managedUserVM.getPassword());
-        mailService.sendActivationEmail(user);
+        if (managedUserVM.isExistingLab()){
+            IhiwUser ihiwUser = ihiwUserRepository.findByUser(user);
+            List<IhiwUser> labUsers = ihiwUserRepository.findByLab(ihiwUser.getLab());
+
+            boolean mailSent = false;
+            //send the activation mail to all PIs of the lab
+            for (IhiwUser labUser : labUsers){
+                if (labUser.getUser().getAuthorities().contains(new Authority(AuthoritiesConstants.PI))){
+                    mailService.sendActivationEmail(user, labUser.getUser().getEmail());
+                    mailSent = true;
+                }
+            }
+            if (!mailSent){
+                //if there was no PI found, send it to the admin address
+                mailService.sendActivationEmail(user, activationEmail);
+            }
+        } else {
+            mailService.sendActivationEmail(user, activationEmail);
+        }
     }
 
     /**

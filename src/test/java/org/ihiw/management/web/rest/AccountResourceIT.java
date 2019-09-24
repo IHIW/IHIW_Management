@@ -5,6 +5,7 @@ import org.ihiw.management.config.Constants;
 import org.ihiw.management.domain.Authority;
 import org.ihiw.management.domain.User;
 import org.ihiw.management.repository.AuthorityRepository;
+import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.service.MailService;
@@ -50,6 +51,9 @@ public class AccountResourceIT {
     private UserRepository userRepository;
 
     @Autowired
+    private IhiwUserRepository ihiwUserRepository;
+
+    @Autowired
     private AuthorityRepository authorityRepository;
 
     @Autowired
@@ -74,15 +78,17 @@ public class AccountResourceIT {
 
     private MockMvc restUserMockMvc;
 
+    private final String activationEmail = "admin@localhost";
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        doNothing().when(mockMailService).sendActivationEmail(any());
+        doNothing().when(mockMailService).sendActivationEmail(any(), any());
         AccountResource accountResource =
-            new AccountResource(userRepository, userService, mockMailService);
+            new AccountResource(userRepository, ihiwUserRepository, userService, mockMailService, activationEmail);
 
         AccountResource accountUserMockResource =
-            new AccountResource(userRepository, mockUserService, mockMailService);
+            new AccountResource(userRepository, ihiwUserRepository, mockUserService, mockMailService, activationEmail);
         this.restMvc = MockMvcBuilders.standaloneSetup(accountResource)
             .setMessageConverters(httpMessageConverters)
             .setControllerAdvice(exceptionTranslator)

@@ -148,6 +148,15 @@ public class UserResource {
             if (existingUser.isPresent() && (!existingUser.get().getId().equals(userDTO.getId()))) {
                 throw new LoginAlreadyUsedException();
             }
+
+            //only admins can change the role
+            if (!currentUser.get().getAuthorities().contains(new Authority(ADMIN))){
+                userDTO.setAuthorities(new HashSet<>());
+                for (Authority auth : existingUser.get().getAuthorities()){
+                    userDTO.getAuthorities().add(auth.getName());
+                }
+            }
+
             Optional<UserDTO> updatedUser = userService.updateUser(userDTO);
 
             return ResponseUtil.wrapOrNotFound(updatedUser,

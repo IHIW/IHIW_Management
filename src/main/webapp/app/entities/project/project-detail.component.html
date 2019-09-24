@@ -11,7 +11,7 @@
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.project.description">Description</span></dt>
                 <dd>
-                    <markdown ngPreserveWhitespaces>
+                    <markdown ngPreserveWhitespaces *ngIf="project.description">
                         {{project.description}}
                     </markdown>
                 </dd>

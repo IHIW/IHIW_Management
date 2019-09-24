@@ -97,11 +97,11 @@ public class ProjectResource {
         if (project.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        Project projectFromDB = projectRepository.getOne(project.getId());
+        Optional<Project> projectFromDB = projectRepository.findOneById(project.getId());
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            projectFromDB.getCreatedBy().equals(currentIhiwUser)) {
+            projectFromDB.get().getCreatedBy().equals(currentIhiwUser)) {
             Project result = projectRepository.save(project);
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, project.getId().toString()))

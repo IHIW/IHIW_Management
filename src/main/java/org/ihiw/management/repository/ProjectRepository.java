@@ -3,6 +3,7 @@ package org.ihiw.management.repository;
 import org.ihiw.management.domain.IhiwLab;
 import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.Project;
+import org.ihiw.management.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
@@ -33,4 +34,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("select project from Project project left join fetch project.labs where project.createdBy =:ihiwUser")
     List<Project> findByCreatedBy(@Param("ihiwUser") IhiwUser ihiwUser);
+
+    Optional<Project> findOneById(Long id);
 }

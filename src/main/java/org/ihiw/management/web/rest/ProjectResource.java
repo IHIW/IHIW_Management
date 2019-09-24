@@ -139,6 +139,11 @@ public class ProjectResource {
         log.debug("REST request to get Project : {}", id);
         Optional<Project> project = projectRepository.findOneWithEagerRelationships(id);
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR))){
+            return ResponseUtil.wrapOrNotFound(project);
+        }
         if (project.get().getLabs().contains(currentIhiwUser.getLab())){
             return ResponseUtil.wrapOrNotFound(project);
         }

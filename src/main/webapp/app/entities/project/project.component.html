@@ -30,7 +30,11 @@
             <tr *ngFor="let project of projects ;trackBy: trackId">
                 <td><a [routerLink]="['/project', project.id, 'view' ]">{{project.id}}</a></td>
                 <td>{{project.name}}</td>
-                <td>{{ (project.description.length>128)? (project.description | slice:0:128)+'...':(project.description) }}</td>
+                <td>
+                    <div *ngIf="project.description">
+                        {{ (project.description.length>128)? (project.description | slice:0:128)+'...':(project.description) }}
+                    </div>
+                </td>
                 <td>{{project.createdAt | date:'short'}}</td>
                 <td>
                     <div *ngIf="project.createdBy">

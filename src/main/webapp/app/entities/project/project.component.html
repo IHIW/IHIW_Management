@@ -21,9 +21,7 @@
             <th><span jhiTranslate="ihiwManagementApp.project.name">Name</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.description">Description</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.createdAt">Created At</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.project.modifiedAt">Modified At</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.createdBy">Created By</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.project.modifiedBy">Modified By</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.lab">Lab</span></th>
             <th></th>
             </tr>
@@ -32,17 +30,11 @@
             <tr *ngFor="let project of projects ;trackBy: trackId">
                 <td><a [routerLink]="['/project', project.id, 'view' ]">{{project.id}}</a></td>
                 <td>{{project.name}}</td>
-                <td>{{project.description}}</td>
+                <td>{{ (project.description.length>128)? (project.description | slice:0:128)+'...':(project.description) }}</td>
                 <td>{{project.createdAt | date:'short'}}</td>
-                <td>{{project.modifiedAt | date:'short'}}</td>
                 <td>
                     <div *ngIf="project.createdBy">
                         <a [routerLink]="['/ihiw-user', project.createdBy?.id, 'view' ]" >{{project.createdBy?.user.firstName}} {{project.createdBy?.user.lastName}}</a>
-                    </div>
-                </td>
-                <td>
-                    <div *ngIf="project.modifiedBy">
-                        <a [routerLink]="['/ihiw-user', project.modifiedBy?.id, 'view' ]" >{{project.modifiedBy?.user.firstName}} {{project.modifiedBy?.user.lastName}}</a>
                     </div>
                 </td>
                 <td>

@@ -9,6 +9,12 @@
                 <dd>
                     <span>{{project.name}}</span>
                 </dd>
+                <dt><span >Activated</span></dt>
+                <dd>
+                    <jhi-boolean
+                        [value]="project.activated">
+                    </jhi-boolean>
+                </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.project.description">Description</span></dt>
                 <dd>
                     <markdown ngPreserveWhitespaces *ngIf="project.description">

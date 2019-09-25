@@ -62,4 +62,15 @@ export class ProjectComponent implements OnInit, OnDestroy {
   protected onError(errorMessage: string) {
     this.jhiAlertService.error(errorMessage, null, null);
   }
+
+  setActive(project, isActivated) {
+    project.activated = isActivated;
+
+    this.projectService.update(project).subscribe(response => {
+      if (response.status === 200) {
+        this.loadAll();
+      } else {
+      }
+    });
+  }
 }

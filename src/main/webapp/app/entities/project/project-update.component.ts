@@ -29,6 +29,7 @@ export class ProjectUpdateComponent implements OnInit {
     id: [],
     name: [null, [Validators.required]],
     description: [],
+    activated: [],
     createdAt: [],
     modifiedAt: [],
     createdBy: [],
@@ -74,6 +75,7 @@ export class ProjectUpdateComponent implements OnInit {
       createdAt: project.createdAt != null ? project.createdAt.format(DATE_TIME_FORMAT) : null,
       modifiedAt: project.modifiedAt != null ? project.modifiedAt.format(DATE_TIME_FORMAT) : null,
       createdBy: project.createdBy,
+      activated: project.activated,
       modifiedBy: project.modifiedBy,
       labs: project.labs
     });
@@ -104,6 +106,7 @@ export class ProjectUpdateComponent implements OnInit {
       modifiedAt:
         this.editForm.get(['modifiedAt']).value != null ? moment(this.editForm.get(['modifiedAt']).value, DATE_TIME_FORMAT) : undefined,
       createdBy: this.editForm.get(['createdBy']).value,
+      activated: this.editForm.get(['activated']).value,
       modifiedBy: this.editForm.get(['modifiedBy']).value,
       labs: this.editForm.get(['labs']).value
     };

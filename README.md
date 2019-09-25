@@ -8,9 +8,16 @@ This application was generated using JHipster 6.2.0, you can find documentation 
 
 Users can either register with an existing lab code or provide all the necessary information to register their lab.
 When providing a lab code, the users will be lab members of the specific lab.
-Users registering a new lab will be considered as PI of the particular lab.
+Users registering a new lab will be considered as PI of the particular lab. PIs must be activated by the admin (who is informed via email).
 
-Newly registered users are deactivated and must be activated by either the admin, workshop chair or PI of the respective lab.
+Newly registered users are deactivated and must be activated by either the admin, workshop chair or PI of the respective lab. The PI gets the activation email of the newly registered user.
+
+## Views
+
+### Project
+
+The project view renders the project description as markdown. In the project overview and create/edit view, only the raw information is shown.
+The project overview only shows the first 128 characters of the project description to save some screen space.
 
 ## Development
 

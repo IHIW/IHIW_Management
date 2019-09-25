@@ -20,6 +20,7 @@
             <th><span jhiTranslate="global.field.id">ID</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.name">Name</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.description">Description</span></th>
+            <th></th>
             <th><span jhiTranslate="ihiwManagementApp.project.createdAt">Created At</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.createdBy">Created By</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.lab">Lab</span></th>
@@ -34,6 +35,12 @@
                     <div *ngIf="project.description">
                         {{ (project.description.length>128)? (project.description | slice:0:128)+'...':(project.description) }}
                     </div>
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm" (click)="setActive(project, true)" *ngIf="!project.activated"
+                            >Deactivated</button>
+                    <button class="btn btn-success btn-sm" (click)="setActive(project, false)" *ngIf="project.activated"
+                             >Activated</button>
                 </td>
                 <td>{{project.createdAt | date:'short'}}</td>
                 <td>

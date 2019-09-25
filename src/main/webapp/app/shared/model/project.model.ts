@@ -6,6 +6,7 @@ export interface IProject {
   id?: number;
   name?: string;
   description?: string;
+  activated?: boolean;
   createdAt?: Moment;
   modifiedAt?: Moment;
   createdBy?: IIhiwUser;
@@ -18,6 +19,7 @@ export class Project implements IProject {
     public id?: number,
     public name?: string,
     public description?: string,
+    public activated?: boolean,
     public createdAt?: Moment,
     public modifiedAt?: Moment,
     public createdBy?: IIhiwUser,

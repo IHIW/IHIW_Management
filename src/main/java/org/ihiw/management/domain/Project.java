@@ -48,6 +48,9 @@ public class Project implements Serializable {
     @JsonIgnoreProperties("projects")
     private IhiwUser modifiedBy;
 
+    @Column(name= "activated")
+    private Boolean activated;
+
     @ManyToMany
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "project_lab",
@@ -114,6 +117,19 @@ public class Project implements Serializable {
 
     public void setModifiedAt(ZonedDateTime modifiedAt) {
         this.modifiedAt = modifiedAt;
+    }
+
+    public Boolean getActivated() {
+        return activated;
+    }
+
+    public Project activated(Boolean activated) {
+        this.activated = activated;
+        return this;
+    }
+
+    public void setActivated(Boolean activated) {
+        this.activated = activated;
     }
 
     public IhiwUser getCreatedBy() {

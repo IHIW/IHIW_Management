@@ -12,7 +12,9 @@
                 <dt><span >Activated</span></dt>
                 <dd>
                     <jhi-boolean
-                        [value]="project.activated">
+                        [value]="project.activated"
+                        [textTrue]="'activated'"
+                        [textFalse]="'deactivated'">
                     </jhi-boolean>
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.project.description">Description</span></dt>

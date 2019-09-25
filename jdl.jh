@@ -4,6 +4,7 @@ entity Project {
     description String
 	createdAt ZonedDateTime
     modifiedAt ZonedDateTime
+    activated Boolean
 }
 
 entity Upload {

@@ -12,6 +12,8 @@ Users registering a new lab will be considered as PI of the particular lab. PIs 
 
 Newly registered users are deactivated and must be activated by either the admin, workshop chair or PI of the respective lab. The PI gets the activation email of the newly registered user.
 
+Password reset requests will activate users.
+
 ## Views
 
 ### Project

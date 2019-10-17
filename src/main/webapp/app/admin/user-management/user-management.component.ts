@@ -37,7 +37,7 @@ export class UserMgmtComponent implements OnInit, OnDestroy {
     private eventManager: JhiEventManager,
     private modalService: NgbModal
   ) {
-    this.itemsPerPage = ITEMS_PER_PAGE;
+    this.itemsPerPage = 500;
     this.routeData = this.activatedRoute.data.subscribe(data => {
       this.page = data['pagingParams'].page;
       this.previousPage = data['pagingParams'].page;

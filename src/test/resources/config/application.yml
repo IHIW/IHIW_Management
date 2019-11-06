@@ -40,7 +40,7 @@ spring:
       hibernate.cache.use_second_level_cache: false
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
-      hibernate.hbm2ddl.auto: validate
+
       hibernate.jdbc.time_zone: UTC
   liquibase:
     contexts: test
@@ -85,7 +85,7 @@ jhipster:
     use-json-format: true # By default, logs are in Json format
     # To test logstash appender
     logstash:
-      enabled: true
+      enabled: false
       host: localhost
       port: 5000
       queue-size: 512
@@ -114,3 +114,10 @@ jhipster:
 # ===================================================================
 
 # application:
+aws:
+  s3:
+    region:
+    timeout: 30000
+    bucket:
+mail:
+  activation-email: admin@localhost

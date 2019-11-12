@@ -32,6 +32,7 @@ public class Project implements Serializable {
     private String name;
 
     @Column(name = "description")
+    @Lob
     private String description;
 
     @Column(name = "created_at")

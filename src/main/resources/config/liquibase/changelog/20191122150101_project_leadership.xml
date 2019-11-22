@@ -30,6 +30,12 @@
                                  constraintName="fk_project_leader_table"
                                  referencedColumnNames="id"
                                  referencedTableName="project"/>
+
+        <sql>
+            INSERT INTO project_leader(project_id, ihiw_user_id)
+            select p.id, i.id
+            from project p JOIN ihiw_user i ON p.created_by_id = i.user_id;
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

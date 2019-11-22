@@ -47,6 +47,21 @@
                         <option [ngValue]="getSelected(editForm.get('labs').value, ihiwLabOption)" *ngFor="let ihiwLabOption of ihiwlabs; trackBy: trackIhiwLabById">{{ihiwLabOption.labCode}}</option>
                     </select>
                 </div>
+
+                <div class="form-group" >
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.leader">Leaders</label>
+                    <p *ngFor="let leader of leaders; let last = last">
+                        <a class="form-control-static" [routerLink]="['/ihiw-user', leader?.id, 'view' ]">{{leader.user?.firstName}} {{leader.user?.lastName}}</a>
+                        <a class="" (click)="removeProjectLeader(leader)" *jhiHasAnyAuthority="['ROLE_ADMIN']"><fa-icon [icon]="'ban'"></fa-icon></a>
+                    </p>
+                </div>
+                <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.leader" for="field_leader">Add Leader</label>
+                    <select class="form-control" id="field_leader" name="leader">
+                        <option [ngValue]="null"></option>
+                        <option *ngFor="let ihiwUserOption of ihiwusers; trackBy: trackIhiwUserById" (click)="addProjectLeader(ihiwUserOption)">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
+                    </select>
+                </div>
             </div>
             <div>
                 <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">

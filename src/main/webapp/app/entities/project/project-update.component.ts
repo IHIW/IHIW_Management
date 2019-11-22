@@ -23,6 +23,8 @@ export class ProjectUpdateComponent implements OnInit {
 
   ihiwusers: IIhiwUser[];
 
+  leaders: IIhiwUser[];
+
   ihiwlabs: IIhiwLab[];
 
   editForm = this.fb.group({
@@ -50,6 +52,7 @@ export class ProjectUpdateComponent implements OnInit {
     this.isSaving = false;
     this.activatedRoute.data.subscribe(({ project }) => {
       this.updateForm(project);
+      this.leaders = project.leaders;
     });
     this.ihiwUserService
       .query()
@@ -77,7 +80,25 @@ export class ProjectUpdateComponent implements OnInit {
       createdBy: project.createdBy,
       activated: project.activated,
       modifiedBy: project.modifiedBy,
-      labs: project.labs
+      labs: project.labs,
+      leaders: project.leaders
+    });
+  }
+
+  removeProjectLeader(leader: IIhiwUser) {
+    this.projectService
+      .removeProjectLeader(this.editForm.get(['id']).value, leader.id)
+      .pipe(map((response: HttpResponse<IProject>) => response.body))
+      .subscribe(project => {
+        this.updateForm(project);
+        this.leaders = project.leaders;
+      });
+  }
+
+  addProjectLeader(leader: IIhiwUser) {
+    this.projectService.addProjectLeader(this.editForm.get(['id']).value, leader.id).subscribe(project => {
+      this.updateForm(project);
+      this.leaders = project.leaders;
     });
   }
 

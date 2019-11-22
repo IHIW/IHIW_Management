@@ -22,7 +22,7 @@
             <th><span jhiTranslate="ihiwManagementApp.project.description">Description</span></th>
             <th></th>
             <th><span jhiTranslate="ihiwManagementApp.project.createdAt">Created At</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.project.createdBy">Created By</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.project.leader">Project Leaders</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.lab">Lab</span></th>
             <th></th>
             </tr>
@@ -44,9 +44,9 @@
                 </td>
                 <td>{{project.createdAt | date:'short'}}</td>
                 <td>
-                    <div *ngIf="project.createdBy">
-                        <a [routerLink]="['/ihiw-user', project.createdBy?.id, 'view' ]" >{{project.createdBy?.user.firstName}} {{project.createdBy?.user.lastName}}</a>
-                    </div>
+                    <span *ngFor="let leader of project.leaders; let last = last">
+                            <a class="form-control-static" [routerLink]="['/ihiw-user', leader?.id, 'view' ]">{{leader.user?.firstName}} {{leader.user?.lastName}}</a>{{last ? '' : ', '}}
+                        </span>
                 </td>
                 <td>
                     <span *ngFor="let lab of project.labs; let last = last">

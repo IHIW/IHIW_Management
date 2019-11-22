@@ -1,4 +1,5 @@
 package org.ihiw.management.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -37,6 +38,11 @@ public class IhiwUser implements Serializable {
     @ManyToOne
     @JsonIgnoreProperties("ihiwUsers")
     private IhiwLab lab;
+
+    @ManyToMany(mappedBy = "leaders")
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JsonIgnore
+    private Set<Project> projectLeaderships = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -109,6 +115,31 @@ public class IhiwUser implements Serializable {
 
     public void setLab(IhiwLab ihiwLab) {
         this.lab = ihiwLab;
+    }
+
+    public Set<Project> getProjectLeaderships() {
+        return projectLeaderships;
+    }
+
+    public IhiwUser projectLeaderships(Set<Project> projectLeaderships) {
+        this.projectLeaderships = projectLeaderships;
+        return this;
+    }
+
+    public IhiwUser addProjectLeadership(Project project) {
+        this.projectLeaderships.add(project);
+        project.getLeaders().add(this);
+        return this;
+    }
+
+    public IhiwUser removeProjectLeadership(Project project) {
+        this.projectLeaderships.remove(project);
+        project.getLeaders().remove(this);
+        return this;
+    }
+
+    public void setProjectLeaderships(Set<Project> projectLeaderships) {
+        this.projectLeaderships = projectLeaderships;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 

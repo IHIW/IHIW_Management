@@ -102,7 +102,6 @@ public class ProjectResource {
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             projectFromDB.get().getCreatedBy().equals(currentIhiwUser)) {
-            project.setLeaders(projectFromDB.get().getLeaders());
             Project result = projectRepository.save(project);
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, project.getId().toString()))
@@ -150,30 +149,6 @@ public class ProjectResource {
             return ResponseUtil.wrapOrNotFound(project);
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
-    }
-
-    @DeleteMapping("/projects/{id}/projectleader/{leader}")
-    @PreAuthorize("hasAnyRole('" + AuthoritiesConstants.ADMIN + "')")
-    public ResponseEntity<Project> deleteProjectLeader(@PathVariable Long id, @PathVariable Long leader) {
-        log.debug("REST request to delete project leader {} of project {}", leader, id);
-        Optional<Project> project = projectRepository.findOneWithEagerRelationships(id);
-        Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(leader);
-        project.get().removeLeader(ihiwUser.get());
-        Project result = projectRepository.save(project.get());
-        ihiwUserRepository.save(ihiwUser.get());
-        return ResponseEntity.ok(result);
-    }
-
-    @PutMapping("/projects/{id}/projectleader/{leader}")
-    @PreAuthorize("hasAnyRole('" + AuthoritiesConstants.ADMIN + "')")
-    public ResponseEntity<Project> addProjectLeader(@PathVariable Long id, @PathVariable Long leader) {
-        log.debug("REST request to add project leader {} of project {}", leader, id);
-        Optional<Project> project = projectRepository.findOneWithEagerRelationships(id);
-        Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(leader);
-        project.get().addLeader(ihiwUser.get());
-        Project result = projectRepository.save(project.get());
-        ihiwUserRepository.save(ihiwUser.get());
-        return ResponseEntity.ok(result);
     }
 
     /**

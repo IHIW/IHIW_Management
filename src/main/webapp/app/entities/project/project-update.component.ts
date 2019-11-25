@@ -36,7 +36,8 @@ export class ProjectUpdateComponent implements OnInit {
     modifiedAt: [],
     createdBy: [],
     modifiedBy: [],
-    labs: []
+    labs: [],
+    leaders: []
   });
 
   constructor(
@@ -52,7 +53,6 @@ export class ProjectUpdateComponent implements OnInit {
     this.isSaving = false;
     this.activatedRoute.data.subscribe(({ project }) => {
       this.updateForm(project);
-      this.leaders = project.leaders;
     });
     this.ihiwUserService
       .query()
@@ -86,20 +86,17 @@ export class ProjectUpdateComponent implements OnInit {
   }
 
   removeProjectLeader(leader: IIhiwUser) {
-    this.projectService
-      .removeProjectLeader(this.editForm.get(['id']).value, leader.id)
-      .pipe(map((response: HttpResponse<IProject>) => response.body))
-      .subscribe(project => {
-        this.updateForm(project);
-        this.leaders = project.leaders;
-      });
+    const index = this.editForm.get(['leaders']).value.indexOf(leader, 0);
+    if (index > -1) {
+      this.editForm.get(['leaders']).value.splice(index, 1);
+    }
   }
 
   addProjectLeader(leader: IIhiwUser) {
-    this.projectService.addProjectLeader(this.editForm.get(['id']).value, leader.id).subscribe(project => {
-      this.updateForm(project);
-      this.leaders = project.leaders;
-    });
+    const index = this.editForm.get(['leaders']).value.indexOf(leader, 0);
+    if (index < 0) {
+      this.editForm.get(['leaders']).value.push(leader);
+    }
   }
 
   previousState() {
@@ -129,7 +126,8 @@ export class ProjectUpdateComponent implements OnInit {
       createdBy: this.editForm.get(['createdBy']).value,
       activated: this.editForm.get(['activated']).value,
       modifiedBy: this.editForm.get(['modifiedBy']).value,
-      labs: this.editForm.get(['labs']).value
+      labs: this.editForm.get(['labs']).value,
+      leaders: this.editForm.get(['leaders']).value
     };
   }
 

@@ -50,7 +50,7 @@
 
                 <div class="form-group" >
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.leader">Leaders</label>
-                    <p *ngFor="let leader of leaders; let last = last">
+                    <p *ngFor="let leader of editForm.get('leaders').value; let last = last">
                         <a class="form-control-static" [routerLink]="['/ihiw-user', leader?.id, 'view' ]">{{leader.user?.firstName}} {{leader.user?.lastName}}</a>
                         <a class="" (click)="removeProjectLeader(leader)" *jhiHasAnyAuthority="['ROLE_ADMIN']"><fa-icon [icon]="'ban'"></fa-icon></a>
                     </p>

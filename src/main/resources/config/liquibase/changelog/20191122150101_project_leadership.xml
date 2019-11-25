@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="addProjectLeadership" author="mniemann">
+
+        <createTable tableName="project_leader">
+            <column name="ihiw_user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="ihiw_user_id, project_id" tableName="project_leader"/>
+
+        <addForeignKeyConstraint baseColumnNames="ihiw_user_id"
+                                 baseTableName="project_leader"
+                                 constraintName="fk_ihiw_user_leader_table"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ihiw_user"/>
+
+        <addForeignKeyConstraint baseColumnNames="project_id"
+                                 baseTableName="project_leader"
+                                 constraintName="fk_project_leader_table"
+                                 referencedColumnNames="id"
+                                 referencedTableName="project"/>
+
+        <sql>
+            INSERT INTO project_leader(project_id, ihiw_user_id)
+            select p.id, i.id
+            from project p JOIN ihiw_user i ON p.created_by_id = i.user_id;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

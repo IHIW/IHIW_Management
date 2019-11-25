@@ -35,6 +35,7 @@ describe('Component Tests', () => {
         const entity = new Project(123);
         spyOn(service, 'update').and.returnValue(of(new HttpResponse({ body: entity })));
         comp.updateForm(entity);
+        entity.leaders = [];
         // WHEN
         comp.save();
         tick(); // simulate async
@@ -49,6 +50,7 @@ describe('Component Tests', () => {
         const entity = new Project();
         spyOn(service, 'create').and.returnValue(of(new HttpResponse({ body: entity })));
         comp.updateForm(entity);
+        entity.leaders = [];
         // WHEN
         comp.save();
         tick(); // simulate async

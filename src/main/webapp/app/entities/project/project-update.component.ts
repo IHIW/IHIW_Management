@@ -23,6 +23,8 @@ export class ProjectUpdateComponent implements OnInit {
 
   ihiwusers: IIhiwUser[];
 
+  leaders: IIhiwUser[];
+
   ihiwlabs: IIhiwLab[];
 
   editForm = this.fb.group({
@@ -34,7 +36,8 @@ export class ProjectUpdateComponent implements OnInit {
     modifiedAt: [],
     createdBy: [],
     modifiedBy: [],
-    labs: []
+    labs: [],
+    leaders: []
   });
 
   constructor(
@@ -68,6 +71,10 @@ export class ProjectUpdateComponent implements OnInit {
   }
 
   updateForm(project: IProject) {
+    let projectLeaders = project.leaders;
+    if (projectLeaders === undefined) {
+      projectLeaders = [];
+    }
     this.editForm.patchValue({
       id: project.id,
       name: project.name,
@@ -77,8 +84,23 @@ export class ProjectUpdateComponent implements OnInit {
       createdBy: project.createdBy,
       activated: project.activated,
       modifiedBy: project.modifiedBy,
-      labs: project.labs
+      labs: project.labs,
+      leaders: projectLeaders
     });
+  }
+
+  removeProjectLeader(leader: IIhiwUser) {
+    const index = this.editForm.get(['leaders']).value.indexOf(leader, 0);
+    if (index > -1) {
+      this.editForm.get(['leaders']).value.splice(index, 1);
+    }
+  }
+
+  addProjectLeader(leader: IIhiwUser) {
+    const index = this.editForm.get(['leaders']).value.indexOf(leader, 0);
+    if (index < 0) {
+      this.editForm.get(['leaders']).value.push(leader);
+    }
   }
 
   previousState() {
@@ -108,7 +130,8 @@ export class ProjectUpdateComponent implements OnInit {
       createdBy: this.editForm.get(['createdBy']).value,
       activated: this.editForm.get(['activated']).value,
       modifiedBy: this.editForm.get(['modifiedBy']).value,
-      labs: this.editForm.get(['labs']).value
+      labs: this.editForm.get(['labs']).value,
+      leaders: this.editForm.get(['leaders']).value
     };
   }
 

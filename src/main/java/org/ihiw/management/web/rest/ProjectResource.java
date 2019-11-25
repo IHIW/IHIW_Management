@@ -122,7 +122,8 @@ public class ProjectResource {
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR))){
-            return projectRepository.findAllWithEagerRelationships();
+            List<Project> result = projectRepository.findAllWithEagerRelationships();
+            return result;
         }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         return projectRepository.findAllWithEagerRelationshipsByLab(currentIhiwUser.getLab().getId());

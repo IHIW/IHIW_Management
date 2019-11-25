@@ -71,6 +71,10 @@ export class ProjectUpdateComponent implements OnInit {
   }
 
   updateForm(project: IProject) {
+    let projectLeaders = project.leaders;
+    if (projectLeaders === undefined) {
+      projectLeaders = [];
+    }
     this.editForm.patchValue({
       id: project.id,
       name: project.name,
@@ -81,7 +85,7 @@ export class ProjectUpdateComponent implements OnInit {
       activated: project.activated,
       modifiedBy: project.modifiedBy,
       labs: project.labs,
-      leaders: project.leaders
+      leaders: projectLeaders
     });
   }
 

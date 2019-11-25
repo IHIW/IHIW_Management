@@ -187,6 +187,10 @@ public class Project implements Serializable {
         return this;
     }
 
+    public void setLabs(Set<IhiwLab> ihiwLabs) {
+        this.labs = ihiwLabs;
+    }
+
     public Set<IhiwUser> getLeaders() {
         return leaders;
     }

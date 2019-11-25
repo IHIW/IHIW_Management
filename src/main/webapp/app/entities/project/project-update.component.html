@@ -34,13 +34,6 @@
                     </label>
                 </div>
 
-                <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']">
-                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.createdBy" for="field_createdBy">Created By</label>
-                    <select class="form-control" id="field_createdBy" name="createdBy" formControlName="createdBy">
-                        <option [ngValue]="null"></option>
-                        <option [ngValue]="ihiwUserOption.id === editForm.get('createdBy').value?.id ? editForm.get('createdBy').value : ihiwUserOption" *ngFor="let ihiwUserOption of ihiwusers; trackBy: trackIhiwUserById">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
-                    </select>
-                </div>
                 <div class="form-group">
                     <label jhiTranslate="ihiwManagementApp.project.lab" for="field_labs">Lab</label>
                     <select class="form-control" id="field_labs" multiple name="labs" formControlName="labs">

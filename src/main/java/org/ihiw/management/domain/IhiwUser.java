@@ -27,7 +27,7 @@ public class IhiwUser implements Serializable {
     @Column(name = "phone")
     private String phone;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(unique = true)
     private User user;
 

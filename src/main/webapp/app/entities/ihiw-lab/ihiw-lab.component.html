@@ -16,7 +16,7 @@
     <div class="table-responsive" *ngIf="ihiwLabs?.length > 0">
         <table class="table table-striped">
             <thead>
-            <tr>
+            <tr><th></th>
             <th><span jhiTranslate="global.field.id">ID</span></th>
             <th><span jhiTranslate="ihiwManagementApp.ihiwLab.labCode">Lab Code</span></th>
             <th><span jhiTranslate="ihiwManagementApp.ihiwLab.title">Title</span></th>
@@ -42,26 +42,6 @@
             </thead>
             <tbody>
             <tr *ngFor="let ihiwLab of ihiwLabs ;trackBy: trackId">
-                <td><a [routerLink]="['/ihiw-lab', ihiwLab.id, 'view' ]">{{ihiwLab.id}}</a></td>
-                <td>{{ihiwLab.labCode}}</td>
-                <td>{{ihiwLab.title}}</td>
-                <td>{{ihiwLab.firstName}}</td>
-                <td>{{ihiwLab.lastName}}</td>
-                <td>{{ihiwLab.director}}</td>
-                <td>{{ihiwLab.department}}</td>
-                <td>{{ihiwLab.institution}}</td>
-                <td>{{ihiwLab.address1}}</td>
-                <td>{{ihiwLab.address2}}</td>
-                <td>{{ihiwLab.city}}</td>
-                <td>{{ihiwLab.state}}</td>
-                <td>{{ihiwLab.zip}}</td>
-                <td>{{ihiwLab.country}}</td>
-                <td>{{ihiwLab.phone}}</td>
-                <td>{{ihiwLab.fax}}</td>
-                <td>{{ihiwLab.email}}</td>
-                <td>{{ihiwLab.url}}</td>
-                <td>{{ihiwLab.oldLabCode}}</td>
-                <td>{{ihiwLab.createdAt | date:'medium'}}</td>
                 <td class="text-right">
                     <div class="btn-group">
                         <button type="submit"
@@ -88,6 +68,26 @@
                         </button>
                     </div>
                 </td>
+                <td><a [routerLink]="['/ihiw-lab', ihiwLab.id, 'view' ]">{{ihiwLab.id}}</a></td>
+                <td>{{ihiwLab.labCode}}</td>
+                <td>{{ihiwLab.title}}</td>
+                <td>{{ihiwLab.firstName}}</td>
+                <td>{{ihiwLab.lastName}}</td>
+                <td>{{ihiwLab.director}}</td>
+                <td>{{ihiwLab.department}}</td>
+                <td>{{ihiwLab.institution}}</td>
+                <td>{{ihiwLab.address1}}</td>
+                <td>{{ihiwLab.address2}}</td>
+                <td>{{ihiwLab.city}}</td>
+                <td>{{ihiwLab.state}}</td>
+                <td>{{ihiwLab.zip}}</td>
+                <td>{{ihiwLab.country}}</td>
+                <td>{{ihiwLab.phone}}</td>
+                <td>{{ihiwLab.fax}}</td>
+                <td>{{ihiwLab.email}}</td>
+                <td>{{ihiwLab.url}}</td>
+                <td>{{ihiwLab.oldLabCode}}</td>
+                <td>{{ihiwLab.createdAt | date:'medium'}}</td>
             </tr>
             </tbody>
         </table>

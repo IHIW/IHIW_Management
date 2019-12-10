@@ -28,6 +28,7 @@ export class ProjectUpdateComponent implements OnInit {
   editForm = this.fb.group({
     id: [],
     name: [null, [Validators.required]],
+    component: [],
     description: [],
     activated: [],
     createdAt: [],
@@ -71,6 +72,7 @@ export class ProjectUpdateComponent implements OnInit {
     this.editForm.patchValue({
       id: project.id,
       name: project.name,
+      component: project.component,
       description: project.description,
       createdAt: project.createdAt != null ? project.createdAt.format(DATE_TIME_FORMAT) : null,
       modifiedAt: project.modifiedAt != null ? project.modifiedAt.format(DATE_TIME_FORMAT) : null,
@@ -100,6 +102,7 @@ export class ProjectUpdateComponent implements OnInit {
       ...new Project(),
       id: this.editForm.get(['id']).value,
       name: this.editForm.get(['name']).value,
+      component: this.editForm.get(['component']).value,
       description: this.editForm.get(['description']).value,
       createdAt:
         this.editForm.get(['createdAt']).value != null ? moment(this.editForm.get(['createdAt']).value, DATE_TIME_FORMAT) : undefined,

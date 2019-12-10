@@ -31,7 +31,7 @@
             <tbody>
             <tr *ngFor="let upload of uploads ;trackBy: trackId">
                 <td><a [routerLink]="['/upload', upload.id, 'view' ]">{{upload.id}}</a></td>
-                <td><span class="badge badge-info" jhiTranslate="{{'ihiwManagementApp.FileType.' + upload.type}}">{{upload.type}}</span></td>
+                <td><span *ngIf=""></span></td>
                 <td>{{upload.createdAt | date:'short'}}</td>
                 <td>{{upload.modifiedAt | date:'short'}}</td>
                 <td>{{upload.fileName}}</td>

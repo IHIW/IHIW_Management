@@ -9,8 +9,8 @@
     <changeSet author="gendx" id="addProjectComponent">
         <addColumn
                    tableName="project">
-            <column name="component" type="varchar(255)" >
-                <constraints nullable="true" />
+            <column name="component" type="varchar(255)" defaultValue="Bioinformatics">
+                <constraints nullable="false" />
             </column>
         </addColumn>
     </changeSet>

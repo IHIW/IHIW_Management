@@ -12,6 +12,7 @@ type EntityArrayResponseType = HttpResponse<IIhiwUser[]>;
 @Injectable({ providedIn: 'root' })
 export class IhiwUserService {
   public resourceUrl = SERVER_API_URL + 'api/ihiw-users';
+  public resourceUrlSingle = SERVER_API_URL + 'api/ihiw-user';
 
   constructor(protected http: HttpClient) {}
 
@@ -25,6 +26,10 @@ export class IhiwUserService {
 
   find(id: number): Observable<EntityResponseType> {
     return this.http.get<IIhiwUser>(`${this.resourceUrl}/${id}`, { observe: 'response' });
+  }
+
+  my(): Observable<EntityResponseType> {
+    return this.http.get<IIhiwUser>(`${this.resourceUrlSingle}`, { observe: 'response' });
   }
 
   query(req?: any): Observable<EntityArrayResponseType> {

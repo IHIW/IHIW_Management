@@ -3,6 +3,7 @@ package org.ihiw.management.web.rest;
 import org.ihiw.management.IhiwManagementApp;
 import org.ihiw.management.domain.Project;
 import org.ihiw.management.repository.IhiwUserRepository;
+import org.ihiw.management.repository.ProjectIhiwLabRepository;
 import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.service.UserService;
@@ -73,6 +74,9 @@ public class ProjectResourceIT {
     private IhiwUserRepository ihiwUserRepositoryMock;
 
     @Mock
+    private ProjectIhiwLabRepository projectIhiwLabRepository;
+
+    @Mock
     private UserService userService;
 
     @Autowired
@@ -97,7 +101,7 @@ public class ProjectResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ProjectResource projectResource = new ProjectResource(projectRepository, ihiwUserRepository, userService);
+        final ProjectResource projectResource = new ProjectResource(projectRepository, projectIhiwLabRepository, ihiwUserRepository, userService);
         this.restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -214,39 +218,6 @@ public class ProjectResourceIT {
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(sameInstant(DEFAULT_CREATED_AT))))
             .andExpect(jsonPath("$.[*].modifiedAt").value(hasItem(sameInstant(DEFAULT_MODIFIED_AT))));
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public void getAllProjectsWithEagerRelationshipsIsEnabled() throws Exception {
-        ProjectResource projectResource = new ProjectResource(projectRepositoryMock, ihiwUserRepositoryMock, userService);
-        when(projectRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-
-        MockMvc restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setControllerAdvice(exceptionTranslator)
-            .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
-
-        restProjectMockMvc.perform(get("/api/projects?eagerload=true"))
-        .andExpect(status().isOk());
-
-        verify(projectRepositoryMock, times(1)).findAllWithEagerRelationships(any());
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public void getAllProjectsWithEagerRelationshipsIsNotEnabled() throws Exception {
-        ProjectResource projectResource = new ProjectResource(projectRepositoryMock, ihiwUserRepositoryMock, userService);
-            when(projectRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-            MockMvc restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setControllerAdvice(exceptionTranslator)
-            .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
-
-        restProjectMockMvc.perform(get("/api/projects?eagerload=true"))
-        .andExpect(status().isOk());
-
-            verify(projectRepositoryMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @Test

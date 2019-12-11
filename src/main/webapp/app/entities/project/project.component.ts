@@ -7,6 +7,8 @@ import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 import { IProject } from 'app/shared/model/project.model';
 import { AccountService } from 'app/core';
 import { ProjectService } from './project.service';
+import { IhiwUserService } from '../ihiw-user/ihiw-user.service';
+import { IIhiwUser } from '../../shared/model/ihiw-user.model';
 
 @Component({
   selector: 'jhi-project',
@@ -16,12 +18,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
   projects: IProject[];
   currentAccount: any;
   eventSubscriber: Subscription;
+  ihiwUser: IIhiwUser;
 
   constructor(
     protected projectService: ProjectService,
     protected jhiAlertService: JhiAlertService,
     protected eventManager: JhiEventManager,
-    protected accountService: AccountService
+    protected accountService: AccountService,
+    protected ihiwUserService: IhiwUserService
   ) {}
 
   loadAll() {
@@ -34,6 +38,18 @@ export class ProjectComponent implements OnInit, OnDestroy {
       .subscribe(
         (res: IProject[]) => {
           this.projects = res;
+        },
+        (res: HttpErrorResponse) => this.onError(res.message)
+      );
+    this.ihiwUserService
+      .my()
+      .pipe(
+        filter((res: HttpResponse<IIhiwUser>) => res.ok),
+        map((res: HttpResponse<IIhiwUser>) => res.body)
+      )
+      .subscribe(
+        (res: IIhiwUser) => {
+          this.ihiwUser = res;
         },
         (res: HttpErrorResponse) => this.onError(res.message)
       );
@@ -72,5 +88,14 @@ export class ProjectComponent implements OnInit, OnDestroy {
       } else {
       }
     });
+  }
+
+  myProjectStatus(project: IProject, status: string) {
+    for (const lab of project.labs) {
+      if (lab.lab.id === this.ihiwUser.lab.id && lab.status === status) {
+        return true;
+      }
+    }
+    return false;
   }
 }

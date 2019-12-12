@@ -92,6 +92,12 @@ public class MailService {
     }
 
     @Async
+    public void sendProjectLeaderSubscriptionNotificationEmail(User user) {
+        log.debug("Sending subscription email to '{}'", user.getEmail());
+        sendEmailFromTemplate(user, user.getEmail(), "mail/subscriptionEmail", "email.subscription.title");
+    }
+
+    @Async
     public void sendCreationEmail(User user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, user.getEmail(), "mail/creationEmail", "email.activation.title");

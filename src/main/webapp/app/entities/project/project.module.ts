@@ -13,6 +13,8 @@ import {
   ProjectDeleteDialogComponent,
   ProjectSubscribePopupComponent,
   ProjectSubscribeDialogComponent,
+  ProjectUnsubscribePopupComponent,
+  ProjectUnsubscribeDialogComponent,
   projectRoute,
   projectPopupRoute
 } from './';
@@ -29,6 +31,8 @@ const ENTITY_STATES = [...projectRoute, ...projectPopupRoute];
     ProjectDeletePopupComponent,
     ProjectSubscribeDialogComponent,
     ProjectSubscribePopupComponent,
+    ProjectUnsubscribeDialogComponent,
+    ProjectUnsubscribePopupComponent,
     StatusPipe
   ],
   entryComponents: [
@@ -37,7 +41,9 @@ const ENTITY_STATES = [...projectRoute, ...projectPopupRoute];
     ProjectDeleteDialogComponent,
     ProjectDeletePopupComponent,
     ProjectSubscribeDialogComponent,
-    ProjectSubscribePopupComponent
+    ProjectSubscribePopupComponent,
+    ProjectUnsubscribeDialogComponent,
+    ProjectUnsubscribePopupComponent
   ],
   providers: [{ provide: JhiLanguageService, useClass: JhiLanguageService }],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

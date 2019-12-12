@@ -20,7 +20,8 @@
             <th><span jhiTranslate="global.field.id">ID</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.name">Name</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.description">Description</span></th>
-            <th></th>
+            <th *jhiHasAnyAuthority="['ROLE_ADMIN']"></th>
+            <th><span>Subscription Status</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.createdAt">Created At</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.leader">Project Leaders</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.lab">Lab</span></th>
@@ -36,11 +37,19 @@
                         {{ (project.description.length>128)? (project.description | slice:0:128)+'...':(project.description) }}
                     </div>
                 </td>
-                <td>
+                <td *jhiHasAnyAuthority="['ROLE_ADMIN']">
                     <button class="btn btn-danger btn-sm" (click)="setActive(project, true)" *ngIf="!project.activated"
                             >Deactivated</button>
                     <button class="btn btn-success btn-sm" (click)="setActive(project, false)" *ngIf="project.activated"
                              >Activated</button>
+                </td>
+                <td>
+                    <button class="btn btn-warning btn-sm" *ngIf="myProjectStatus(project, 'REQUESTED')">
+                        Waiting
+                    </button>
+                    <button class="btn btn-success btn-sm" *ngIf="myProjectStatus(project, 'SUBSCRIBED')">
+                        Subscribed
+                    </button>
                 </td>
                 <td>{{project.createdAt | date:'short'}}</td>
                 <td>
@@ -84,7 +93,7 @@
                                     replaceUrl="true"
                                     queryParamsHandling="merge"
                                     class="btn btn-primary btn-sm">
-                                <fa-icon [icon]="'user-times'"></fa-icon>
+                                <fa-icon [icon]="'plus-square'"></fa-icon>
                                 <span class="d-none d-md-inline" jhiTranslate="entity.action.subscribe">Subscribe</span>
                             </button>
                             <button *ngIf="myProjectStatus(project, 'SUBSCRIBED')"
@@ -93,17 +102,17 @@
                                     replaceUrl="true"
                                     queryParamsHandling="merge"
                                     class="btn btn-danger btn-sm">
-                                <fa-icon [icon]="'user-check'"></fa-icon>
+                                <fa-icon [icon]="'minus-square'"></fa-icon>
                                 <span class="d-none d-md-inline" jhiTranslate="entity.action.unsubscribe">Unubscribe</span>
                             </button>
-                            <button *ngIf="myProjectStatus(project, 'REQUESTED')"
-                                    type="submit"
-                                    replaceUrl="true"
-                                    queryParamsHandling="merge"
-                                    class="btn btn-info btn-sm">
-                                <fa-icon [icon]="'user-clock'"></fa-icon>
-                                <span class="d-none d-md-inline" jhiTranslate="entity.action.requested">Requested</span>
-                            </button>
+                            <!--<button *ngIf="myProjectStatus(project, 'REQUESTED')"-->
+                                    <!--type="submit"-->
+                                    <!--replaceUrl="true"-->
+                                    <!--queryParamsHandling="merge"-->
+                                    <!--class="btn btn-warning btn-sm">-->
+                                <!--<fa-icon [icon]="'clock'"></fa-icon>-->
+                                <!--<span class="d-none d-md-inline" jhiTranslate="entity.action.requested">Requested</span>-->
+                            <!--</button>-->
                         </ng-container>
                     </div>
                 </td>

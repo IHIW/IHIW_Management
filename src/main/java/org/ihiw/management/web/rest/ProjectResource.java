@@ -8,6 +8,7 @@ import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
+import org.ihiw.management.service.MailService;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
 
@@ -16,6 +17,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -48,12 +50,14 @@ public class ProjectResource {
     private final ProjectIhiwLabRepository projectIhiwLabRepository;
     private final IhiwUserRepository ihiwUserRepository;
     private final UserService userService;
+    private final MailService mailService;
 
-    public ProjectResource(ProjectRepository projectRepository, ProjectIhiwLabRepository projectIhiwLabRepository, IhiwUserRepository ihiwUserRepository, UserService userService) {
+    public ProjectResource(ProjectRepository projectRepository, ProjectIhiwLabRepository projectIhiwLabRepository, IhiwUserRepository ihiwUserRepository, UserService userService, MailService mailService) {
         this.projectRepository = projectRepository;
         this.ihiwUserRepository = ihiwUserRepository;
         this.projectIhiwLabRepository = projectIhiwLabRepository;
         this.userService = userService;
+        this.mailService = mailService;
     }
 
     /**
@@ -99,17 +103,52 @@ public class ProjectResource {
 
             Optional<Project> projectFromDB = projectRepository.findOneById(projectId);
             ProjectIhiwLab projectIhiwLab = projectIhiwLabRepository.findByLabAndProject(currentIhiwUser.getLab(), projectFromDB.get());
+            // if there is no relation yet
+            boolean isNew = false;
+            if (projectIhiwLab == null){
+                projectIhiwLab = new ProjectIhiwLab();
+                projectIhiwLab.setLab(currentIhiwUser.getLab());
+                projectIhiwLab.setProject(projectFromDB.get());
+                isNew = true;
+            }
+            projectIhiwLab.setStatus(ProjectSubscriptionStatus.REQUESTED);
+            projectIhiwLab = projectIhiwLabRepository.save(projectIhiwLab);
+            if (isNew){
+                projectFromDB.get().getLabs().add(projectIhiwLab);
+                projectRepository.save(projectFromDB.get());
+            }
+
+            // send all project leaders a notification
+            for (IhiwUser leader : projectFromDB.get().getLeaders()){
+                mailService.sendProjectLeaderSubscriptionNotificationEmail(leader.getUser());
+            }
+
+            return ResponseEntity.created(new URI("/api/projects/" + projectId + "/subscribe"))
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, projectId + ""))
+                .body(projectIhiwLab);
+        }
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, projectId + "")).build();
+    }
+
+    @PostMapping("/projects/{projectId}/unsubscribe")
+    public ResponseEntity<ProjectIhiwLab> unsubscribeProject(@PathVariable long projectId) throws URISyntaxException {
+        log.debug("REST request to subscribe to Project : {}", projectId);
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.PI))){
+            IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+            Optional<Project> projectFromDB = projectRepository.findOneById(projectId);
+            ProjectIhiwLab projectIhiwLab = projectIhiwLabRepository.findByLabAndProject(currentIhiwUser.getLab(), projectFromDB.get());
             if (projectIhiwLab == null){
                 projectIhiwLab = new ProjectIhiwLab();
                 projectIhiwLab.setLab(currentIhiwUser.getLab());
                 projectIhiwLab.setProject(projectFromDB.get());
             }
-            projectIhiwLab.setStatus(ProjectSubscriptionStatus.REQUESTED);
+            projectIhiwLab.setStatus(ProjectSubscriptionStatus.UNSUBSCRIBED);
             projectIhiwLab = projectIhiwLabRepository.save(projectIhiwLab);
 
-            //TODO: send email to project leader
             return ResponseEntity.created(new URI("/api/projects/" + projectId + "/subscribe"))
-                .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, projectId + ""))
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, projectId + ""))
                 .body(projectIhiwLab);
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, projectId + "")).build();

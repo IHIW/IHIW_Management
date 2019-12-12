@@ -11,6 +11,7 @@ import { ProjectDetailComponent } from './project-detail.component';
 import { ProjectUpdateComponent } from './project-update.component';
 import { ProjectDeletePopupComponent } from './project-delete-dialog.component';
 import { ProjectSubscribePopupComponent } from './project-subscribe-dialog.component';
+import { ProjectUnsubscribePopupComponent } from './project-unsubscribe-dialog.component';
 import { IProject } from 'app/shared/model/project.model';
 
 @Injectable({ providedIn: 'root' })
@@ -98,7 +99,20 @@ export const projectPopupRoute: Routes = [
       project: ProjectResolve
     },
     data: {
-      authorities: ['PI', 'ProjectLeader'],
+      authorities: ['PI'],
+      pageTitle: 'ihiwManagementApp.project.home.title'
+    },
+    canActivate: [UserRouteAccessService],
+    outlet: 'popup'
+  },
+  {
+    path: ':id/unsubscribe',
+    component: ProjectUnsubscribePopupComponent,
+    resolve: {
+      project: ProjectResolve
+    },
+    data: {
+      authorities: ['PI'],
       pageTitle: 'ihiwManagementApp.project.home.title'
     },
     canActivate: [UserRouteAccessService],

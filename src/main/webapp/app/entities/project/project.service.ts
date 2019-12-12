@@ -53,6 +53,10 @@ export class ProjectService {
     return this.http.post<any>(`${this.resourceUrl}/${id}/subscribe`, { observe: 'response' });
   }
 
+  unsubscribe(id: number): Observable<HttpResponse<any>> {
+    return this.http.post<any>(`${this.resourceUrl}/${id}/unsubscribe`, { observe: 'response' });
+  }
+
   removeProjectLeader(project: number, leader: number): Observable<HttpResponse<any>> {
     return this.http.delete<any>(`${this.resourceUrl}/${project}/projectleader/${leader}`, { observe: 'response' });
   }

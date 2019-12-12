@@ -6,6 +6,7 @@ import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.ProjectIhiwLabRepository;
 import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.repository.UserRepository;
+import org.ihiw.management.service.MailService;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.ExceptionTranslator;
 
@@ -79,6 +80,9 @@ public class ProjectResourceIT {
     @Mock
     private UserService userService;
 
+    @Mock
+    private MailService mailService;
+
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
@@ -101,7 +105,7 @@ public class ProjectResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ProjectResource projectResource = new ProjectResource(projectRepository, projectIhiwLabRepository, ihiwUserRepository, userService);
+        final ProjectResource projectResource = new ProjectResource(projectRepository, projectIhiwLabRepository, ihiwUserRepository, userService, mailService);
         this.restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

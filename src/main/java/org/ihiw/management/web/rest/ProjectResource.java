@@ -173,7 +173,7 @@ public class ProjectResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            projectFromDB.get().getCreatedBy().equals(currentIhiwUser)) {
+            projectFromDB.get().getLeaders().contains(currentIhiwUser)) {
             Project result = projectRepository.save(project);
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, project.getId().toString()))

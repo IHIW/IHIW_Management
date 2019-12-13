@@ -34,6 +34,10 @@ public class ProjectIhiwLab implements Serializable {
     public ProjectIhiwLab() {
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Project getProject() {
         return project;
     }
@@ -65,6 +69,7 @@ public class ProjectIhiwLab implements Serializable {
 
         ProjectIhiwLab that = (ProjectIhiwLab) o;
 
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (project != null ? !project.equals(that.project) : that.project != null) return false;
         if (lab != null ? !lab.equals(that.lab) : that.lab != null) return false;
         return status == that.status;
@@ -73,7 +78,8 @@ public class ProjectIhiwLab implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = project != null ? project.hashCode() : 0;
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (project != null ? project.hashCode() : 0);
         result = 31 * result + (lab != null ? lab.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         return result;

@@ -44,12 +44,12 @@
                              >Activated</button>
                 </td>
                 <td>
-                    <button class="btn btn-warning btn-sm" *ngIf="myProjectStatus(project, 'REQUESTED')">
+                    <span class="badge badge-warning btn-sm" *ngIf="myProjectStatus(project, 'REQUESTED')">
                         Waiting
-                    </button>
-                    <button class="btn btn-success btn-sm" *ngIf="myProjectStatus(project, 'SUBSCRIBED')">
+                    </span>
+                    <span class="badge badge-success btn-sm" *ngIf="myProjectStatus(project, 'SUBSCRIBED')">
                         Subscribed
-                    </button>
+                    </span>
                 </td>
                 <td>{{project.createdAt | date:'short'}}</td>
                 <td>
@@ -58,7 +58,7 @@
                         </span>
                 </td>
                 <td>
-                    <span *ngFor="let labWrapper of project.labs | status:'DECLINED'; let last = last">
+                    <span *ngFor="let labWrapper of project.labs | status:'DECLINED;UNSUBSCRIBED'; let last = last">
                             <a class="form-control-static" [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">{{labWrapper.lab.labCode}}</a>{{last ? '' : ', '}}
                         </span>
                 </td>

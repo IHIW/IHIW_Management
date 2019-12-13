@@ -5,8 +5,9 @@ import { IIhiwLab } from 'app/shared/model/ihiw-lab.model';
 export interface IProjectIhiwLab {
   status?: string;
   lab?: IIhiwLab;
+  id?: number;
 }
 
 export class ProjectIhiwLab implements IProjectIhiwLab {
-  constructor(public status?: string, public labs?: IIhiwLab) {}
+  constructor(public status?: string, public labs?: IIhiwLab, public id?: number) {}
 }

@@ -59,7 +59,7 @@ export const projectRoute: Routes = [
       project: ProjectResolve
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: ['ROLE_ADMIN'],
       pageTitle: 'ihiwManagementApp.project.home.title'
     },
     canActivate: [UserRouteAccessService]
@@ -71,7 +71,7 @@ export const projectRoute: Routes = [
       project: ProjectResolve
     },
     data: {
-      authorities: ['ROLE_USER'],
+      authorities: ['ROLE_USER', 'ProjectLeader'],
       pageTitle: 'ihiwManagementApp.project.home.title'
     },
     canActivate: [UserRouteAccessService]

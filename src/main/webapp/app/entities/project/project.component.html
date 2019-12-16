@@ -19,6 +19,7 @@
             <tr>
             <th><span jhiTranslate="global.field.id">ID</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.name">Name</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.project.component">Component</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.description">Description</span></th>
             <th></th>
             <th><span jhiTranslate="ihiwManagementApp.project.createdAt">Created At</span></th>
@@ -31,6 +32,7 @@
             <tr *ngFor="let project of projects ;trackBy: trackId">
                 <td><a [routerLink]="['/project', project.id, 'view' ]">{{project.id}}</a></td>
                 <td>{{project.name}}</td>
+                <td>{{ProjectComponentEnum[project.component]}}</td>
                 <td>
                     <div *ngIf="project.description">
                         {{ (project.description.length>128)? (project.description | slice:0:128)+'...':(project.description) }}

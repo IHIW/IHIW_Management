@@ -2,6 +2,7 @@ package org.ihiw.management.web.rest;
 
 import org.ihiw.management.IhiwManagementApp;
 import org.ihiw.management.domain.Project;
+import org.ihiw.management.domain.enumeration.ProjectComponent;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.repository.UserRepository;
@@ -51,6 +52,9 @@ public class ProjectResourceIT {
 
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
+
+    private static final ProjectComponent DEFAULT_COMPONENTENUM = ProjectComponent.AntigenicityImmunogenicity;
+    private static final ProjectComponent UPDATED_COMPONENTENUM = ProjectComponent.Bioinformatics;
 
     private static final ZonedDateTime DEFAULT_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_CREATED_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
@@ -115,6 +119,7 @@ public class ProjectResourceIT {
     public static Project createEntity(EntityManager em) {
         Project project = new Project()
             .name(DEFAULT_NAME)
+            .component(DEFAULT_COMPONENTENUM)
             .description(DEFAULT_DESCRIPTION)
             .createdAt(DEFAULT_CREATED_AT)
             .modifiedAt(DEFAULT_MODIFIED_AT);
@@ -130,6 +135,7 @@ public class ProjectResourceIT {
         Project project = new Project()
             .name(UPDATED_NAME)
             .description(UPDATED_DESCRIPTION)
+            .component(UPDATED_COMPONENTENUM)
             .createdAt(UPDATED_CREATED_AT)
             .modifiedAt(UPDATED_MODIFIED_AT);
         return project;

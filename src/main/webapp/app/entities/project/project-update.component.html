@@ -20,6 +20,16 @@
                         </small>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.component" for="field_component">Component</label>
+                    <select class="form-control" name="component" formControlName="component" id="field_component">
+                        <option value="AntigenicityImmunogenicity" selected="selected">Antigenicity &amp; Immunogenicity</option>
+                        <option value="Immunogenetics">Immunogenetics</option>
+                        <option value="Bioinformatics">Bioinformatics</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.description" for="field_description">Description</label>
                     <textarea type="text" class="form-control" name="description" id="field_description"

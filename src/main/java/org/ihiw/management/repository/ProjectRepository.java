@@ -19,20 +19,20 @@ import java.util.Optional;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-    @Query(value = "select distinct project from Project project left join fetch project.labs",
+    @Query(value = "select distinct project from Project project left join fetch project.labs left join fetch project.leaders",
         countQuery = "select count(distinct project) from Project project")
     Page<Project> findAllWithEagerRelationships(Pageable pageable);
 
-    @Query("select distinct project from Project project left join fetch project.labs")
+    @Query("select distinct project from Project project left join fetch project.labs left join fetch project.leaders")
     List<Project> findAllWithEagerRelationships();
 
-    @Query("select distinct project from Project project left join fetch project.labs l where l.id = :id")
+    @Query("select distinct project from Project project left join fetch project.leaders left join fetch project.labs l  where l.id = :id")
     List<Project> findAllWithEagerRelationshipsByLab(@Param("id") Long labId);
 
-    @Query("select project from Project project left join fetch project.labs where project.id =:id")
+    @Query("select project from Project project left join fetch project.labs left join fetch project.leaders where project.id =:id")
     Optional<Project> findOneWithEagerRelationships(@Param("id") Long id);
 
-    @Query("select project from Project project left join fetch project.labs where project.createdBy =:ihiwUser")
+    @Query("select project from Project project left join fetch project.labs left join fetch project.leaders where project.createdBy =:ihiwUser")
     List<Project> findByCreatedBy(@Param("ihiwUser") IhiwUser ihiwUser);
 
     Optional<Project> findOneById(Long id);

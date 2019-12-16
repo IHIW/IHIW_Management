@@ -47,10 +47,16 @@
                         <a [routerLink]="['/ihiw-user', project.modifiedBy?.id, 'view']">{{project.modifiedBy?.id}}</a>
                     </div>
                 </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.project.lab">Lab</span></dt>
+                <dt><span jhiTranslate="ihiwManagementApp.project.lab">Labs</span></dt>
                 <dd>
                     <span *ngFor="let lab of project.labs; let last = last">
-                        <a [routerLink]="['/ihiw-lab', lab?.id, 'view' ]">{{lab.id}}</a>{{last ? '' : ', '}}
+                        <a [routerLink]="['/ihiw-lab', lab?.id, 'view' ]">{{lab.labCode}}</a>{{last ? '' : ', '}}
+                    </span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.project.leader">Leaders</span></dt>
+                <dd>
+                    <span *ngFor="let leader of project.leaders; let last = last">
+                        <a [routerLink]="['/ihiw-user', leader?.id, 'view' ]">{{leader.user?.firstName}} {{leader.user?.lastName}}</a>{{last ? '' : ', '}}
                     </span>
                 </dd>
             </dl>

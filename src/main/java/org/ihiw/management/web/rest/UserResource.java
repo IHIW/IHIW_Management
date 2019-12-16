@@ -22,12 +22,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -168,16 +168,23 @@ public class UserResource {
     /**
      * {@code GET /users} : get all users.
      *
-     * @param pageable the pagination information.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body all users.
      */
     @GetMapping("/users")
-    public ResponseEntity<List<UserDTO>> getAllUsers(Pageable pageable) {
+    public ResponseEntity<List<UserDTO>> getAllUsers(@RequestParam(value = "page" , required = false) Integer offset,
+    @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sort", required = false) String sort) {
         Optional<User> currentUser = userService.getUserWithAuthorities();
         Page<UserDTO> page = null;
-        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))){
+        Pageable pageable;
+        if(offset != null && size != null) {
+            Sort sorting  = Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]);
+            pageable = PageRequest.of(offset, size, sorting);
+        } else {
+            pageable = Pageable.unpaged();
+        }
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
             page = userService.getAllManagedUsers(pageable);
-        } else if (currentUser.get().getAuthorities().contains(new Authority(PI))){
+        } else if (currentUser.get().getAuthorities().contains(new Authority(PI))) {
             IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
             page = userService.getMyManagedUsers(pageable, currentIhiwUser.getLab());
         }

@@ -128,7 +128,7 @@ export class ProjectUpdateComponent implements OnInit {
 
   addIhiwLab(lab: IIhiwLab) {
     const labWrapper = {
-      lab: lab,
+      lab,
       status: 'SUBSCRIBED'
     };
     const index = this.editForm.get(['labs']).value.indexOf(labWrapper, 0);
@@ -190,8 +190,8 @@ export class ProjectUpdateComponent implements OnInit {
     return item.id;
   }
 
-  trackIhiwLabById(index: number, item: IIhiwLab) {
-    return item.id;
+  trackIhiwLabById(index: number, item: IProjectIhiwLab) {
+    return item.lab.id;
   }
 
   getSelected(selectedVals: Array<any>, option: any) {

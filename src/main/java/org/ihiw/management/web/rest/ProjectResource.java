@@ -195,10 +195,10 @@ public class ProjectResource {
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR)) ||
                 currentUser.get().getAuthorities().contains(new Authority(PI))){
-            return projectRepository.findAllWithEagerRelationshipsOrderByComponent();
+            return projectRepository.findAllByOrderByComponent();
         }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        List<ProjectIhiwLab> projectIhiwLabs = projectIhiwLabRepository.findAllWithEagerRelationshipsByLabOrderByComponent(currentIhiwUser.getLab());
+        List<ProjectIhiwLab> projectIhiwLabs = projectIhiwLabRepository.findByLab(currentIhiwUser.getLab());
         List<Project> projects = new ArrayList<>();
         for (ProjectIhiwLab pil : projectIhiwLabs) {
             projects.add(pil.getProject());

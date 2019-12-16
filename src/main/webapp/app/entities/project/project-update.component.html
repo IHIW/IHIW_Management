@@ -57,7 +57,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let labWrapper of editForm.get('labs').value ;trackBy: trackId">
+                                <tr *ngFor="let labWrapper of editForm.get('labs').value ;trackBy: trackIhiwLabById">
                                     <td><a class="form-control-static" [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">{{labWrapper.lab.labCode}}</a></td>
                                     <td>{{labWrapper.lab.firstName}} {{labWrapper.lab.lastName}}</td>
                                     <td>

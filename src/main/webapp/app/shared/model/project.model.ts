@@ -12,6 +12,7 @@ export interface IProject {
   createdBy?: IIhiwUser;
   modifiedBy?: IIhiwUser;
   labs?: IIhiwLab[];
+  leaders?: IIhiwUser[];
 }
 
 export class Project implements IProject {
@@ -24,6 +25,7 @@ export class Project implements IProject {
     public modifiedAt?: Moment,
     public createdBy?: IIhiwUser,
     public modifiedBy?: IIhiwUser,
-    public labs?: IIhiwLab[]
+    public labs?: IIhiwLab[],
+    public leaders?: IIhiwUser[]
   ) {}
 }

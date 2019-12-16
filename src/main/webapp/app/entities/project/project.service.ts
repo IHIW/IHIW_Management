@@ -49,6 +49,14 @@ export class ProjectService {
     return this.http.delete<any>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
+  removeProjectLeader(project: number, leader: number): Observable<HttpResponse<any>> {
+    return this.http.delete<any>(`${this.resourceUrl}/${project}/projectleader/${leader}`, { observe: 'response' });
+  }
+
+  addProjectLeader(project: number, leader: number): Observable<HttpResponse<any>> {
+    return this.http.put<any>(`${this.resourceUrl}/${project}/projectleader/${leader}`, { observe: 'response' });
+  }
+
   protected convertDateFromClient(project: IProject): IProject {
     const copy: IProject = Object.assign({}, project, {
       createdAt: project.createdAt != null && project.createdAt.isValid() ? project.createdAt.toJSON() : null,

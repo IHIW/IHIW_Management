@@ -1,10 +1,29 @@
+${AnsiColor.BLUE}MMMMMMMMMMMMMMMMMMMMMWWNNNNNWWMMMMMMMMMMMMMMMMMMMM
+${AnsiColor.BLUE}MMMMMMMMMMMMMMMWXOxol::;,,,;::coxOKNMMMMMMMMMMMMMM
+${AnsiColor.BLUE}MMMMMMMMMMMWXOo:'.................';lkXWMMMMMMMMMM
+${AnsiColor.BLUE}MMMMMMMMMW0o,.,od;......;odkx:........,l0WMMMMMMMM
+${AnsiColor.BLUE}MMMMMMMW0l....dWMK:....;KMMMMK:..........cOWMMMMMM
+${AnsiColor.BLUE}MMMMMMNd'....'OMMWd....xWMMMM0;.....cdl'...oXMMMMM
+${AnsiColor.BLUE}MMMMMXl.;xkl.'OMMWd...;KMMMMNo.....dNMWKo...:0WMMM
+${AnsiColor.BLUE}MMMMXc.,OMM0,.xWMXc...lNMMMMO,....oXXKXWWk,..:0MMM
+${AnsiColor.BLUE}MMMNo..oNMMk..cXMO'...xWMMMNl....c0d,',oKWk'..cXMM
+${AnsiColor.BLUE}MMM0,..kMMNl..;0Nl....kMMMMO,...,Ox.....:KNl...kWM
+${AnsiColor.BLUE}MMWd. 'OMM0,..;0O,...'OMMMWo....oXl......dWO'..lNM
+${AnsiColor.BLUE}MMNo..'OMMK;..oXo... 'OMMMX:...,0Nx,''',cOWK;..:XM
+${AnsiColor.BLUE}MMNo..,OMMW0dkXXc.....kMMM0,...oNMWNXXXNWMMXc..:XM
+${AnsiColor.BLUE}MMWx...kMMWXKNMNc.....xWMMO'..'kMN0dlllokXWXc..lNM
+${AnsiColor.BLUE}MMM0;..lNM0;.:kNx.....lNMWk' .,kO:.......;OK:.'kMM
+${AnsiColor.BLUE}MMMWd..'xNk'..'kXl....;0MMO'...'..........oO,.lXMM
+${AnsiColor.BLUE}MMMMXl..'xXO:..:KXl....oNMXc......:xd,....;:.:KMMM
+${AnsiColor.BLUE}MMMMMXo...oKNk;.oNNd'..'xNW0:...'oXMNo......cKMMMM
+${AnsiColor.BLUE}MMMMMMNx,..,dkc.'kWWO;..'ckNN0kOKWMMK:....'dXMMMMM
+${AnsiColor.BLUE}MMMMMMMWKo'......'xNMK:....o0NWWWNKk:....l0WMMMMMM
+${AnsiColor.BLUE}MMMMMMMMMWKd;......:xx:......;cc:;'...,o0WMMMMMMMM
+${AnsiColor.BLUE}MMMMMMMMMMMMN0d:'.................':oONMMMMMMMMMMM
+${AnsiColor.BLUE}MMMMMMMMMMMMMMMWX0xdlc:;;;;;:clox0XWMMMMMMMMMMMMMM
+${AnsiColor.BLUE}MMMMMMMMMMMMMMMMMMMMMWWWNWWWWWMMMMMMMMMMMMMMMMMMMM
+${AnsiColor.BLUE}MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 
-  ${AnsiColor.GREEN}      ██╗${AnsiColor.RED} ██╗   ██╗ ████████╗ ███████╗   ██████╗ ████████╗ ████████╗ ███████╗
-  ${AnsiColor.GREEN}      ██║${AnsiColor.RED} ██║   ██║ ╚══██╔══╝ ██╔═══██╗ ██╔════╝ ╚══██╔══╝ ██╔═════╝ ██╔═══██╗
-  ${AnsiColor.GREEN}      ██║${AnsiColor.RED} ████████║    ██║    ███████╔╝ ╚█████╗     ██║    ██████╗   ███████╔╝
-  ${AnsiColor.GREEN}██╗   ██║${AnsiColor.RED} ██╔═══██║    ██║    ██╔════╝   ╚═══██╗    ██║    ██╔═══╝   ██╔══██║
-  ${AnsiColor.GREEN}╚██████╔╝${AnsiColor.RED} ██║   ██║ ████████╗ ██║       ██████╔╝    ██║    ████████╗ ██║  ╚██╗
-  ${AnsiColor.GREEN} ╚═════╝ ${AnsiColor.RED} ╚═╝   ╚═╝ ╚═══════╝ ╚═╝       ╚═════╝     ╚═╝    ╚═══════╝ ╚═╝   ╚═╝
+${AnsiColor.BRIGHT_BLUE}:: IHIWS Management 🤓  :: Running Spring Boot ${spring-boot.version} ::
 
-${AnsiColor.BRIGHT_BLUE}:: JHipster 🤓  :: Running Spring Boot ${spring-boot.version} ::
-:: https://www.jhipster.tech ::${AnsiColor.DEFAULT}
+

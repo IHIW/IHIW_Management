@@ -32,6 +32,7 @@ public class Project implements Serializable {
     private String name;
 
     @Column(name = "description")
+    @Lob
     private String description;
 
     @Column(name = "created_at")
@@ -57,6 +58,13 @@ public class Project implements Serializable {
                joinColumns = @JoinColumn(name = "project_id", referencedColumnName = "id"),
                inverseJoinColumns = @JoinColumn(name = "lab_id", referencedColumnName = "id"))
     private Set<IhiwLab> labs = new HashSet<>();
+
+    @ManyToMany
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JoinTable(name = "project_leader",
+        joinColumns = @JoinColumn(name = "project_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "ihiw_user_id", referencedColumnName = "id"))
+    private Set<IhiwUser> leaders = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -181,6 +189,31 @@ public class Project implements Serializable {
 
     public void setLabs(Set<IhiwLab> ihiwLabs) {
         this.labs = ihiwLabs;
+    }
+
+    public Set<IhiwUser> getLeaders() {
+        return leaders;
+    }
+
+    public Project leaders(Set<IhiwUser> leader) {
+        this.leaders = leader;
+        return this;
+    }
+
+    public Project addLeader(IhiwUser leader) {
+        this.leaders.add(leader);
+        leader.getProjectLeaderships().add(this);
+        return this;
+    }
+
+    public Project removeLeader(IhiwUser leader) {
+        this.leaders.remove(leader);
+        leader.getProjectLeaderships().remove(this);
+        return this;
+    }
+
+    public void setLeaders(Set<IhiwUser> leaders) {
+        this.leaders = leaders;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 

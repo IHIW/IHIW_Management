@@ -8,7 +8,6 @@
 
     <changeSet author="mniemann" id="addProjectActivation">
         <addColumn
-                   schemaName="ihiwManagement"
                    tableName="project">
             <column name="activated" type="boolean" defaultValue="0"/>
         </addColumn>

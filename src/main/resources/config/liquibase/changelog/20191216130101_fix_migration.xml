@@ -6,11 +6,10 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet author="mniemann" id="modifyDataTypeProjectDescription">
-        <modifyDataType
-                        columnName="description"
-                        newDataType="text"
-                        tableName="project"/>
+    <changeSet id="fixMigration" author="mniemann">
+        <sql>
+            UPDATE jhi_user SET login = REPLACE(login, " ", "_");
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

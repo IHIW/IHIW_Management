@@ -83,7 +83,8 @@ public class AccountResource {
             boolean mailSent = false;
             //send the activation mail to all PIs of the lab
             for (IhiwUser labUser : labUsers){
-                if (labUser.getUser().getAuthorities().contains(new Authority(AuthoritiesConstants.PI))){
+                Optional<User> userFromIhiw = userRepository.findOneWithAuthoritiesById(labUser.getUser().getId());
+                if (userFromIhiw.get().getAuthorities().contains(new Authority(AuthoritiesConstants.PI))){
                     mailService.sendActivationEmail(user, labUser.getUser().getEmail());
                     mailSent = true;
                 }

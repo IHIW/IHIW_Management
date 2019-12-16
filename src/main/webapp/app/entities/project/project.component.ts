@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
 
-import { IProject, ProjectComponentEnum } from 'app/shared/model/project.model';
+import { IProject } from 'app/shared/model/project.model';
 import { AccountService } from 'app/core';
 import { ProjectService } from './project.service';
 
@@ -14,8 +14,6 @@ import { ProjectService } from './project.service';
 })
 export class ProjectComponent implements OnInit, OnDestroy {
   projects: IProject[];
-  // @ts-ignore It needs the any ProjectComponentEnum, without it reverse mapping does not work
-  ProjectComponentEnum: any = ProjectComponentEnum;
   currentAccount: any;
   eventSubscriber: Subscription;
 

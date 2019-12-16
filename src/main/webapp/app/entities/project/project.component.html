@@ -58,8 +58,14 @@
                         </span>
                 </td>
                 <td>
-                    <span *ngFor="let labWrapper of project.labs | status:'DECLINED;UNSUBSCRIBED'; let last = last">
-                            <a class="form-control-static" [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">{{labWrapper.lab.labCode}}</a>{{last ? '' : ', '}}
+                    <span *ngFor="let labWrapper of project.labs | status:'UNSUBSCRIBED'; let last = last">
+                            <a class="form-control-static" [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">
+                                {{labWrapper.lab.labCode}}
+                                <span class="badge badge-warning badge-pill" *ngIf="labWrapper.status === 'REQUESTED'">
+                                    <fa-icon  [icon]="'clock'"></fa-icon>
+                                </span>
+                            </a>
+                            {{last ? '' : ', '}}
                         </span>
                 </td>
                 <td class="text-right">

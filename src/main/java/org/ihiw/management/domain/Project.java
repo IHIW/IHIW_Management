@@ -53,7 +53,7 @@ public class Project implements Serializable {
     @Column(name= "activated")
     private Boolean activated;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JsonManagedReference
     private Set<ProjectIhiwLab> labs = new HashSet<>();

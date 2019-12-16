@@ -2,7 +2,7 @@ import { Component, OnInit, NgModule } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
 
-import { IProject } from 'app/shared/model/project.model';
+import { IProject, ProjectComponentEnum } from 'app/shared/model/project.model';
 
 @Component({
   selector: 'jhi-project-detail',
@@ -13,6 +13,8 @@ import { IProject } from 'app/shared/model/project.model';
 })
 export class ProjectDetailComponent implements OnInit {
   project: IProject;
+  // @ts-ignore It needs the any ProjectComponentEnum, without it reverse mapping does not work
+  ProjectComponentEnum: any = ProjectComponentEnum;
 
   constructor(protected activatedRoute: ActivatedRoute) {}
 

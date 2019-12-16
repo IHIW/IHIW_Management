@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.ihiw.management.domain.enumeration.FileType;
+import org.ihiw.management.domain.enumeration.ProjectComponent;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -31,6 +33,10 @@ public class Project implements Serializable {
     @NotNull
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "component")
+    private ProjectComponent component;
 
     @Column(name = "description")
     @Lob
@@ -86,6 +92,20 @@ public class Project implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public ProjectComponent getComponent() {
+        return component;
+    }
+
+    public Project component(ProjectComponent component) {
+        this.component = component;
+        return this;
+    }
+
+    public void setComponent(ProjectComponent component) {
+        this.component = component;
+    }
+
 
     public String getDescription() {
         return description;
@@ -237,6 +257,7 @@ public class Project implements Serializable {
         return "Project{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", component='" + getComponent() + "'" +
             ", description='" + getDescription() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", modifiedAt='" + getModifiedAt() + "'" +

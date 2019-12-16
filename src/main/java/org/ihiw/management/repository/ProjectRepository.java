@@ -37,4 +37,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findByLabs(ProjectIhiwLab lab);
 
     List<Project> findByCreatedBy(IhiwUser currentIhiwUser);
+
+    @Query("select distinct project from Project project left join fetch project.labs order by project.component")
+    List<Project> findAllWithEagerRelationshipsOrderByComponent();
+
+    @Query("select distinct project from Project project left join fetch project.labs l where l.id = :id order by project.component")
+    List<Project> findAllWithEagerRelationshipsByLabOrderByComponent(Long id);
 }

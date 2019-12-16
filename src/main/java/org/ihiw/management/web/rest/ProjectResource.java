@@ -189,17 +189,16 @@ public class ProjectResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of projects in body.
      */
     @GetMapping("/projects")
-    public List<Project> getAllProjects(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
+    public List<Project> getAllProjectsOrderByComponent(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all Projects");
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR)) ||
                 currentUser.get().getAuthorities().contains(new Authority(PI))){
-            List<Project> result = projectRepository.findAll();
-            return result;
+            return projectRepository.findAllWithEagerRelationshipsOrderByComponent();
         }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        List<ProjectIhiwLab> projectIhiwLabs = projectIhiwLabRepository.findByLab(currentIhiwUser.getLab());
+        List<ProjectIhiwLab> projectIhiwLabs = projectIhiwLabRepository.findAllWithEagerRelationshipsByLabOrderByComponent(currentIhiwUser.getLab());
         List<Project> projects = new ArrayList<>();
         for (ProjectIhiwLab pil : projectIhiwLabs) {
             projects.add(pil.getProject());

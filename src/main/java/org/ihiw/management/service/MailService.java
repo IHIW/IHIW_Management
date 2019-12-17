@@ -1,11 +1,16 @@
 package org.ihiw.management.service;
 
+import org.ihiw.management.domain.IhiwLab;
+import org.ihiw.management.domain.IhiwUser;
+import org.ihiw.management.domain.Project;
 import org.ihiw.management.domain.User;
 
 import io.github.jhipster.config.JHipsterProperties;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
@@ -30,6 +35,8 @@ public class MailService {
     private final Logger log = LoggerFactory.getLogger(MailService.class);
 
     private static final String USER = "user";
+    private static final String LAB = "lab";
+    private static final String PROJECT = "project";
 
     private static final String BASE_URL = "baseUrl";
 
@@ -75,11 +82,14 @@ public class MailService {
     }
 
     @Async
-    public void sendEmailFromTemplate(User user, String receiver, String templateName, String titleKey) {
+    public void sendEmailFromTemplate(User user, String receiver, String templateName, String titleKey, Map<String, Object> contextParameters) {
         Locale locale = Locale.forLanguageTag(user.getLangKey());
         Context context = new Context(locale);
         context.setVariable(USER, user);
         context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        for (String key : contextParameters.keySet()){
+            context.setVariable(key, contextParameters.get(key));
+        }
         String content = templateEngine.process(templateName, context);
         String subject = messageSource.getMessage(titleKey, null, locale);
         sendEmail(receiver, subject, content, false, true);
@@ -88,24 +98,27 @@ public class MailService {
     @Async
     public void sendActivationEmail(User user, String receiver) {
         log.debug("Sending activation email to '{}'", receiver);
-        sendEmailFromTemplate(user, receiver, "mail/activationEmail", "email.activation.title");
+        sendEmailFromTemplate(user, receiver, "mail/activationEmail", "email.activation.title", new HashMap<>());
     }
 
     @Async
-    public void sendProjectLeaderSubscriptionNotificationEmail(User user) {
+    public void sendProjectLeaderSubscriptionNotificationEmail(User user, IhiwLab lab, Project project) {
         log.debug("Sending subscription email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, user.getEmail(), "mail/subscriptionEmail", "email.subscription.title");
+        Map<String, Object> context = new HashMap<>();
+        context.put(LAB, lab);
+        context.put(PROJECT, project);
+        sendEmailFromTemplate(user, user.getEmail(), "mail/subscriptionEmail", "email.subscription.title", context);
     }
 
     @Async
     public void sendCreationEmail(User user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, user.getEmail(), "mail/creationEmail", "email.activation.title");
+        sendEmailFromTemplate(user, user.getEmail(), "mail/creationEmail", "email.activation.title", new HashMap<>());
     }
 
     @Async
     public void sendPasswordResetMail(User user) {
         log.debug("Sending password reset email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, user.getEmail(), "mail/passwordResetEmail", "email.reset.title");
+        sendEmailFromTemplate(user, user.getEmail(), "mail/passwordResetEmail", "email.reset.title", new HashMap<>());
     }
 }

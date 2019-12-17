@@ -120,7 +120,7 @@ public class ProjectResource {
 
             // send all project leaders a notification
             for (IhiwUser leader : projectFromDB.get().getLeaders()){
-                mailService.sendProjectLeaderSubscriptionNotificationEmail(leader.getUser());
+                mailService.sendProjectLeaderSubscriptionNotificationEmail(leader.getUser(), currentIhiwUser.getLab(), projectFromDB.get());
             }
 
             return ResponseEntity.created(new URI("/api/projects/" + projectId + "/subscribe"))

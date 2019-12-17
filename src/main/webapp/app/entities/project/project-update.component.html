@@ -57,7 +57,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let labWrapper of editForm.get('labs').value ;trackBy: trackIhiwLabById">
+                                <tr *ngFor="let labWrapper of editForm.get('labs').value">
                                     <td><a class="form-control-static" [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">{{labWrapper.lab.labCode}}</a></td>
                                     <td>{{labWrapper.lab.firstName}} {{labWrapper.lab.lastName}}</td>
                                     <td>
@@ -100,7 +100,7 @@
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.lab" for="field_leader">Add Lab</label>
                     <select class="form-control" id="field_lab" name="lab">
                         <option [ngValue]="null"></option>
-                        <option *ngFor="let lab of ihiwlabs; trackBy: trackIhiwLabById" (click)="addIhiwLab(lab)">{{lab.labCode}}</option>
+                        <option *ngFor="let lab of ihiwlabs;" (click)="addIhiwLab(lab)">{{lab.labCode}}</option>
                     </select>
                 </div>
 
@@ -115,7 +115,7 @@
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.leader" for="field_leader">Add Leader</label>
                     <select class="form-control" id="field_leader" name="leader">
                         <option [ngValue]="null"></option>
-                        <option *ngFor="let ihiwUserOption of ihiwusers; trackBy: trackIhiwUserById" (click)="addProjectLeader(ihiwUserOption)">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
+                        <option *ngFor="let ihiwUserOption of ihiwusers" (click)="addProjectLeader(ihiwUserOption)">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
                     </select>
                 </div>
             </div>

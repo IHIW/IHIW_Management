@@ -92,7 +92,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
 
   myProjectStatus(project: IProject, status: string) {
     for (const lab of project.labs) {
-      if (lab.lab.id === this.ihiwUser.lab.id && lab.status === status) {
+      if (this.ihiwUser !== undefined && lab.lab.id === this.ihiwUser.lab.id && lab.status === status) {
         return true;
       }
     }

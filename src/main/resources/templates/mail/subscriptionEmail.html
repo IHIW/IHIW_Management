@@ -10,7 +10,7 @@
             Dear
         </p>
         <p th:text="#{email.subscription.text1(${lab.labCode}, ${project.name})}">
-            The lab {0} wants to join to your IHIW project {1}. Please login and manage your project's subscriptions.
+            The lab {0} wants to join your IHIW project {1}. Please login and manage your project's subscriptions.
         </p>
         <a th:with="url=(@{|${baseUrl}|})" th:href="${baseUrl}"
            th:text="${baseUrl}">Go to the app</a>

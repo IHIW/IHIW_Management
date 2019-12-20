@@ -80,15 +80,17 @@ public class AccountResourceIT {
 
     private final String activationEmail = "admin@localhost";
 
+    private final String activation2Email = "admin@localhost";
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
         doNothing().when(mockMailService).sendActivationEmail(any(), any());
         AccountResource accountResource =
-            new AccountResource(userRepository, ihiwUserRepository, userService, mockMailService, activationEmail);
+            new AccountResource(userRepository, ihiwUserRepository, userService, mockMailService, activationEmail, activation2Email);
 
         AccountResource accountUserMockResource =
-            new AccountResource(userRepository, ihiwUserRepository, mockUserService, mockMailService, activationEmail);
+            new AccountResource(userRepository, ihiwUserRepository, mockUserService, mockMailService, activationEmail, activation2Email);
         this.restMvc = MockMvcBuilders.standaloneSetup(accountResource)
             .setMessageConverters(httpMessageConverters)
             .setControllerAdvice(exceptionTranslator)

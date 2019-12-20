@@ -22,7 +22,7 @@ management:
         include: ['configprops', 'env', 'health', 'info', 'jhimetrics', 'logfile', 'loggers', 'prometheus', 'threaddump']
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
       roles: 'ROLE_ADMIN'
     jhimetrics:
       enabled: true
@@ -31,7 +31,7 @@ management:
       mode: full
   health:
     mail:
-      enabled: false # When using the MailService, configure an SMTP server and set this to true
+      enabled: true # When using the MailService, configure an SMTP server and set this to true
   metrics:
     export:
       # Prometheus is the default metrics backend
@@ -163,3 +163,5 @@ aws:
     bucket:
 mail:
   activation-email: admin@localhost
+  registration-email: admin@localhost
+  activation2-email: admin@localhost

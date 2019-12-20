@@ -1,16 +1,9 @@
 package org.ihiw.management.service;
 
-import org.ihiw.management.domain.User;
-
 import io.github.jhipster.config.JHipsterProperties;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Locale;
-import javax.mail.internet.MimeMessage;
-
+import org.ihiw.management.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -18,6 +11,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import javax.mail.internet.MimeMessage;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 /**
  * Service for sending emails.
@@ -40,6 +37,8 @@ public class MailService {
     private final MessageSource messageSource;
 
     private final SpringTemplateEngine templateEngine;
+    private User user;
+    private String receiver;
 
     public MailService(JHipsterProperties jHipsterProperties, JavaMailSender javaMailSender,
             MessageSource messageSource, SpringTemplateEngine templateEngine) {
@@ -92,6 +91,12 @@ public class MailService {
     }
 
     @Async
+    public void sendActivation2Email(User user, String receiver) {
+        log.debug("Sending activation email to '{}'", receiver);
+        sendEmailFromTemplate(user, receiver, "mail/activation2Email", "email.activation2.title");
+    }
+
+    @Async
     public void sendCreationEmail(User user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, user.getEmail(), "mail/creationEmail", "email.activation.title");
@@ -102,4 +107,6 @@ public class MailService {
         log.debug("Sending password reset email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, user.getEmail(), "mail/passwordResetEmail", "email.reset.title");
     }
+
+
 }

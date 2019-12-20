@@ -52,13 +52,17 @@ public class AccountResource {
 
     private final String activationEmail;
 
-    public AccountResource(UserRepository userRepository, IhiwUserRepository ihiwUserRepository, UserService userService, MailService mailService, @Qualifier("activationEmail") String activationEmail) {
+    private final String activation2Email;
+
+    public AccountResource(UserRepository userRepository, IhiwUserRepository ihiwUserRepository, UserService userService, MailService mailService, @Qualifier("activationEmail") String activationEmail, @Qualifier("activation2Email") String activation2Email) {
 
         this.userRepository = userRepository;
         this.ihiwUserRepository = ihiwUserRepository;
         this.userService = userService;
         this.mailService = mailService;
         this.activationEmail = activationEmail;
+        this.activation2Email = activation2Email;
+
     }
 
     /**
@@ -109,6 +113,7 @@ public class AccountResource {
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this activation key");
         }
+        mailService.sendActivation2Email(user.get(),activationEmail);
     }
 
     /**

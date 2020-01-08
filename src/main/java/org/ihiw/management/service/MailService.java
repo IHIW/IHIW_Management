@@ -40,8 +40,7 @@ public class MailService {
     private User user;
     private String receiver;
 
-    public MailService(JHipsterProperties jHipsterProperties, JavaMailSender javaMailSender,
-            MessageSource messageSource, SpringTemplateEngine templateEngine) {
+    public MailService(JHipsterProperties jHipsterProperties, JavaMailSender javaMailSender, MessageSource messageSource, SpringTemplateEngine templateEngine) {
 
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
@@ -91,9 +90,9 @@ public class MailService {
     }
 
     @Async
-    public void sendActivation2Email(User user, String receiver) {
-        log.debug("Sending activation email to '{}'", receiver);
-        sendEmailFromTemplate(user, receiver, "mail/activation2Email", "email.activation2.title");
+    public void sendActivation2Email(User user) {
+        log.debug("Sending activation2 email to '{}'", user.getEmail());
+        sendEmailFromTemplate(user, user.getEmail(), "mail/activation2Email", "email.activation2.title");
     }
 
     @Async

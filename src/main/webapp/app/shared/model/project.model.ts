@@ -1,6 +1,7 @@
 import { Moment } from 'moment';
 import { IIhiwUser } from 'app/shared/model/ihiw-user.model';
 import { IIhiwLab } from 'app/shared/model/ihiw-lab.model';
+import { IProjectIhiwLab } from 'app/shared/model/project-ihiw-lab.model';
 
 export const enum ProjectComponentEnum {
   AntigenicityImmunogenicity = 'Antigenicity & Immunogenicity',
@@ -18,7 +19,7 @@ export interface IProject {
   modifiedAt?: Moment;
   createdBy?: IIhiwUser;
   modifiedBy?: IIhiwUser;
-  labs?: IIhiwLab[];
+  labs?: IProjectIhiwLab[];
   leaders?: IIhiwUser[];
 }
 
@@ -33,7 +34,7 @@ export class Project implements IProject {
     public modifiedAt?: Moment,
     public createdBy?: IIhiwUser,
     public modifiedBy?: IIhiwUser,
-    public labs?: IIhiwLab[],
+    public labs?: IProjectIhiwLab[],
     public leaders?: IIhiwUser[]
   ) {}
 }

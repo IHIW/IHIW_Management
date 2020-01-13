@@ -49,8 +49,8 @@
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.project.lab">Labs</span></dt>
                 <dd>
-                    <span *ngFor="let lab of project.labs; let last = last">
-                        <a [routerLink]="['/ihiw-lab', lab?.id, 'view' ]">{{lab.labCode}}</a>{{last ? '' : ', '}}
+                    <span *ngFor="let labWrapper of project.labs; let last = last">
+                        <a [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">{{labWrapper.lab.labCode}}</a>{{last ? '' : ', '}}
                     </span>
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.project.leader">Leaders</span></dt>
@@ -69,6 +69,7 @@
 
             <button type="button"
                     [routerLink]="['/project', project.id, 'edit']"
+                    *jhiHasAnyAuthority="['ROLE_ADMIN', 'ProjectLeader']"
                     class="btn btn-primary">
                 <fa-icon [icon]="'pencil-alt'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit"> Edit</span>
             </button>

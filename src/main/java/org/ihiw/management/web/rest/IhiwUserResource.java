@@ -109,6 +109,13 @@ public class IhiwUserResource {
         return ResponseUtil.wrapOrNotFound(ihiwUser);
     }
 
+    @GetMapping("/ihiw-user")
+    public ResponseEntity<IhiwUser> getIhiwUser() {
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        return ResponseEntity.ok()
+            .body(currentIhiwUser);
+    }
+
     /**
      * {@code DELETE  /ihiw-users/:id} : delete the "id" ihiwUser.
      *

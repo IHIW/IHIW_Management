@@ -2,9 +2,12 @@ package org.ihiw.management.web.rest;
 
 import org.ihiw.management.IhiwManagementApp;
 import org.ihiw.management.domain.Project;
+import org.ihiw.management.domain.enumeration.ProjectComponent;
 import org.ihiw.management.repository.IhiwUserRepository;
+import org.ihiw.management.repository.ProjectIhiwLabRepository;
 import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.repository.UserRepository;
+import org.ihiw.management.service.MailService;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.ExceptionTranslator;
 
@@ -52,6 +55,9 @@ public class ProjectResourceIT {
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
+    private static final ProjectComponent DEFAULT_COMPONENTENUM = ProjectComponent.AntigenicityImmunogenicity;
+    private static final ProjectComponent UPDATED_COMPONENTENUM = ProjectComponent.Bioinformatics;
+
     private static final ZonedDateTime DEFAULT_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(0L), ZoneOffset.UTC);
     private static final ZonedDateTime UPDATED_CREATED_AT = ZonedDateTime.now(ZoneId.systemDefault()).withNano(0);
     private static final ZonedDateTime SMALLER_CREATED_AT = ZonedDateTime.ofInstant(Instant.ofEpochMilli(-1L), ZoneOffset.UTC);
@@ -73,7 +79,13 @@ public class ProjectResourceIT {
     private IhiwUserRepository ihiwUserRepositoryMock;
 
     @Mock
+    private ProjectIhiwLabRepository projectIhiwLabRepository;
+
+    @Mock
     private UserService userService;
+
+    @Mock
+    private MailService mailService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -97,7 +109,7 @@ public class ProjectResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final ProjectResource projectResource = new ProjectResource(projectRepository, ihiwUserRepository, userService);
+        final ProjectResource projectResource = new ProjectResource(projectRepository, projectIhiwLabRepository, ihiwUserRepository, userService, mailService);
         this.restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -115,6 +127,7 @@ public class ProjectResourceIT {
     public static Project createEntity(EntityManager em) {
         Project project = new Project()
             .name(DEFAULT_NAME)
+            .component(DEFAULT_COMPONENTENUM)
             .description(DEFAULT_DESCRIPTION)
             .createdAt(DEFAULT_CREATED_AT)
             .modifiedAt(DEFAULT_MODIFIED_AT);
@@ -130,6 +143,7 @@ public class ProjectResourceIT {
         Project project = new Project()
             .name(UPDATED_NAME)
             .description(UPDATED_DESCRIPTION)
+            .component(UPDATED_COMPONENTENUM)
             .createdAt(UPDATED_CREATED_AT)
             .modifiedAt(UPDATED_MODIFIED_AT);
         return project;
@@ -214,39 +228,6 @@ public class ProjectResourceIT {
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(sameInstant(DEFAULT_CREATED_AT))))
             .andExpect(jsonPath("$.[*].modifiedAt").value(hasItem(sameInstant(DEFAULT_MODIFIED_AT))));
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public void getAllProjectsWithEagerRelationshipsIsEnabled() throws Exception {
-        ProjectResource projectResource = new ProjectResource(projectRepositoryMock, ihiwUserRepositoryMock, userService);
-        when(projectRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-
-        MockMvc restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setControllerAdvice(exceptionTranslator)
-            .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
-
-        restProjectMockMvc.perform(get("/api/projects?eagerload=true"))
-        .andExpect(status().isOk());
-
-        verify(projectRepositoryMock, times(1)).findAllWithEagerRelationships(any());
-    }
-
-    @SuppressWarnings({"unchecked"})
-    public void getAllProjectsWithEagerRelationshipsIsNotEnabled() throws Exception {
-        ProjectResource projectResource = new ProjectResource(projectRepositoryMock, ihiwUserRepositoryMock, userService);
-            when(projectRepositoryMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
-            MockMvc restProjectMockMvc = MockMvcBuilders.standaloneSetup(projectResource)
-            .setCustomArgumentResolvers(pageableArgumentResolver)
-            .setControllerAdvice(exceptionTranslator)
-            .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter).build();
-
-        restProjectMockMvc.perform(get("/api/projects?eagerload=true"))
-        .andExpect(status().isOk());
-
-            verify(projectRepositoryMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @Test

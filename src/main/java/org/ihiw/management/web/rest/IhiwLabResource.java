@@ -134,9 +134,9 @@ public class IhiwLabResource {
         if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
             List<Project> projectsOfUser = projectRepository.findByCreatedBy(currentIhiwUser);
             for (Project project : projectsOfUser){
-                for (IhiwLab lab : project.getLabs()){
-                    if (!result.contains(lab)){
-                        result.add(lab);
+                for (ProjectIhiwLab lab : project.getLabs()){
+                    if (!result.contains(lab.getLab())){
+                        result.add(lab.getLab());
                     }
                 }
             }

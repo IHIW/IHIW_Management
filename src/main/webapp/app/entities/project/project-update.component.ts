@@ -8,11 +8,13 @@ import * as moment from 'moment';
 import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService } from 'ng-jhipster';
 import { IProject, Project } from 'app/shared/model/project.model';
+import { IProjectIhiwLab } from 'app/shared/model/project-ihiw-lab.model';
 import { ProjectService } from './project.service';
 import { IIhiwUser } from 'app/shared/model/ihiw-user.model';
 import { IhiwUserService } from 'app/entities/ihiw-user';
 import { IIhiwLab } from 'app/shared/model/ihiw-lab.model';
 import { IhiwLabService } from 'app/entities/ihiw-lab';
+import { AccountService } from 'app/core';
 
 @Component({
   selector: 'jhi-project-update',
@@ -30,6 +32,7 @@ export class ProjectUpdateComponent implements OnInit {
   editForm = this.fb.group({
     id: [],
     name: [null, [Validators.required]],
+    component: [],
     description: [],
     activated: [],
     createdAt: [],
@@ -45,6 +48,7 @@ export class ProjectUpdateComponent implements OnInit {
     protected projectService: ProjectService,
     protected ihiwUserService: IhiwUserService,
     protected ihiwLabService: IhiwLabService,
+    private accountService: AccountService,
     protected activatedRoute: ActivatedRoute,
     private fb: FormBuilder
   ) {}
@@ -54,13 +58,17 @@ export class ProjectUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ project }) => {
       this.updateForm(project);
     });
-    this.ihiwUserService
-      .query()
-      .pipe(
-        filter((mayBeOk: HttpResponse<IIhiwUser[]>) => mayBeOk.ok),
-        map((response: HttpResponse<IIhiwUser[]>) => response.body)
-      )
-      .subscribe((res: IIhiwUser[]) => (this.ihiwusers = res), (res: HttpErrorResponse) => this.onError(res.message));
+    this.accountService.identity().then(account => {
+      if (account.authorities.indexOf('ROLE_ADMIN') > -1) {
+        this.ihiwUserService
+          .query()
+          .pipe(
+            filter((mayBeOk: HttpResponse<IIhiwUser[]>) => mayBeOk.ok),
+            map((response: HttpResponse<IIhiwUser[]>) => response.body)
+          )
+          .subscribe((res: IIhiwUser[]) => (this.ihiwusers = res), (res: HttpErrorResponse) => this.onError(res.message));
+      }
+    });
     this.ihiwLabService
       .query()
       .pipe(
@@ -78,6 +86,7 @@ export class ProjectUpdateComponent implements OnInit {
     this.editForm.patchValue({
       id: project.id,
       name: project.name,
+      component: project.component,
       description: project.description,
       createdAt: project.createdAt != null ? project.createdAt.format(DATE_TIME_FORMAT) : null,
       modifiedAt: project.modifiedAt != null ? project.modifiedAt.format(DATE_TIME_FORMAT) : null,
@@ -103,6 +112,31 @@ export class ProjectUpdateComponent implements OnInit {
     }
   }
 
+  removeLab(lab: IProjectIhiwLab) {
+    console.log(lab);
+    console.log(this.editForm.get(['labs']));
+    const index = this.editForm.get(['labs']).value.indexOf(lab, 0);
+    console.log(index);
+    if (index > -1) {
+      this.editForm.get(['labs']).value.splice(index, 1);
+    }
+  }
+
+  grantLabSubscription(lab: IProjectIhiwLab) {
+    lab.status = 'SUBSCRIBED';
+  }
+
+  addIhiwLab(lab: IIhiwLab) {
+    const labWrapper = {
+      lab,
+      status: 'SUBSCRIBED'
+    };
+    const index = this.editForm.get(['labs']).value.indexOf(labWrapper, 0);
+    if (index < 0) {
+      this.editForm.get(['labs']).value.push(labWrapper);
+    }
+  }
+
   previousState() {
     window.history.back();
   }
@@ -122,6 +156,7 @@ export class ProjectUpdateComponent implements OnInit {
       ...new Project(),
       id: this.editForm.get(['id']).value,
       name: this.editForm.get(['name']).value,
+      component: this.editForm.get(['component']).value,
       description: this.editForm.get(['description']).value,
       createdAt:
         this.editForm.get(['createdAt']).value != null ? moment(this.editForm.get(['createdAt']).value, DATE_TIME_FORMAT) : undefined,
@@ -155,8 +190,8 @@ export class ProjectUpdateComponent implements OnInit {
     return item.id;
   }
 
-  trackIhiwLabById(index: number, item: IIhiwLab) {
-    return item.id;
+  trackIhiwLabById(index: number, item: IProjectIhiwLab) {
+    return item.lab.id;
   }
 
   getSelected(selectedVals: Array<any>, option: any) {

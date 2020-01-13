@@ -1,4 +1,5 @@
 package org.ihiw.management.domain;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -110,10 +111,10 @@ public class IhiwLab implements Serializable {
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
-    @ManyToMany(mappedBy = "labs")
+    @OneToMany(mappedBy = "lab", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JsonIgnore
-    private Set<Project> projects = new HashSet<>();
+    @JsonBackReference
+    private Set<ProjectIhiwLab> projects = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -475,28 +476,28 @@ public class IhiwLab implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Set<Project> getProjects() {
+    public Set<ProjectIhiwLab> getProjects() {
         return projects;
     }
 
-    public IhiwLab projects(Set<Project> projects) {
+    public IhiwLab projects(Set<ProjectIhiwLab> projects) {
         this.projects = projects;
         return this;
     }
 
-    public IhiwLab addProject(Project project) {
+    public IhiwLab addProject(ProjectIhiwLab project) {
         this.projects.add(project);
-        project.getLabs().add(this);
+        project.getProject().getLabs().add(project);
         return this;
     }
 
-    public IhiwLab removeProject(Project project) {
+    public IhiwLab removeProject(ProjectIhiwLab project) {
         this.projects.remove(project);
-        project.getLabs().remove(this);
+        project.getProject().getLabs().remove(project);
         return this;
     }
 
-    public void setProjects(Set<Project> projects) {
+    public void setProjects(Set<ProjectIhiwLab> projects) {
         this.projects = projects;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove

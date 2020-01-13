@@ -20,6 +20,16 @@
                         </small>
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.component" for="field_component">Component</label>
+                    <select class="form-control" name="component" formControlName="component" id="field_component">
+                        <option value="AntigenicityImmunogenicity" selected="selected">Antigenicity &amp; Immunogenicity</option>
+                        <option value="Immunogenetics">Immunogenetics</option>
+                        <option value="Bioinformatics">Bioinformatics</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.description" for="field_description">Description</label>
                     <textarea type="text" class="form-control" name="description" id="field_description"
@@ -35,9 +45,62 @@
                 </div>
 
                 <div class="form-group">
-                    <label jhiTranslate="ihiwManagementApp.project.lab" for="field_labs">Lab</label>
-                    <select class="form-control" id="field_labs" multiple name="labs" formControlName="labs">
-                        <option [ngValue]="getSelected(editForm.get('labs').value, ihiwLabOption)" *ngFor="let ihiwLabOption of ihiwlabs; trackBy: trackIhiwLabById">{{ihiwLabOption.labCode}}</option>
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.lab">Labs</label>
+                    <div class="table-responsive" *ngIf="editForm.get('labs').value?.length > 0">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th><span>Lab Code</span></th>
+                                    <th><span>PI</span></th>
+                                    <th><span>Subscription Status</span></th>
+                                    <th><span>Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let labWrapper of editForm.get('labs').value">
+                                    <td><a class="form-control-static" [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">{{labWrapper.lab.labCode}}</a></td>
+                                    <td>{{labWrapper.lab.firstName}} {{labWrapper.lab.lastName}}</td>
+                                    <td>
+                                        <span class="badge badge-warning btn-sm" *ngIf="labWrapper.status === 'REQUESTED'">
+                                            Requested Access
+                                        </span>
+                                        <span class="badge badge-success btn-sm" *ngIf="labWrapper.status === 'SUBSCRIBED'">
+                                            Subscribed
+                                        </span>
+                                        <span class="badge badge-danger btn-sm" *ngIf="labWrapper.status === 'UNSUBSCRIBED'">
+                                            Unsubscribed
+                                        </span>
+                                        <span class="badge badge-light btn-sm" *ngIf="labWrapper.status === 'DECLINED'">
+                                            Declined
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button *jhiHasAnyAuthority="['ROLE_ADMIN']"
+                                                (click)="removeLab(labWrapper)"
+                                                class="btn btn-danger btn-sm"
+                                                type="button">
+                                            <fa-icon [icon]="'trash-alt'"></fa-icon>
+                                            <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Remove</span>
+                                        </button>
+                                        <button *ngIf="labWrapper.status === 'REQUESTED'"
+                                                (click)="grantLabSubscription(labWrapper)"
+                                                class="btn btn-success btn-sm"
+                                                type="button">
+                                            <fa-icon [icon]="'check'"></fa-icon>
+                                            <span class="d-none d-md-inline" jhiTranslate="entity.action.confirm">Grant</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.lab" for="field_leader">Add Lab</label>
+                    <select class="form-control" id="field_lab" name="lab">
+                        <option [ngValue]="null"></option>
+                        <option *ngFor="let lab of ihiwlabs;" (click)="addIhiwLab(lab)">{{lab.labCode}}</option>
                     </select>
                 </div>
 
@@ -48,11 +111,11 @@
                         <a class="" (click)="removeProjectLeader(leader)" *jhiHasAnyAuthority="['ROLE_ADMIN']"><fa-icon [icon]="'ban'"></fa-icon></a>
                     </p>
                 </div>
-                <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']">
+                <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']" >
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.leader" for="field_leader">Add Leader</label>
                     <select class="form-control" id="field_leader" name="leader">
                         <option [ngValue]="null"></option>
-                        <option *ngFor="let ihiwUserOption of ihiwusers; trackBy: trackIhiwUserById" (click)="addProjectLeader(ihiwUserOption)">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
+                        <option *ngFor="let ihiwUserOption of ihiwusers" (click)="addProjectLeader(ihiwUserOption)">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
                     </select>
                 </div>
             </div>

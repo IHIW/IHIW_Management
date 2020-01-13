@@ -1,8 +1,11 @@
 package org.ihiw.management.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModel;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.ihiw.management.domain.enumeration.FileType;
+import org.ihiw.management.domain.enumeration.ProjectComponent;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -31,6 +34,10 @@ public class Project implements Serializable {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "component")
+    private ProjectComponent component;
+
     @Column(name = "description")
     @Lob
     private String description;
@@ -52,14 +59,12 @@ public class Project implements Serializable {
     @Column(name= "activated")
     private Boolean activated;
 
-    @ManyToMany
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JoinTable(name = "project_lab",
-               joinColumns = @JoinColumn(name = "project_id", referencedColumnName = "id"),
-               inverseJoinColumns = @JoinColumn(name = "lab_id", referencedColumnName = "id"))
-    private Set<IhiwLab> labs = new HashSet<>();
+    @JsonManagedReference
+    private Set<ProjectIhiwLab> labs = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @JoinTable(name = "project_leader",
         joinColumns = @JoinColumn(name = "project_id", referencedColumnName = "id"),
@@ -87,6 +92,20 @@ public class Project implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public ProjectComponent getComponent() {
+        return component;
+    }
+
+    public Project component(ProjectComponent component) {
+        this.component = component;
+        return this;
+    }
+
+    public void setComponent(ProjectComponent component) {
+        this.component = component;
+    }
+
 
     public String getDescription() {
         return description;
@@ -166,28 +185,28 @@ public class Project implements Serializable {
         this.modifiedBy = ihiwUser;
     }
 
-    public Set<IhiwLab> getLabs() {
+    public Set<ProjectIhiwLab> getLabs() {
         return labs;
     }
 
-    public Project labs(Set<IhiwLab> ihiwLabs) {
+    public Project labs(Set<ProjectIhiwLab> ihiwLabs) {
         this.labs = ihiwLabs;
         return this;
     }
 
-    public Project addLab(IhiwLab ihiwLab) {
+    public Project addLab(ProjectIhiwLab ihiwLab) {
         this.labs.add(ihiwLab);
-        ihiwLab.getProjects().add(this);
+        ihiwLab.getLab().getProjects().add(ihiwLab);
         return this;
     }
 
-    public Project removeLab(IhiwLab ihiwLab) {
+    public Project removeLab(ProjectIhiwLab ihiwLab) {
         this.labs.remove(ihiwLab);
-        ihiwLab.getProjects().remove(this);
+        ihiwLab.getLab().getProjects().remove(this);
         return this;
     }
 
-    public void setLabs(Set<IhiwLab> ihiwLabs) {
+    public void setLabs(Set<ProjectIhiwLab> ihiwLabs) {
         this.labs = ihiwLabs;
     }
 
@@ -238,6 +257,7 @@ public class Project implements Serializable {
         return "Project{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", component='" + getComponent() + "'" +
             ", description='" + getDescription() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", modifiedAt='" + getModifiedAt() + "'" +

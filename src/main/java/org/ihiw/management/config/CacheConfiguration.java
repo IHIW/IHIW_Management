@@ -52,6 +52,7 @@ public class CacheConfiguration {
             createCache(cm, org.ihiw.management.domain.IhiwUser.class.getName());
             createCache(cm, org.ihiw.management.domain.IhiwUser.class.getName() + ".uploads");
             createCache(cm, org.ihiw.management.domain.IhiwUser.class.getName() + ".projectLeaderships");
+            createCache(cm, org.ihiw.management.domain.ProjectIhiwLab.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

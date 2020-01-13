@@ -19,8 +19,10 @@
             <tr>
             <th><span jhiTranslate="global.field.id">ID</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.name">Name</span></th>
+            <th><span jhiTranslate="ihiwManagementApp.project.component">Component</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.description">Description</span></th>
-            <th></th>
+            <th *jhiHasAnyAuthority="['ROLE_ADMIN']"></th>
+            <th><span>Subscription Status</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.createdAt">Created At</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.leader">Project Leaders</span></th>
             <th><span jhiTranslate="ihiwManagementApp.project.lab">Lab</span></th>
@@ -31,16 +33,25 @@
             <tr *ngFor="let project of projects ;trackBy: trackId">
                 <td><a [routerLink]="['/project', project.id, 'view' ]">{{project.id}}</a></td>
                 <td>{{project.name}}</td>
+                <td>{{project.component}}</td>
                 <td>
                     <div *ngIf="project.description">
                         {{ (project.description.length>128)? (project.description | slice:0:128)+'...':(project.description) }}
                     </div>
                 </td>
-                <td>
+                <td *jhiHasAnyAuthority="['ROLE_ADMIN']">
                     <button class="btn btn-danger btn-sm" (click)="setActive(project, true)" *ngIf="!project.activated"
                             >Deactivated</button>
                     <button class="btn btn-success btn-sm" (click)="setActive(project, false)" *ngIf="project.activated"
                              >Activated</button>
+                </td>
+                <td>
+                    <span class="badge badge-warning btn-sm" *ngIf="myProjectStatus(project, 'REQUESTED')">
+                        Waiting
+                    </span>
+                    <span class="badge badge-success btn-sm" *ngIf="myProjectStatus(project, 'SUBSCRIBED')">
+                        Subscribed
+                    </span>
                 </td>
                 <td>{{project.createdAt | date:'short'}}</td>
                 <td>
@@ -49,8 +60,14 @@
                         </span>
                 </td>
                 <td>
-                    <span *ngFor="let lab of project.labs; let last = last">
-                            <a class="form-control-static" [routerLink]="['/ihiw-lab', lab?.id, 'view' ]">{{lab.labCode}}</a>{{last ? '' : ', '}}
+                    <span *ngFor="let labWrapper of project.labs | status:'UNSUBSCRIBED'; let last = last">
+                            <a class="form-control-static" [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">
+                                {{labWrapper.lab.labCode}}
+                                <span class="badge badge-warning badge-pill" *ngIf="labWrapper.status === 'REQUESTED'">
+                                    <fa-icon  [icon]="'clock'"></fa-icon>
+                                </span>
+                            </a>
+                            {{last ? '' : ', '}}
                         </span>
                 </td>
                 <td class="text-right">
@@ -77,6 +94,34 @@
                             <fa-icon [icon]="'times'"></fa-icon>
                             <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
                         </button>
+                        <ng-container *jhiHasAnyAuthority="['ProjectLeader', 'PI']">
+                            <button *ngIf="!myProjectStatus(project, 'SUBSCRIBED') && !myProjectStatus(project, 'DECLINED') && !myProjectStatus(project, 'REQUESTED')"
+                                    type="submit"
+                                    [routerLink]="['/project', { outlets: { popup: project.id + '/subscribe'} }]"
+                                    replaceUrl="true"
+                                    queryParamsHandling="merge"
+                                    class="btn btn-primary btn-sm">
+                                <fa-icon [icon]="'plus-square'"></fa-icon>
+                                <span class="d-none d-md-inline" jhiTranslate="entity.action.subscribe">Subscribe</span>
+                            </button>
+                            <button *ngIf="myProjectStatus(project, 'SUBSCRIBED')"
+                                    type="submit"
+                                    [routerLink]="['/project', { outlets: { popup: project.id + '/unsubscribe'} }]"
+                                    replaceUrl="true"
+                                    queryParamsHandling="merge"
+                                    class="btn btn-danger btn-sm">
+                                <fa-icon [icon]="'minus-square'"></fa-icon>
+                                <span class="d-none d-md-inline" jhiTranslate="entity.action.unsubscribe">Unubscribe</span>
+                            </button>
+                            <!--<button *ngIf="myProjectStatus(project, 'REQUESTED')"-->
+                                    <!--type="submit"-->
+                                    <!--replaceUrl="true"-->
+                                    <!--queryParamsHandling="merge"-->
+                                    <!--class="btn btn-warning btn-sm">-->
+                                <!--<fa-icon [icon]="'clock'"></fa-icon>-->
+                                <!--<span class="d-none d-md-inline" jhiTranslate="entity.action.requested">Requested</span>-->
+                            <!--</button>-->
+                        </ng-container>
                     </div>
                 </td>
             </tr>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet author="mniemann" id="addProjectSubcriptionStatus">
+        <dropForeignKeyConstraint
+            constraintName="fk_project_lab_lab_id"
+            baseTableName="project_lab"/>
+        <dropForeignKeyConstraint
+            constraintName="fk_project_lab_project_id"
+            baseTableName="project_lab"/>
+        <addColumn tableName="project_lab">
+            <column name="status" type="varchar(255)"/>
+        </addColumn>
+        <addColumn tableName="project_lab">
+            <column name="id" type="bigint" />
+        </addColumn>
+        <sql>
+            SET @row=0;
+            UPDATE project_lab SET id = (SELECT @row:=@row+1 AS row)
+        </sql>
+        <sql>
+            UPDATE project_lab SET status='SUBSCRIBED'
+        </sql>
+        <addNotNullConstraint tableName="project_lab" columnName="id" columnDataType="bigint"/>
+        <dropPrimaryKey tableName="project_lab"/>
+        <addPrimaryKey tableName="project_lab" columnNames="id"/>
+        <addAutoIncrement tableName="project_lab" columnName="id" columnDataType="bigint"/>
+
+        <addForeignKeyConstraint baseColumnNames="project_id"
+                                 baseTableName="project_lab"
+                                 constraintName="fk_project_lab_project_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="project"
+                                 onDelete="CASCADE"/>
+        <addForeignKeyConstraint baseColumnNames="lab_id"
+                                 baseTableName="project_lab"
+                                 constraintName="fk_project_lab_lab_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ihiw_lab"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

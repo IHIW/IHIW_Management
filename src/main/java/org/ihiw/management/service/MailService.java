@@ -90,9 +90,9 @@ public class MailService {
     }
 
     @Async
-    public void sendActivation2Email(User user) {
+    public void sendactivationconfirmation(User user) {
         log.debug("Sending activation2 email to '{}'", user.getEmail());
-        sendEmailFromTemplate(user, user.getEmail(), "mail/activation2Email", "email.activation2.title");
+        sendEmailFromTemplate(user, user.getEmail(), "mail/activationconfirmation", "email.activationconfirmation.title");
     }
 
     @Async

@@ -80,7 +80,7 @@ public class AccountResourceIT {
 
     private final String activationEmail = "admin@localhost";
 
-    private final String activation2Email = "admin@localhost";
+    private final String activationconfirmation = "admin@localhost";
 
     @BeforeEach
     public void setup() {

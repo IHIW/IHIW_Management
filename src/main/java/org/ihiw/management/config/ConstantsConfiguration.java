@@ -20,8 +20,8 @@ public class ConstantsConfiguration {
         return env.getProperty("mail.activation-email");
     }
 
-    @Bean(name="activation2Email")
-    public String activation2Email(){
+    @Bean(name="activationconfirmation")
+    public String activationconfirmation(){
         return env.getProperty("mail.activation2-email");
     }
 }

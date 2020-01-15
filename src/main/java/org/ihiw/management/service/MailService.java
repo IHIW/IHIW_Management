@@ -41,6 +41,7 @@ public class MailService {
     private static final String USER = "user";
     private static final String LAB = "lab";
     private static final String PROJECT = "project";
+    private static final String FIRSTNAME = "firstname";
 
     private static final String BASE_URL = "baseUrl";
 
@@ -99,9 +100,11 @@ public class MailService {
     }
 
     @Async
-    public void sendActivationEmail(User user, String receiver) {
+    public void sendActivationEmail(User user, String receiver, String firstNameOfReceiver) {
         log.debug("Sending activation email to '{}'", receiver);
-        sendEmailFromTemplate(user, receiver, "mail/activationEmail", "email.activation.title", new HashMap<>());
+        HashMap<String, Object> context = new HashMap<>();
+        context.put(FIRSTNAME, firstNameOfReceiver);
+        sendEmailFromTemplate(user, receiver, "mail/activationEmail", "email.activation.title", context);
     }
 
     @Async

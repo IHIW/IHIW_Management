@@ -6,10 +6,10 @@
         <link rel="shortcut icon" th:href="@{|${baseUrl}/favicon.ico|}" />
     </head>
     <body>
-        <p th:text="#{email.activation.greeting(${user.login})}">
+        <p th:text="#{email.activationconfirmation.greeting(${user.firstName})}">
             Dear
         </p>
-        <p th:text="#{email.activationconfirmation.text1(${user.getLastName()})}">
+        <p th:text="#{email.activationconfirmation.text1}">
             Your JHipster account has been activated.
         </p>
 

@@ -89,16 +89,16 @@ public class AccountResource {
             for (IhiwUser labUser : labUsers){
                 Optional<User> userFromIhiw = userRepository.findOneWithAuthoritiesById(labUser.getUser().getId());
                 if (userFromIhiw.get().getAuthorities().contains(new Authority(AuthoritiesConstants.PI))){
-                    mailService.sendActivationEmail(user, labUser.getUser().getEmail());
+                    mailService.sendActivationEmail(user, labUser.getUser().getEmail(), userFromIhiw.get().getFirstName());
                     mailSent = true;
                 }
             }
             if (!mailSent){
                 //if there was no PI found, send it to the admin address
-                mailService.sendActivationEmail(user, activationEmail);
+                mailService.sendActivationEmail(user, activationEmail, "admin");
             }
         } else {
-            mailService.sendActivationEmail(user, activationEmail);
+            mailService.sendActivationEmail(user, activationEmail, "admin");
         }
     }
 

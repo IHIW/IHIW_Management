@@ -115,7 +115,7 @@ public class AccountResource {
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this activation key");
         }
-        mailService.sendactivationconfirmation(user.get());
+        mailService.sendActivationConfirmation(user.get());
     }
 
     /**

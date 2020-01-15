@@ -129,7 +129,4 @@ aws:
     timeout: 30000
     bucket: pirche-ihiw-test
 mail:
-  enabled: true # If e-mail sending is enabled. The standard `spring.mail` keys will need to be configured
-  from: ioanfortest@gmail.com # The default "from" address for e-mails
-  base-url: http://127.0.0.1:8080 # URL to the application, used inside e-mails
-
+  activation-email:

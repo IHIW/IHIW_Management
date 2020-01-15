@@ -4,12 +4,17 @@ import { JhiLanguageService } from 'ng-jhipster';
 import { JhiLanguageHelper } from 'app/core';
 import { MarkdownModule } from 'ngx-markdown';
 import { IhiwManagementSharedModule } from 'app/shared';
+import { StatusPipe } from 'app/status.pipe';
 import {
   ProjectComponent,
   ProjectDetailComponent,
   ProjectUpdateComponent,
   ProjectDeletePopupComponent,
   ProjectDeleteDialogComponent,
+  ProjectSubscribePopupComponent,
+  ProjectSubscribeDialogComponent,
+  ProjectUnsubscribePopupComponent,
+  ProjectUnsubscribeDialogComponent,
   projectRoute,
   projectPopupRoute
 } from './';
@@ -23,9 +28,23 @@ const ENTITY_STATES = [...projectRoute, ...projectPopupRoute];
     ProjectDetailComponent,
     ProjectUpdateComponent,
     ProjectDeleteDialogComponent,
-    ProjectDeletePopupComponent
+    ProjectDeletePopupComponent,
+    ProjectSubscribeDialogComponent,
+    ProjectSubscribePopupComponent,
+    ProjectUnsubscribeDialogComponent,
+    ProjectUnsubscribePopupComponent,
+    StatusPipe
   ],
-  entryComponents: [ProjectComponent, ProjectUpdateComponent, ProjectDeleteDialogComponent, ProjectDeletePopupComponent],
+  entryComponents: [
+    ProjectComponent,
+    ProjectUpdateComponent,
+    ProjectDeleteDialogComponent,
+    ProjectDeletePopupComponent,
+    ProjectSubscribeDialogComponent,
+    ProjectSubscribePopupComponent,
+    ProjectUnsubscribeDialogComponent,
+    ProjectUnsubscribePopupComponent
+  ],
   providers: [{ provide: JhiLanguageService, useClass: JhiLanguageService }],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })

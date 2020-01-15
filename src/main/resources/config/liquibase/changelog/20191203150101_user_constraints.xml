@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="addProjectLeadership" author="mniemann">
+
+        <dropForeignKeyConstraint
+                              constraintName="fk_ihiw_user_user_id"
+                              baseTableName="ihiw_user"/>
+
+        <addForeignKeyConstraint baseColumnNames="user_id"
+                                 baseTableName="ihiw_user"
+                                 constraintName="fk_ihiw_user_user_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="jhi_user"
+                                onDelete="CASCADE"/>
+
+        <dropForeignKeyConstraint
+            constraintName="fk_ihiw_user_leader_table"
+            baseTableName="project_leader"/>
+
+        <addForeignKeyConstraint baseColumnNames="ihiw_user_id"
+                                 baseTableName="project_leader"
+                                 constraintName="fk_ihiw_user_leader_table"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ihiw_user"
+                                onDelete="CASCADE"/>
+
+        <dropForeignKeyConstraint
+            constraintName="fk_project_created_by_id"
+            baseTableName="project"/>
+
+        <addForeignKeyConstraint baseColumnNames="created_by_id"
+                                 baseTableName="project"
+                                 constraintName="fk_project_created_by_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ihiw_user"
+                                onDelete="SET NULL"/>
+
+        <dropForeignKeyConstraint
+            constraintName="fk_upload_created_by_id"
+            baseTableName="upload"/>
+
+        <addForeignKeyConstraint baseColumnNames="created_by_id"
+                                 baseTableName="upload"
+                                 constraintName="fk_upload_created_by_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="ihiw_user"
+                                onDelete="SET NULL"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,11 +1,14 @@
 package org.ihiw.management.web.rest;
 
 import org.ihiw.management.domain.*;
+import org.ihiw.management.domain.enumeration.ProjectSubscriptionStatus;
 import org.ihiw.management.repository.IhiwUserRepository;
+import org.ihiw.management.repository.ProjectIhiwLabRepository;
 import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
+import org.ihiw.management.service.MailService;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
 
@@ -14,6 +17,7 @@ import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,13 +47,17 @@ public class ProjectResource {
     private String applicationName;
 
     private final ProjectRepository projectRepository;
+    private final ProjectIhiwLabRepository projectIhiwLabRepository;
     private final IhiwUserRepository ihiwUserRepository;
     private final UserService userService;
+    private final MailService mailService;
 
-    public ProjectResource(ProjectRepository projectRepository, IhiwUserRepository ihiwUserRepository, UserService userService) {
+    public ProjectResource(ProjectRepository projectRepository, ProjectIhiwLabRepository projectIhiwLabRepository, IhiwUserRepository ihiwUserRepository, UserService userService, MailService mailService) {
         this.projectRepository = projectRepository;
         this.ihiwUserRepository = ihiwUserRepository;
+        this.projectIhiwLabRepository = projectIhiwLabRepository;
         this.userService = userService;
+        this.mailService = mailService;
     }
 
     /**
@@ -82,6 +91,69 @@ public class ProjectResource {
             .body(result);
     }
 
+    @PostMapping("/projects/{projectId}/subscribe")
+    //FIXME: why the heck is preauthorize not working for the PI?
+//    @PreAuthorize("hasAnyRole('" + AuthoritiesConstants.PI + "', '" + AuthoritiesConstants.PROJECT_LEADER + "')")
+    public ResponseEntity<ProjectIhiwLab> subscribeProject(@PathVariable long projectId) throws URISyntaxException {
+        log.debug("REST request to subscribe to Project : {}", projectId);
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.PI)) ||
+            currentUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.PROJECT_LEADER))){
+            IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+            Optional<Project> projectFromDB = projectRepository.findOneById(projectId);
+            ProjectIhiwLab projectIhiwLab = projectIhiwLabRepository.findByLabAndProject(currentIhiwUser.getLab(), projectFromDB.get());
+            // if there is no relation yet
+            boolean isNew = false;
+            if (projectIhiwLab == null){
+                projectIhiwLab = new ProjectIhiwLab();
+                projectIhiwLab.setLab(currentIhiwUser.getLab());
+                projectIhiwLab.setProject(projectFromDB.get());
+                isNew = true;
+            }
+            projectIhiwLab.setStatus(ProjectSubscriptionStatus.REQUESTED);
+            projectIhiwLab = projectIhiwLabRepository.save(projectIhiwLab);
+            if (isNew){
+                projectFromDB.get().getLabs().add(projectIhiwLab);
+                projectRepository.save(projectFromDB.get());
+            }
+
+            // send all project leaders a notification
+            for (IhiwUser leader : projectFromDB.get().getLeaders()){
+                mailService.sendProjectLeaderSubscriptionNotificationEmail(leader.getUser(), currentIhiwUser.getLab(), projectFromDB.get());
+            }
+
+            return ResponseEntity.created(new URI("/api/projects/" + projectId + "/subscribe"))
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, projectId + ""))
+                .body(projectIhiwLab);
+        }
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, projectId + "")).build();
+    }
+
+    @PostMapping("/projects/{projectId}/unsubscribe")
+    public ResponseEntity<ProjectIhiwLab> unsubscribeProject(@PathVariable long projectId) throws URISyntaxException {
+        log.debug("REST request to subscribe to Project : {}", projectId);
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if (currentUser.get().getAuthorities().contains(new Authority(AuthoritiesConstants.PI))){
+            IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+            Optional<Project> projectFromDB = projectRepository.findOneById(projectId);
+            ProjectIhiwLab projectIhiwLab = projectIhiwLabRepository.findByLabAndProject(currentIhiwUser.getLab(), projectFromDB.get());
+            if (projectIhiwLab == null){
+                projectIhiwLab = new ProjectIhiwLab();
+                projectIhiwLab.setLab(currentIhiwUser.getLab());
+                projectIhiwLab.setProject(projectFromDB.get());
+            }
+            projectIhiwLab.setStatus(ProjectSubscriptionStatus.UNSUBSCRIBED);
+            projectIhiwLab = projectIhiwLabRepository.save(projectIhiwLab);
+
+            return ResponseEntity.created(new URI("/api/projects/" + projectId + "/subscribe"))
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, projectId + ""))
+                .body(projectIhiwLab);
+        }
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, projectId + "")).build();
+    }
+
     /**
      * {@code PUT  /projects} : Updates an existing project.
      *
@@ -101,7 +173,7 @@ public class ProjectResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            projectFromDB.get().getCreatedBy().equals(currentIhiwUser)) {
+            projectFromDB.get().getLeaders().contains(currentIhiwUser)) {
             Project result = projectRepository.save(project);
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, project.getId().toString()))
@@ -117,15 +189,21 @@ public class ProjectResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of projects in body.
      */
     @GetMapping("/projects")
-    public List<Project> getAllProjects(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
+    public List<Project> getAllProjectsOrderByComponent(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all Projects");
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR))){
-            return projectRepository.findAllWithEagerRelationships();
+            currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR)) ||
+                currentUser.get().getAuthorities().contains(new Authority(PI))){
+            return projectRepository.findAllByOrderByComponent();
         }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        return projectRepository.findAllWithEagerRelationshipsByLab(currentIhiwUser.getLab().getId());
+        List<ProjectIhiwLab> projectIhiwLabs = projectIhiwLabRepository.findByLab(currentIhiwUser.getLab());
+        List<Project> projects = new ArrayList<>();
+        for (ProjectIhiwLab pil : projectIhiwLabs) {
+            projects.add(pil.getProject());
+        }
+        return projects;
     }
 
     /**
@@ -137,11 +215,12 @@ public class ProjectResource {
     @GetMapping("/projects/{id}")
     public ResponseEntity<Project> getProject(@PathVariable Long id) {
         log.debug("REST request to get Project : {}", id);
-        Optional<Project> project = projectRepository.findOneWithEagerRelationships(id);
+        Optional<Project> project = projectRepository.findById(id);
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR))){
+            currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR)) ||
+            currentUser.get().getAuthorities().contains(new Authority(PI))){
             return ResponseUtil.wrapOrNotFound(project);
         }
         if (project.get().getLabs().contains(currentIhiwUser.getLab())){
@@ -160,7 +239,7 @@ public class ProjectResource {
     @PreAuthorize("hasAnyRole('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.PROJECT_LEADER + "')")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         log.debug("REST request to delete Project : {}", id);
-        Optional<Project> project = projectRepository.findOneWithEagerRelationships(id);
+        Optional<Project> project = projectRepository.findById(id);
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (!currentUser.get().getAuthorities().contains(new Authority(ADMIN))){

@@ -24,6 +24,11 @@
     <include file="config/liquibase/changelog/20190829143748_added_entity_constraints_IhiwUser.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20190923120201_project_description.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20190925081601_project_activation.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20191122150101_project_leadership.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20191203150101_user_constraints.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20191216130101_fix_migration.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20191210133500_project_component.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20191210160201_project_subscription_status.xml" relativeToChangelogFile="false"/>
 
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

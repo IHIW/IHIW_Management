@@ -48,6 +48,7 @@
                             Your username can only contain letters and digits.
                         </small>
                     </div>
+
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="firstName" jhiTranslate="global.form.firstName.label">First name</label>
@@ -244,8 +245,11 @@
                 </div>
                 <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
                     <label class="form-control-label" for="country" jhiTranslate="global.form.country.label">Country of your lab</label>
-                    <input type="text" class="form-control" id="country" name="country" placeholder="{{'global.form.country.placeholder' | translate}}"
-                           formControlName="country">
+                    <select type="text" class="form-control" id="country" name="country" formControlName="country">
+                        <option *ngFor="let country of countries" [value]="country" >
+                            {{country}}
+                        </option>
+                    </select>
                     <div *ngIf="registerForm.get('country').invalid && (registerForm.get('country').dirty || registerForm.get('country').touched)">
                         <small class="form-text text-danger" *ngIf="registerForm.get('country').errors.required"
                                jhiTranslate="global.messages.validate.country.required">

@@ -18,6 +18,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   errorUserExists: string;
   success: boolean;
   modalRef: NgbModalRef;
+  countries: string[] = [];
 
   registerForm = this.fb.group({
     login: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50), Validators.pattern('^[_.@A-Za-z0-9-]*$')]],
@@ -55,6 +56,13 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.success = false;
     this.setRegistrationValidators();
+    const lookup = require('country-code-lookup');
+    const countryLookup: any = lookup.countries;
+
+    this.countries = new Array(countryLookup.length);
+    for (let i = 0, len = countryLookup.length; i < len; i++) {
+      this.countries[i] = countryLookup[i].country;
+    }
   }
 
   setRegistrationValidators() {

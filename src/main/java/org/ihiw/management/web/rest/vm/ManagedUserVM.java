@@ -27,6 +27,7 @@ public class ManagedUserVM extends UserDTO {
     private String state;
     private String zip;
     private String country;
+    private String countryCode;
     private String phone;
     private String fax;
     private String labEmail;
@@ -131,6 +132,12 @@ public class ManagedUserVM extends UserDTO {
     public void setCountry(String country) {
         this.country = country;
     }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) { this.countryCode = countryCode; }
 
     public String getPhone() {
         return phone;

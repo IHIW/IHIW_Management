@@ -13,9 +13,9 @@ import java.util.Locale;
 import java.util.Map;
 import javax.mail.internet.MimeMessage;
 
+import org.ihiw.management.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -23,6 +23,10 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
+
+import javax.mail.internet.MimeMessage;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 /**
  * Service for sending emails.
@@ -37,6 +41,7 @@ public class MailService {
     private static final String USER = "user";
     private static final String LAB = "lab";
     private static final String PROJECT = "project";
+    private static final String FIRSTNAME = "firstname";
 
     private static final String BASE_URL = "baseUrl";
 
@@ -48,8 +53,7 @@ public class MailService {
 
     private final SpringTemplateEngine templateEngine;
 
-    public MailService(JHipsterProperties jHipsterProperties, JavaMailSender javaMailSender,
-            MessageSource messageSource, SpringTemplateEngine templateEngine) {
+    public MailService(JHipsterProperties jHipsterProperties, JavaMailSender javaMailSender, MessageSource messageSource, SpringTemplateEngine templateEngine) {
 
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
@@ -96,9 +100,11 @@ public class MailService {
     }
 
     @Async
-    public void sendActivationEmail(User user, String receiver) {
+    public void sendActivationEmail(User user, String receiver, String firstNameOfReceiver) {
         log.debug("Sending activation email to '{}'", receiver);
-        sendEmailFromTemplate(user, receiver, "mail/activationEmail", "email.activation.title", new HashMap<>());
+        HashMap<String, Object> context = new HashMap<>();
+        context.put(FIRSTNAME, firstNameOfReceiver);
+        sendEmailFromTemplate(user, receiver, "mail/activationEmail", "email.activation.title", context);
     }
 
     @Async
@@ -108,6 +114,12 @@ public class MailService {
         context.put(LAB, lab);
         context.put(PROJECT, project);
         sendEmailFromTemplate(user, user.getEmail(), "mail/subscriptionEmail", "email.subscription.title", context);
+    }
+
+    @Async
+    public void sendActivationConfirmation(User user) {
+        log.debug("Sending activation2 email to '{}'", user.getEmail());
+        sendEmailFromTemplate(user, user.getEmail(), "mail/activationconfirmation", "email.activationconfirmation.title", new HashMap<>());
     }
 
     @Async

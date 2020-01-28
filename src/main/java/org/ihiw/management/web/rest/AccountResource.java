@@ -52,6 +52,8 @@ public class AccountResource {
 
     private final String activationEmail;
 
+
+
     public AccountResource(UserRepository userRepository, IhiwUserRepository ihiwUserRepository, UserService userService, MailService mailService, @Qualifier("activationEmail") String activationEmail) {
 
         this.userRepository = userRepository;
@@ -59,6 +61,8 @@ public class AccountResource {
         this.userService = userService;
         this.mailService = mailService;
         this.activationEmail = activationEmail;
+
+
     }
 
     /**
@@ -85,16 +89,16 @@ public class AccountResource {
             for (IhiwUser labUser : labUsers){
                 Optional<User> userFromIhiw = userRepository.findOneWithAuthoritiesById(labUser.getUser().getId());
                 if (userFromIhiw.get().getAuthorities().contains(new Authority(AuthoritiesConstants.PI))){
-                    mailService.sendActivationEmail(user, labUser.getUser().getEmail());
+                    mailService.sendActivationEmail(user, labUser.getUser().getEmail(), userFromIhiw.get().getFirstName());
                     mailSent = true;
                 }
             }
             if (!mailSent){
                 //if there was no PI found, send it to the admin address
-                mailService.sendActivationEmail(user, activationEmail);
+                mailService.sendActivationEmail(user, activationEmail, "admin");
             }
         } else {
-            mailService.sendActivationEmail(user, activationEmail);
+            mailService.sendActivationEmail(user, activationEmail, "admin");
         }
     }
 
@@ -104,12 +108,14 @@ public class AccountResource {
      * @param key the activation key.
      * @throws RuntimeException {@code 500 (Internal Server Error)} if the user couldn't be activated.
      */
+
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
         Optional<User> user = userService.activateRegistration(key);
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this activation key");
         }
+        mailService.sendActivationConfirmation(user.get());
     }
 
     /**

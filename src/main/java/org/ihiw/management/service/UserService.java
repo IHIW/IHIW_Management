@@ -181,7 +181,7 @@ public class UserService {
             }
             if (managedUserVM.getCountry() != null && !managedUserVM.getCountry().isEmpty()){
                 lab.setCountry(managedUserVM.getCountry());
-                if (lab.getCountry().equals("USA")){
+                if (lab.getCountry().equals("United States")){
                     labCode += "U";
                 }
                 else {
@@ -190,7 +190,7 @@ public class UserService {
             }
             if (managedUserVM.getState() != null && !managedUserVM.getState().isEmpty()){
                 lab.setState(managedUserVM.getState());
-                if (lab.getCountry().equals("USA")){
+                if (lab.getCountry().equals("United States")){
                     labCode += lab.getState().trim().substring(0,2);
                 }
             }

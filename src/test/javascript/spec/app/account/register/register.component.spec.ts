@@ -62,6 +62,7 @@ describe('Component Tests', () => {
           address2: '',
           city: '',
           country: '',
+          countryCode: '',
           department: '',
           director: '',
           existingLab: 'true',

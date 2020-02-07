@@ -1,5 +1,7 @@
 package org.ihiw.management.domain;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -46,6 +48,14 @@ public class Upload implements Serializable {
     @ManyToOne
     @JsonIgnoreProperties("uploads")
     private IhiwUser createdBy;
+
+    @Transient
+    @JsonProperty
+    private String rawDownload;
+
+    @Transient
+    @JsonProperty
+    private String convertedDownload;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -146,6 +156,23 @@ public class Upload implements Serializable {
     public void setCreatedBy(IhiwUser ihiwUser) {
         this.createdBy = ihiwUser;
     }
+
+    public String getRawDownload() {
+        return rawDownload;
+    }
+
+    public void setRawDownload(String rawDownload) {
+        this.rawDownload = rawDownload;
+    }
+
+    public String getConvertedDownload() {
+        return convertedDownload;
+    }
+
+    public void setConvertedDownload(String convertedDownload) {
+        this.convertedDownload = convertedDownload;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override

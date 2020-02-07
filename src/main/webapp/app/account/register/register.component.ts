@@ -148,6 +148,13 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     if (password !== this.registerForm.get(['confirmPassword']).value) {
       this.doNotMatch = 'ERROR';
     } else {
+      let countryCode = '';
+      if (country !== '') {
+        const lookup = require('country-code-lookup');
+        const countryLookup = lookup.byCountry(country);
+        countryCode = countryLookup.iso3;
+      }
+
       registerAccount = {
         ...registerAccount,
         login,
@@ -164,6 +171,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         state,
         zip,
         country,
+        countryCode,
         phone,
         fax,
         labEmail,

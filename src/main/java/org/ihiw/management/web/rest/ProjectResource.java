@@ -223,8 +223,10 @@ public class ProjectResource {
             currentUser.get().getAuthorities().contains(new Authority(PI))){
             return ResponseUtil.wrapOrNotFound(project);
         }
-        if (project.get().getLabs().contains(currentIhiwUser.getLab())){
-            return ResponseUtil.wrapOrNotFound(project);
+        for (ProjectIhiwLab projectIhiwLab : project.get().getLabs()){
+            if (projectIhiwLab.getLab().equals(currentIhiwUser.getLab())) {
+                return ResponseUtil.wrapOrNotFound(project);
+            }
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }

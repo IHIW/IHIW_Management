@@ -185,7 +185,7 @@ public class UserService {
                     labCode += "U";
                 }
                 else {
-                    labCode += lab.getCountry().trim().substring(0,3);
+                    labCode += managedUserVM.getCountryCode();
                 }
             }
             if (managedUserVM.getState() != null && !managedUserVM.getState().isEmpty()){

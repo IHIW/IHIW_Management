@@ -1,6 +1,8 @@
 package org.ihiw.management.repository;
 
+import com.amazonaws.services.s3.AbstractAmazonS3;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URL;
 
 @Repository
 public class FileRepository {
@@ -35,7 +38,18 @@ public class FileRepository {
         log.debug("Stored file " + fileName + " with length " + data.length + " in bucket " + bucket);
     }
 
-    public byte[] getFile(String fileName){
-        return new byte[4];
+    public void deleteFile(String fileName) {
+        if (s3.doesObjectExist(bucket, fileName)){
+            s3.deleteObject(bucket, fileName);
+        }
+    }
+
+    public String rawUrl(String fileName) {
+        if (s3.doesObjectExist(bucket, fileName)){
+            GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket, fileName);
+            URL url = s3.generatePresignedUrl(request);
+            return url.toString();
+        }
+        return null;
     }
 }

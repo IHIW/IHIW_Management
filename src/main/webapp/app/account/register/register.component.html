@@ -246,8 +246,8 @@
                 <div class="form-group" *ngIf="registerForm.get('existingLab').value === 'false'">
                     <label class="form-control-label" for="country" jhiTranslate="global.form.country.label">Country of your lab</label>
                     <select type="text" class="form-control" id="country" name="country" formControlName="country">
-                        <option *ngFor="let country of countries" [value]="country" >
-                            {{country}}
+                        <option *ngFor="let country of countries" [value]="country[0]" >
+                            {{country[1]}}
                         </option>
                     </select>
                     <div *ngIf="registerForm.get('country').invalid && (registerForm.get('country').dirty || registerForm.get('country').touched)">

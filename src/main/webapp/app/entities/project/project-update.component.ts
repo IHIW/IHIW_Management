@@ -67,7 +67,8 @@ export class ProjectUpdateComponent implements OnInit {
             map((response: HttpResponse<IIhiwUser[]>) => response.body)
           )
           .subscribe(
-            (res: IIhiwUser[]) => (this.ihiwusers = res.sort((a, b) => (a.user.lastName > b.user.lastName ? 1 : -1))),
+            (res: IIhiwUser[]) =>
+              (this.ihiwusers = res.sort((a, b) => (a.user.lastName.toUpperCase() > b.user.lastName.toUpperCase() ? 1 : -1))),
             (res: HttpErrorResponse) => this.onError(res.message)
           );
       }
@@ -79,7 +80,7 @@ export class ProjectUpdateComponent implements OnInit {
         map((response: HttpResponse<IIhiwLab[]>) => response.body)
       )
       .subscribe(
-        (res: IIhiwLab[]) => (this.ihiwlabs = res.sort((a, b) => (a.labCode > b.labCode ? 1 : -1))),
+        (res: IIhiwLab[]) => (this.ihiwlabs = res.sort((a, b) => (a.labCode.toUpperCase() > b.labCode.toUpperCase() ? 1 : -1))),
         (res: HttpErrorResponse) => this.onError(res.message)
       );
   }

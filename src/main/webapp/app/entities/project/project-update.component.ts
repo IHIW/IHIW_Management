@@ -66,7 +66,10 @@ export class ProjectUpdateComponent implements OnInit {
             filter((mayBeOk: HttpResponse<IIhiwUser[]>) => mayBeOk.ok),
             map((response: HttpResponse<IIhiwUser[]>) => response.body)
           )
-          .subscribe((res: IIhiwUser[]) => (this.ihiwusers = res), (res: HttpErrorResponse) => this.onError(res.message));
+          .subscribe(
+            (res: IIhiwUser[]) => (this.ihiwusers = res.sort((a, b) => (a.user.lastName > b.user.lastName ? 1 : -1))),
+            (res: HttpErrorResponse) => this.onError(res.message)
+          );
       }
     });
     this.ihiwLabService
@@ -75,7 +78,10 @@ export class ProjectUpdateComponent implements OnInit {
         filter((mayBeOk: HttpResponse<IIhiwLab[]>) => mayBeOk.ok),
         map((response: HttpResponse<IIhiwLab[]>) => response.body)
       )
-      .subscribe((res: IIhiwLab[]) => (this.ihiwlabs = res), (res: HttpErrorResponse) => this.onError(res.message));
+      .subscribe(
+        (res: IIhiwLab[]) => (this.ihiwlabs = res.sort((a, b) => (a.labCode > b.labCode ? 1 : -1))),
+        (res: HttpErrorResponse) => this.onError(res.message)
+      );
   }
 
   updateForm(project: IProject) {

@@ -20,11 +20,12 @@
             <th><span jhiTranslate="global.field.id">ID</span></th>
             <th><span jhiTranslate="ihiwManagementApp.upload.type">Type</span></th>
             <th><span jhiTranslate="ihiwManagementApp.upload.createdAt">Created At</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.upload.modifiedAt">Modified At</span></th>
+<!--            <th><span jhiTranslate="ihiwManagementApp.upload.modifiedAt">Modified At</span></th>-->
             <th><span jhiTranslate="ihiwManagementApp.upload.fileName">File Name</span></th>
             <th><span jhiTranslate="ihiwManagementApp.upload.valid">Valid</span></th>
             <th><span jhiTranslate="ihiwManagementApp.upload.enabled">Enabled</span></th>
             <th><span jhiTranslate="ihiwManagementApp.upload.createdBy">Created By</span></th>
+            <th><span >Download</span></th>
             <th></th>
             </tr>
             </thead>
@@ -33,7 +34,7 @@
                 <td><a [routerLink]="['/upload', upload.id, 'view' ]">{{upload.id}}</a></td>
                 <td><span class="badge badge-info" jhiTranslate="{{'ihiwManagementApp.FileType.' + upload.type}}">{{upload.type}}</span></td>
                 <td>{{upload.createdAt | date:'short'}}</td>
-                <td>{{upload.modifiedAt | date:'short'}}</td>
+<!--                <td>{{upload.modifiedAt | date:'short'}}</td>-->
                 <td>{{upload.fileName}}</td>
                 <td><span class="badge" [ngClass]="{'badge-danger': !upload.valid, 'badge-success': upload.valid}">{{upload.valid}}</span></td>
                 <td><span class="badge" [ngClass]="{'badge-danger': !upload.enabled, 'badge-success': upload.enabled}">{{upload.enabled}}</span></td>
@@ -41,6 +42,10 @@
                     <div *ngIf="upload.createdBy">
                         <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view' ]" >{{upload.createdBy?.user.firstName}} {{upload.createdBy?.user.lastName}}</a>
                     </div>
+                </td>
+                <td>
+                    <a *ngIf="upload.rawDownload != null" class="badge badge-info" [href]="upload.rawDownload"><fa-icon [icon]="'file-download'"></fa-icon> RAW</a>
+                    <a *ngIf="upload.convertedDownload != null" class="badge badge-info" [href]="upload.convertedDownload"><fa-icon [icon]="'file-download'"></fa-icon> HAML</a>
                 </td>
                 <td class="text-right">
                     <div class="btn-group">

@@ -15,6 +15,8 @@ export interface IUpload {
   valid?: boolean;
   enabled?: boolean;
   createdBy?: IIhiwUser;
+  rawDownload?: string;
+  convertedDownload?: string;
 }
 
 export class Upload implements IUpload {
@@ -26,7 +28,9 @@ export class Upload implements IUpload {
     public fileName?: string,
     public valid?: boolean,
     public enabled?: boolean,
-    public createdBy?: IIhiwUser
+    public createdBy?: IIhiwUser,
+    public rawDownload?: string,
+    public convertedDownload?: string
   ) {
     this.valid = this.valid || false;
     this.enabled = this.enabled || false;

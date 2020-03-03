@@ -16,6 +16,7 @@ import {
   faTimes,
   faArrowLeft,
   faSave,
+  faFileDownload,
   faPlus,
   faPencilAlt,
   faBars,
@@ -91,5 +92,6 @@ library.add(faCheck);
 library.add(faPlusSquare);
 library.add(faMinusSquare);
 library.add(faClock);
+library.add(faFileDownload);
 
 // jhipster-needle-add-element-to-vendor - JHipster will add new menu items here

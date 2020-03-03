@@ -4,6 +4,7 @@ import org.ihiw.management.domain.Authority;
 import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.Upload;
 import org.ihiw.management.domain.User;
+import org.ihiw.management.domain.enumeration.FileType;
 import org.ihiw.management.repository.FileRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UploadRepository;
@@ -70,7 +71,7 @@ public class UploadResource {
             throw new BadRequestAlertException("A new upload cannot already have an ID", ENTITY_NAME, "idexists");
         }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        String fileName = currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getFileName();
+        String fileName = currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getType() + "_" + upload.getFileName();
         upload.setFileName(fileName);
         upload.setCreatedBy(currentIhiwUser);
         upload.setCreatedAt(ZonedDateTime.now());
@@ -100,7 +101,7 @@ public class UploadResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/uploads")
-    public ResponseEntity<Upload> updateUpload(@RequestBody Upload upload) throws URISyntaxException {
+    public ResponseEntity<Upload> updateUpload(@RequestBody Upload upload, @RequestPart MultipartFile file) throws URISyntaxException {
         log.debug("REST request to update Upload : {}", upload);
         if (upload.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -113,6 +114,15 @@ public class UploadResource {
 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+
+            fileRepository.deleteFile(dbUpload.get().getFileName());
+            fileRepository.deleteFile(dbUpload.get().getFileName() + ".haml");
+
+            try {
+                fileRepository.storeFile(upload.getFileName(), file.getBytes());
+            } catch (IOException e) {
+                log.error("File could not be uploaded: " + upload.getFileName());
+            }
 
             Upload result = uploadRepository.save(upload);
             return ResponseEntity.ok()
@@ -135,12 +145,20 @@ public class UploadResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentIhiwUser.getLab());
 
-        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
-            return uploadRepository.findAll();
+        List<Upload> result;
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
+            result = uploadRepository.findAll();
+        } else {
+            result = uploadRepository.findByCreatedByIn(colleages);
         }
 
-        return uploadRepository.findByCreatedByIn(colleages);
+        for (Upload upload : result) {
+            upload.setRawDownload(fileRepository.rawUrl(upload.getFileName()));
+            if (upload.getType().equals(FileType.HAML)){
+                upload.setConvertedDownload(fileRepository.rawUrl(upload.getFileName() + ".haml"));
+            }
+        }
+        return result;
     }
 
     /**
@@ -158,8 +176,11 @@ public class UploadResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-            currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER)) ||
             upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+            upload.get().setRawDownload(fileRepository.rawUrl(upload.get().getFileName()));
+            if (upload.get().getType().equals(FileType.HAML)){
+                upload.get().setConvertedDownload(fileRepository.rawUrl(upload.get().getFileName() + ".haml"));
+            }
             return ResponseUtil.wrapOrNotFound(upload);
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
@@ -181,6 +202,8 @@ public class UploadResource {
 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+            fileRepository.deleteFile(upload.get().getFileName());
+            fileRepository.deleteFile(upload.get().getFileName() + ".haml");
             uploadRepository.deleteById(id);
             return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
         }

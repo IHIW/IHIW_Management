@@ -18,7 +18,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
   errorUserExists: string;
   success: boolean;
   modalRef: NgbModalRef;
-  countries: string[] = [];
+  countries: [string, string][] = [];
 
   registerForm = this.fb.group({
     login: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50), Validators.pattern('^[_.@A-Za-z0-9-]*$')]],
@@ -59,10 +59,18 @@ export class RegisterComponent implements OnInit, AfterViewInit {
     const lookup = require('country-code-lookup');
     const countryLookup: any = lookup.countries;
 
-    this.countries = new Array(countryLookup.length);
+    this.countries = new Array<[string, string]>(countryLookup.length);
     for (let i = 0, len = countryLookup.length; i < len; i++) {
-      this.countries[i] = countryLookup[i].country;
+      // initialize empty tuple
+      this.countries[i] = ['', ''];
+      // value used as value in the dropdown
+      this.countries[i][0] = countryLookup[i].country.toString();
+      // value used to sort, remove the 'The' at the beginning and put it at the end
+      this.countries[i][1] = countryLookup[i].country.replace(/^The (.+)$/i, '$1, The');
     }
+
+    // sort the countries on the second value, without 'The'
+    this.countries.sort((a, b) => a[1].localeCompare(b[1]));
   }
 
   setRegistrationValidators() {

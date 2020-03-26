@@ -1,34 +1,36 @@
 package org.ihiw.management.web.rest;
 
+import io.github.jhipster.web.util.HeaderUtil;
+import io.github.jhipster.web.util.PaginationUtil;
 import org.ihiw.management.domain.*;
 import org.ihiw.management.repository.IhiwLabRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.ProjectRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.service.UserService;
+import org.ihiw.management.service.dto.LabDTO;
+import org.ihiw.management.service.mapper.LabMapper;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
-
-import io.github.jhipster.web.util.HeaderUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
-import static org.ihiw.management.security.AuthoritiesConstants.PI;
-import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
+import static org.ihiw.management.security.AuthoritiesConstants.*;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.IhiwLab}.
@@ -117,17 +119,30 @@ public class IhiwLabResource {
 
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of ihiwLabs in body.
      */
+
+
     @GetMapping("/ihiw-labs")
-    public List<IhiwLab> getAllIhiwLabs() {
+    public ResponseEntity<List<LabDTO>> getAllIhiwLabs(@RequestParam(value = "page" , required = false) Integer offset,
+                                                       @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sort", required = false) String sort) {
         log.debug("REST request to get all IhiwLabs");
 
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
         List<IhiwLab> result = new ArrayList<>();
 
+        //Optional<IhiwLab> currentLab = .getUserWithAuthorities();
+        Page<LabDTO> page = null;
+        Pageable pageable;
+        if(offset != null && size != null) {
+            Sort sorting  = Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]);
+            pageable = PageRequest.of(offset, size, sorting);
+        } else {
+            pageable = Pageable.unpaged();
+        }
+
         //if it is an admin, return all labs
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
-            return ihiwLabRepository.findAll();
+            page = userService.getAllLabs(pageable);
         }
 
         //if it is a project leader, add all his projects' labs to the list
@@ -140,13 +155,25 @@ public class IhiwLabResource {
                     }
                 }
             }
+            LabMapper myMap = new LabMapper();
+            List<LabDTO> entityToDto = myMap.labToLabDTO(result);
+            page = new PageImpl<>(entityToDto);
         }
 
         //and finally add the lab of the current user
-        if (!result.contains(currentIhiwUser.getLab())){
-            result.add(currentIhiwUser.getLab());
+        if (page == null) {
+            if (!result.contains(currentIhiwUser.getLab())){
+                result.add(currentIhiwUser.getLab());
+                LabMapper myMap = new LabMapper();
+                List<LabDTO> entityToDto = myMap.labToLabDTO(result);
+                page = new PageImpl<>(entityToDto);
+            }
         }
-        return result;
+
+
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        //return result;
     }
 
     /**
@@ -154,7 +181,7 @@ public class IhiwLabResource {
      *
      * @param id the id of the ihiwLab to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the ihiwLab, or with status {@code 404 (Not Found)}.
-     */
+
     @GetMapping("/ihiw-labs/{id}")
     public ResponseEntity<IhiwLab> getIhiwLab(@PathVariable Long id) {
         log.debug("REST request to get IhiwLab : {}", id);
@@ -179,6 +206,7 @@ public class IhiwLabResource {
         }
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, id.toString())).build();
     }
+    */
 
     /**
      * {@code DELETE  /ihiw-labs/:id} : delete the "id" ihiwLab.

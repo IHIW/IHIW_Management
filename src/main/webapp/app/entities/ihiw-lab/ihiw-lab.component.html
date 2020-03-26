@@ -16,12 +16,12 @@
     <div class="table-responsive" *ngIf="ihiwLabs?.length > 0">
         <table class="table table-striped">
             <thead>
-            <tr>
-            <th><span jhiTranslate="global.field.id">ID</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.ihiwLab.labCode">Lab Code</span></th>
-                <th><span jhiTranslate="ihiwManagementApp.ihiwLab.department">Department</span></th>
-                <th><span jhiTranslate="ihiwManagementApp.ihiwLab.institution">Institution</span></th>
-                <th><span jhiTranslate="ihiwManagementApp.ihiwLab.city">City</span></th>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
+                <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID100</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="labCode"><span jhiTranslate="ihiwManagementApp.ihiwLab.labCode">Lab Code</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="department"><span jhiTranslate="ihiwManagementApp.ihiwLab.department">Department</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="institution"><span jhiTranslate="ihiwManagementApp.ihiwLab.institution">Institution</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="city"><span jhiTranslate="ihiwManagementApp.ihiwLab.city">City</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <!--
             <th><span jhiTranslate="ihiwManagementApp.ihiwLab.title">Title</span></th>
             <th><span jhiTranslate="ihiwManagementApp.ihiwLab.firstName">First Name</span></th>
@@ -38,7 +38,7 @@
             <th><span jhiTranslate="ihiwManagementApp.ihiwLab.url">Url</span></th>
             <th><span jhiTranslate="ihiwManagementApp.ihiwLab.oldLabCode">Old Lab Code</span></th>
             <th><span jhiTranslate="ihiwManagementApp.ihiwLab.createdAt">Created At</span></th> -->
-            <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>

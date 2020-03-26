@@ -11,6 +11,8 @@ import org.ihiw.management.service.UserService;
 import org.ihiw.management.service.dto.LabDTO;
 import org.ihiw.management.service.mapper.LabMapper;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
+
+import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -181,7 +183,7 @@ public class IhiwLabResource {
      *
      * @param id the id of the ihiwLab to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the ihiwLab, or with status {@code 404 (Not Found)}.
-
+     */
     @GetMapping("/ihiw-labs/{id}")
     public ResponseEntity<IhiwLab> getIhiwLab(@PathVariable Long id) {
         log.debug("REST request to get IhiwLab : {}", id);
@@ -206,7 +208,6 @@ public class IhiwLabResource {
         }
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, ENTITY_NAME, id.toString())).build();
     }
-    */
 
     /**
      * {@code DELETE  /ihiw-labs/:id} : delete the "id" ihiwLab.

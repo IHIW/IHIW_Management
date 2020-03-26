@@ -30,7 +30,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let project of projects ;trackBy: trackId">
+            <tr *ngFor="let project of projects; trackBy: trackId">
                 <td><a [routerLink]="['/project', project.id, 'view' ]">{{project.id}}</a></td>
                 <td>{{project.name}}</td>
                 <td>{{project.component}}</td>

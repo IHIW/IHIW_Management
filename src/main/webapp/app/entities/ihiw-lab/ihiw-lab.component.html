@@ -17,7 +17,7 @@
         <table class="table table-striped">
             <thead>
             <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
-                <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID100</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="id"><span jhiTranslate="global.field.id">ID</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th jhiSortBy="labCode"><span jhiTranslate="ihiwManagementApp.ihiwLab.labCode">Lab Code</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th jhiSortBy="department"><span jhiTranslate="ihiwManagementApp.ihiwLab.department">Department</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th jhiSortBy="institution"><span jhiTranslate="ihiwManagementApp.ihiwLab.institution">Institution</span> <fa-icon [icon]="'sort'"></fa-icon></th>
@@ -93,6 +93,14 @@
             </tr>
             </tbody>
         </table>
+    </div>
+    <div *ngIf="ihiwLabs">
+        <div class="row justify-content-center">
+            <jhi-item-count [page]="page" [total]="totalItems" [itemsPerPage]="itemsPerPage"></jhi-item-count>
+        </div>
+        <div class="row justify-content-center">
+            <ngb-pagination [collectionSize]="totalItems" [(page)]="page" [pageSize]="itemsPerPage" [maxSize]="5" [rotate]="true" [boundaryLinks]="true" (pageChange)="loadPage(page)"></ngb-pagination>
+        </div>
     </div>
 </div>
 

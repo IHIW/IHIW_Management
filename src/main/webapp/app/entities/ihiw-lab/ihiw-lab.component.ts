@@ -23,16 +23,17 @@ export class IhiwLabComponent implements OnInit, OnDestroy {
   previousPage: any;
   itemsPerPage: any;
   reverse: any;
-  // eventSubscriber: Subscription;
+  totalItems: any;
+  eventSubscriber: Subscription;
 
   constructor(
     protected ihiwLabService: IhiwLabService,
     protected jhiAlertService: JhiAlertService,
-    private eventManager: JhiEventManager,
+    protected eventManager: JhiEventManager,
+    protected accountService: AccountService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private parseLinks: JhiParseLinks,
-    protected accountService: AccountService,
     private modalService: NgbModal
   ) {
     this.itemsPerPage = 500;
@@ -46,30 +47,27 @@ export class IhiwLabComponent implements OnInit, OnDestroy {
 
   loadAll() {
     this.ihiwLabService
-      .query({ sort: this.sort() })
-      .pipe(
-        filter((res: HttpResponse<IIhiwLab[]>) => res.ok),
-        map((res: HttpResponse<IIhiwLab[]>) => res.body)
-      )
+      .query({
+        page: this.page - 1,
+        size: this.itemsPerPage,
+        sort: this.sort()
+      })
       .subscribe(
-        (res: IIhiwLab[]) => {
-          this.ihiwLabs = res;
-        },
+        (res: HttpResponse<IIhiwLab[]>) => this.onSuccess(res.body, res.headers),
         (res: HttpResponse<any>) => this.onError(res.body)
       );
   }
 
   ngOnInit() {
+    this.loadAll();
     this.accountService.identity().then(account => {
       this.currentAccount = account;
-      this.loadAll();
-      this.registerChangeInIhiwLabs();
     });
+    this.registerChangeInIhiwLabs();
   }
 
   ngOnDestroy() {
-    // this.eventManager.destroy(this.eventSubscriber);
-    this.routeData.unsubscribe();
+    this.eventManager.destroy(this.eventSubscriber);
   }
 
   trackId(index: number, item: IIhiwLab) {
@@ -85,9 +83,10 @@ export class IhiwLabComponent implements OnInit, OnDestroy {
   }
 
   transition() {
-    this.router.navigate(['/admin/ihiw-lab'], {
+    this.router.navigate(['/ihiw-lab'], {
       queryParams: {
         page: this.page,
+        size: this.itemsPerPage,
         sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
       }
     });
@@ -102,12 +101,19 @@ export class IhiwLabComponent implements OnInit, OnDestroy {
   }
 
   registerChangeInIhiwLabs() {
+    this.eventSubscriber = this.eventManager.subscribe('ihiwLabListModification', response => this.loadAll());
+
     // this.eventManager.subscribe('userListModification', response => this.loadAll());
-    this.eventManager.subscribe('ihiwLabListModification', response => this.loadAll());
+    // this.eventManager.subscribe('ihiwLabListModification', response => this.loadAll());
     // this.eventManager = this.eventManager.subscribe('ihiwLabListModification', response => this.loadAll());
   }
 
-  protected onError(error) {
-    this.jhiAlertService.error(error, null, null);
+  private onSuccess(data, headers) {
+    this.totalItems = headers.get('X-Total-Count');
+    this.ihiwLabs = data;
+  }
+
+  protected onError(errorMessage: string) {
+    this.jhiAlertService.error(errorMessage, null, null);
   }
 }

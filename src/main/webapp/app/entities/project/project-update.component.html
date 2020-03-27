@@ -98,9 +98,9 @@
 
                 <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']">
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.lab" for="field_leader">Add Lab</label>
-                    <select class="form-control" id="field_lab" name="lab">
-                        <option [ngValue]="null"></option>
-                        <option *ngFor="let lab of ihiwlabs;" (click)="addIhiwLab(lab)">{{lab.labCode}}</option>
+                    <select class="form-control" id="field_lab" name="lab" (change)="addIhiwLab($event)">
+                        <option ></option>
+                        <option *ngFor="let lab of ihiwlabs">{{lab.labCode}}</option>
                     </select>
                 </div>
 

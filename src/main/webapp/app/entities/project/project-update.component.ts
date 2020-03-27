@@ -80,7 +80,9 @@ export class ProjectUpdateComponent implements OnInit {
         map((response: HttpResponse<IIhiwLab[]>) => response.body)
       )
       .subscribe(
-        (res: IIhiwLab[]) => (this.ihiwlabs = res.sort((a, b) => (a.labCode.toUpperCase() > b.labCode.toUpperCase() ? 1 : -1))),
+        (res: IIhiwLab[]) => {
+          this.ihiwlabs = res.sort((a, b) => (a.labCode.toUpperCase() > b.labCode.toUpperCase() ? 1 : -1));
+        },
         (res: HttpErrorResponse) => this.onError(res.message)
       );
   }
@@ -120,10 +122,10 @@ export class ProjectUpdateComponent implements OnInit {
   }
 
   removeLab(lab: IProjectIhiwLab) {
-    console.log(lab);
-    console.log(this.editForm.get(['labs']));
+    // console.log(lab);
+    // console.log(this.editForm.get(['labs']));
     const index = this.editForm.get(['labs']).value.indexOf(lab, 0);
-    console.log(index);
+    // console.log(index);
     if (index > -1) {
       this.editForm.get(['labs']).value.splice(index, 1);
     }
@@ -133,9 +135,9 @@ export class ProjectUpdateComponent implements OnInit {
     lab.status = 'SUBSCRIBED';
   }
 
-  addIhiwLab(lab: IIhiwLab) {
+  addIhiwLab(event: any) {
     const labWrapper = {
-      lab,
+      lab: this.ihiwlabs[event.target.selectedIndex - 1],
       status: 'SUBSCRIBED'
     };
     const index = this.editForm.get(['labs']).value.indexOf(labWrapper, 0);

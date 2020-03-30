@@ -102,10 +102,6 @@ export class IhiwLabComponent implements OnInit, OnDestroy {
 
   registerChangeInIhiwLabs() {
     this.eventSubscriber = this.eventManager.subscribe('ihiwLabListModification', response => this.loadAll());
-
-    // this.eventManager.subscribe('userListModification', response => this.loadAll());
-    // this.eventManager.subscribe('ihiwLabListModification', response => this.loadAll());
-    // this.eventManager = this.eventManager.subscribe('ihiwLabListModification', response => this.loadAll());
   }
 
   private onSuccess(data, headers) {

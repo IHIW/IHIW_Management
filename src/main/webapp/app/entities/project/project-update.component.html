@@ -99,7 +99,7 @@
                 <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']">
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.lab" for="field_leader">Add Lab</label>
                     <select class="form-control" id="field_lab" name="lab" (change)="addIhiwLab($event)">
-                        <option ></option>
+                        <option></option>
                         <option *ngFor="let lab of ihiwlabs">{{lab.labCode}}</option>
                     </select>
                 </div>
@@ -113,9 +113,9 @@
                 </div>
                 <div class="form-group" *jhiHasAnyAuthority="['ROLE_ADMIN']" >
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.leader" for="field_leader">Add Leader</label>
-                    <select class="form-control" id="field_leader" name="leader">
-                        <option [ngValue]="null"></option>
-                        <option *ngFor="let ihiwUserOption of ihiwusers" (click)="addProjectLeader(ihiwUserOption)">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
+                    <select class="form-control" id="field_leader" name="leader" (change)="addProjectLeader($event)">
+                        <option></option>
+                        <option *ngFor="let ihiwUserOption of ihiwusers">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
                     </select>
                 </div>
             </div>

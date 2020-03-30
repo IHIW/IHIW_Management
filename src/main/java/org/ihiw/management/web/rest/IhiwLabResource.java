@@ -118,11 +118,8 @@ public class IhiwLabResource {
     /**
      * {@code GET  /ihiw-labs} : get all the ihiwLabs.
      *
-
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of ihiwLabs in body.
      */
-
-
     @GetMapping("/ihiw-labs")
     public ResponseEntity<List<LabDTO>> getAllIhiwLabs(@RequestParam(value = "page" , required = false) Integer offset,
                                                        @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sort", required = false) String sort) {
@@ -145,37 +142,34 @@ public class IhiwLabResource {
         //if it is an admin, return all labs
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
             page = userService.getAllLabs(pageable);
-        }
-
-        //if it is a project leader, add all his projects' labs to the list
-        if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
-            List<Project> projectsOfUser = projectRepository.findByCreatedBy(currentIhiwUser);
-            for (Project project : projectsOfUser){
-                for (ProjectIhiwLab lab : project.getLabs()){
-                    if (!result.contains(lab.getLab())){
-                        result.add(lab.getLab());
+        } else {
+            //if it is a project leader, add all his projects' labs to the list
+            if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
+                List<Project> projectsOfUser = projectRepository.findAllByLeaders(currentIhiwUser);
+                for (Project project : projectsOfUser){
+                    for (ProjectIhiwLab lab : project.getLabs()){
+                        if (!result.contains(lab.getLab())){
+                            result.add(lab.getLab());
+                        }
                     }
                 }
             }
+
+            //and finally add the lab of the current user if it's not already contained
+            if (page == null) {
+                if (!result.contains(currentIhiwUser.getLab())){
+                    result.add(currentIhiwUser.getLab());
+                }
+            }
+
+            //map to DTO and create page
             LabMapper myMap = new LabMapper();
             List<LabDTO> entityToDto = myMap.labToLabDTO(result);
             page = new PageImpl<>(entityToDto);
         }
 
-        //and finally add the lab of the current user
-        if (page == null) {
-            if (!result.contains(currentIhiwUser.getLab())){
-                result.add(currentIhiwUser.getLab());
-                LabMapper myMap = new LabMapper();
-                List<LabDTO> entityToDto = myMap.labToLabDTO(result);
-                page = new PageImpl<>(entityToDto);
-            }
-        }
-
-
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-        //return result;
     }
 
     /**

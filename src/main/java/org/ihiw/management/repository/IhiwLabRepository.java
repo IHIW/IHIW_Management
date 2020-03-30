@@ -18,7 +18,7 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface IhiwLabRepository extends JpaRepository<IhiwLab, Long> {
-    Optional<IhiwLab> findByLabCode(String LabCode);
+    Optional<IhiwLab> findByLabCode(String labCode);
 
     Optional<IhiwLab> findById(Long id);
 

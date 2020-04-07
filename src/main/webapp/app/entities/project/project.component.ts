@@ -61,7 +61,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
         (res: HttpResponse<IProject[]>) => this.onSuccess(res.body, res.headers),
         (res: HttpResponse<any>) => this.onError(res.body)
       );
-    // this.ihiwUserService
+    this.ihiwUserService;
     //   //.my()
     //   .query({
     //     page: this.page - 1,
@@ -118,7 +118,7 @@ export class ProjectComponent implements OnInit, OnDestroy {
   }
 
   transition() {
-    this.router.navigate(['/projects'], {
+    this.router.navigate(['/project'], {
       queryParams: {
         page: this.page,
         size: this.itemsPerPage,

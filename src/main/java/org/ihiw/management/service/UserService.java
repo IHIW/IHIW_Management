@@ -9,6 +9,7 @@ import org.ihiw.management.repository.*;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
 import org.ihiw.management.service.dto.ProjectDTO;
+import org.ihiw.management.service.dto.UploadDTO;
 import org.ihiw.management.service.dto.UserDTO;
 import org.ihiw.management.service.util.RandomUtil;
 import org.ihiw.management.web.rest.errors.EmailAlreadyUsedException;
@@ -49,17 +50,20 @@ public class UserService {
 
     private final IhiwLabRepository ihiwLabRepository;
 
+    private final UploadRepository uploadRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final AuthorityRepository authorityRepository;
 
     private final CacheManager cacheManager;
 
-    public UserService(UserRepository userRepository, ProjectRepository projectRepository, IhiwUserRepository ihiwUserRepository, IhiwLabRepository ihiwLabRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, CacheManager cacheManager) {
+    public UserService(UploadRepository uploadRepository, UserRepository userRepository, ProjectRepository projectRepository, IhiwUserRepository ihiwUserRepository, IhiwLabRepository ihiwLabRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.ihiwLabRepository = ihiwLabRepository;
         this.ihiwUserRepository = ihiwUserRepository;
         this.projectRepository = projectRepository;
+        this.uploadRepository = uploadRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
@@ -370,6 +374,16 @@ public class UserService {
             ids.add(user.getUser().getId());
         }
         return userRepository.findByUserInIds(pageable, ids).map(UserDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UploadDTO> getAllUploads(Pageable pageable) {
+        return  uploadRepository.findAll(pageable).map(UploadDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UploadDTO> getAllUploadsByUserId(Pageable pageable,List<Long> ids) {
+        return  uploadRepository.findAllByUserId(pageable,ids).map(UploadDTO::new);
     }
 
     @Transactional(readOnly = true)

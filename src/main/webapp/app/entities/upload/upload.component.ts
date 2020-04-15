@@ -2,11 +2,14 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { JhiEventManager, JhiAlertService } from 'ng-jhipster';
+import { JhiEventManager, JhiAlertService, JhiParseLinks } from 'ng-jhipster';
 
 import { IUpload } from 'app/shared/model/upload.model';
 import { AccountService } from 'app/core';
 import { UploadService } from './upload.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { IProject } from 'app/shared/model/project.model';
 
 @Component({
   selector: 'jhi-upload',
@@ -15,27 +18,44 @@ import { UploadService } from './upload.service';
 export class UploadComponent implements OnInit, OnDestroy {
   uploads: IUpload[];
   currentAccount: any;
+  predicate: any;
+  routeData: any;
+  page: any;
+  previousPage: any;
+  itemsPerPage: any;
+  reverse: any;
+  totalItems: any;
   eventSubscriber: Subscription;
 
   constructor(
     protected uploadService: UploadService,
     protected jhiAlertService: JhiAlertService,
     protected eventManager: JhiEventManager,
-    protected accountService: AccountService
-  ) {}
+    protected accountService: AccountService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private parseLinks: JhiParseLinks,
+    private modalService: NgbModal
+  ) {
+    this.itemsPerPage = 500;
+    this.routeData = this.activatedRoute.data.subscribe(data => {
+      this.page = data['pagingParams'].page;
+      this.previousPage = data['pagingParams'].page;
+      this.reverse = data['pagingParams'].ascending;
+      this.predicate = data['pagingParams'].predicate;
+    });
+  }
 
   loadAll() {
     this.uploadService
-      .query()
-      .pipe(
-        filter((res: HttpResponse<IUpload[]>) => res.ok),
-        map((res: HttpResponse<IUpload[]>) => res.body)
-      )
+      .query({
+        page: this.page - 1,
+        size: this.itemsPerPage,
+        sort: this.sort()
+      })
       .subscribe(
-        (res: IUpload[]) => {
-          this.uploads = res;
-        },
-        (res: HttpErrorResponse) => this.onError(res.message)
+        (res: HttpResponse<IUpload[]>) => this.onSuccess(res.body, res.headers),
+        (res: HttpResponse<any>) => this.onError(res.body)
       );
   }
 
@@ -57,6 +77,37 @@ export class UploadComponent implements OnInit, OnDestroy {
 
   registerChangeInUploads() {
     this.eventSubscriber = this.eventManager.subscribe('uploadListModification', response => this.loadAll());
+  }
+
+  sort() {
+    const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
+    if (this.predicate !== 'id') {
+      result.push('id');
+    }
+    return result;
+  }
+
+  transition() {
+    this.router.navigate(['/uploads'], {
+      queryParams: {
+        page: this.page,
+        size: this.itemsPerPage,
+        sort: this.predicate + ',' + (this.reverse ? 'asc' : 'desc')
+      }
+    });
+    this.loadAll();
+  }
+
+  loadPage(page: number) {
+    if (page !== this.previousPage) {
+      this.previousPage = page;
+      this.transition();
+    }
+  }
+
+  private onSuccess(data, headers) {
+    this.totalItems = headers.get('X-Total-Count');
+    this.uploads = data;
   }
 
   protected onError(errorMessage: string) {

@@ -76,7 +76,7 @@ public class UploadResource {
         upload.setCreatedBy(currentIhiwUser);
         upload.setCreatedAt(ZonedDateTime.now());
         upload.setModifiedAt(ZonedDateTime.now());
-        upload.setValid(true);
+        upload.setValid(false);
 
         Upload result = uploadRepository.save(upload);
 
@@ -130,6 +130,52 @@ public class UploadResource {
                 .body(result);
         }
         return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
+    }
+    
+    
+    /**
+     * {@code PUT  /uploads} : Set validation status on an existing upload.
+     *
+     * @param upload the upload to update.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated upload,
+     * or with status {@code 400 (Bad Request)} if the upload is not valid,
+     * or with status {@code 500 (Internal Server Error)} if the upload couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PutMapping("/uploads/{id}")
+    public ResponseEntity<Upload> setUploadValidation(@RequestBody Upload upload) throws URISyntaxException {
+        log.debug("REST request to set validation feedback for Upload : {}", upload);
+        if (upload.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+        
+        //Get the existing upload object
+        Optional<Upload> dbOptionalUpload = uploadRepository.findById(upload.getId());        
+        Upload dbUpload = null;
+        if(dbOptionalUpload.isPresent()) {
+        	dbUpload = dbOptionalUpload.get();
+        }
+        else {
+        	log.debug("No upload with id " + upload.getId() + " was found.");      	
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
+        }
+
+        //Set validation status
+        if (dbUpload!=null) {
+        	dbUpload.setValid(upload.isValid());
+        	dbUpload.setValidationFeedback(upload.getValidationFeedback());
+        }
+        else {
+        	log.debug("The database returned a null upload object.");      	
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
+        }
+        
+        Upload result = uploadRepository.save(dbUpload);        
+        log.debug("Upload saved:" + result.toString());
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))
+            .body(result);
     }
 
     /**

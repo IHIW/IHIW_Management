@@ -28,9 +28,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.ihiw.management.security.AuthoritiesConstants.*;
 
@@ -186,6 +184,10 @@ public class IhiwLabResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         Optional<User> currentUser = userService.getUserWithAuthorities();
 
+        List<IhiwUser> labUsers = ihiwUserRepository.findByLab(ihiwLab.get());
+        ihiwLab.get().setIhiwUsers(new HashSet<>());
+        ihiwLab.get().getIhiwUsers().addAll(labUsers);
+
         //admins get every lab and every user gets his own lab
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             (currentIhiwUser.getLab() != null && currentIhiwUser.getLab().getId().equals(id))){
@@ -193,7 +195,7 @@ public class IhiwLabResource {
         }
         //project leaders can see all labs that are part of the projects they lead
         if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))){
-            List<Project> projectsOfUser = projectRepository.findByCreatedBy(currentIhiwUser);
+            List<Project> projectsOfUser = projectRepository.findAllByLeaders(currentIhiwUser);
             for (Project project : projectsOfUser){
                 if (project.getLabs().contains(ihiwLab.get())){
                     return ResponseUtil.wrapOrNotFound(ihiwLab);

@@ -45,10 +45,15 @@ public class FileRepository {
     }
 
     public String rawUrl(String fileName) {
-        if (s3.doesObjectExist(bucket, fileName)){
-            GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket, fileName);
-            URL url = s3.generatePresignedUrl(request);
-            return url.toString();
+        try{
+            if (s3.doesObjectExist(bucket, fileName)){
+                GeneratePresignedUrlRequest request = new GeneratePresignedUrlRequest(bucket, fileName);
+                URL url = s3.generatePresignedUrl(request);
+                return url.toString();
+            }
+        }
+        catch (Exception e) {
+            log.debug("Could not create download link for " + fileName);
         }
         return null;
     }

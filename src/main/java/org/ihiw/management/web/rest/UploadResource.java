@@ -134,48 +134,56 @@ public class UploadResource {
     
     
     /**
-     * {@code PUT  /uploads} : Set validation status on an existing upload.
+     * {@code PUT  /uploads/setvalidation} : Set validation status on an existing upload.
      *
-     * @param upload the upload to update.
+     * @param upload the upload to update, containing the filename to be updated, a "valid" status, and "validationFeedback" with the reasons the file is invalid
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated upload,
-     * or with status {@code 400 (Bad Request)} if the upload is not valid,
+     * or with status {@code 400 (Bad Request)} if the user is not "validation" with admin permissions.
      * or with status {@code 500 (Internal Server Error)} if the upload couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/uploads/{id}")
+    @PutMapping("/uploads/setvalidation")
     public ResponseEntity<Upload> setUploadValidation(@RequestBody Upload upload) throws URISyntaxException {
         log.debug("REST request to set validation feedback for Upload : {}", upload);
-        if (upload.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
         
-        //Get the existing upload object
-        Optional<Upload> dbOptionalUpload = uploadRepository.findById(upload.getId());        
-        Upload dbUpload = null;
-        if(dbOptionalUpload.isPresent()) {
-        	dbUpload = dbOptionalUpload.get();
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        if(currentUser==null || currentUser.get()==null) {
+        	throw new BadRequestAlertException("Null user id", ENTITY_NAME, "idnull");
+        }
+        else if(!currentUser.get().getLogin().equals("validation")) {
+        	throw new BadRequestAlertException("Incorrect user id:" + currentUser.get().getLogin().toString() , ENTITY_NAME, "idnull");
+        }
+        else if(!currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
+        	throw new BadRequestAlertException("Insufficient Permissions", ENTITY_NAME, "idnull");
         }
         else {
-        	log.debug("No upload with id " + upload.getId() + " was found.");      	
-        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
-        }
+        	log.debug("user " + currentUser.get().getLogin() + " is allowed to update validation status");
+	
+	        // get the upload ID.        
+	        List<Upload> allUploads = uploadRepository.findAll();
 
-        //Set validation status
-        if (dbUpload!=null) {
-        	dbUpload.setValid(upload.isValid());
-        	dbUpload.setValidationFeedback(upload.getValidationFeedback());
+	        Upload dbUpload = null;
+	        for (Upload currentUpload : allUploads) {
+	        	if(currentUpload.getFileName().equals(upload.getFileName())) {
+	        		dbUpload=currentUpload;
+	        	}
+	        }
+	        
+	        if(dbUpload==null){
+	        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString())).build();
+		    }	        
+	        else {
+	        	dbUpload.setValid(upload.isValid());
+	        	dbUpload.setValidationFeedback(upload.getValidationFeedback());
+	        }
+	 	        
+	        Upload result = uploadRepository.save(dbUpload);        
+	        log.debug("Upload saved:" + result.toString());
+			
+	        return ResponseEntity.ok()
+	            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString()))
+	            .body(result);
         }
-        else {
-        	log.debug("The database returned a null upload object.");      	
-        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
-        }
-        
-        Upload result = uploadRepository.save(dbUpload);        
-        log.debug("Upload saved:" + result.toString());
-
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))
-            .body(result);
     }
 
     /**

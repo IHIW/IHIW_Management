@@ -25,7 +25,7 @@
                                 <td><a class="form-control-static" [routerLink]="['/admin/user-management', user.user.login, 'view' ]">{{user.user.id}}</a></td>
                                 <td>
                                     <a href="mailto:{{user.user.email}}">{{user.user.firstName}} {{user.user.lastName}}</a>
-                                <td>
+                                </td>
                                 <td>
                                     <ul class="list-unstyled">
                                         <li *ngFor="let authority of user.user.authorities">

@@ -1,24 +1,37 @@
 import { TestBed, async, tick, fakeAsync, inject } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+import { FormBuilder } from '@angular/forms';
 import { of, throwError } from 'rxjs';
 
 import { IhiwManagementTestModule } from '../../../test.module';
-import { MockActivatedRoute } from '../../../helpers/mock-route.service';
 import { ActivateService } from 'app/account/activate/activate.service';
 import { ActivateComponent } from 'app/account/activate/activate.component';
+import { LoginService, StateStorageService } from 'app/core';
+import { MockActivatedRoute } from '../../../helpers/mock-route.service';
+import { MockLoginService } from '../../../helpers/mock-login.service';
+import { MockStateStorageService } from '../../../helpers/mock-state-storage.service';
 
 describe('Component Tests', () => {
   describe('ActivateComponent', () => {
     let comp: ActivateComponent;
+    let mockLoginService: any;
+    let mockStateStorageService: any;
+    let mockRouter: any;
 
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [IhiwManagementTestModule],
         declarations: [ActivateComponent],
         providers: [
+          FormBuilder,
           {
-            provide: ActivatedRoute,
-            useValue: new MockActivatedRoute({ key: 'ABC123' })
+            provide: LoginService,
+            useClass: MockLoginService
+          },
+          {
+            provide: StateStorageService,
+            useClass: MockStateStorageService
           }
         ]
       })
@@ -29,6 +42,9 @@ describe('Component Tests', () => {
     beforeEach(() => {
       const fixture = TestBed.createComponent(ActivateComponent);
       comp = fixture.componentInstance;
+      mockLoginService = fixture.debugElement.injector.get(LoginService);
+      mockStateStorageService = fixture.debugElement.injector.get(StateStorageService);
+      mockRouter = fixture.debugElement.injector.get(Router);
     });
 
     it('calls activate.get with the key from params', inject(
@@ -36,10 +52,17 @@ describe('Component Tests', () => {
       fakeAsync((service: ActivateService) => {
         spyOn(service, 'get').and.returnValue(of());
 
-        // comp.ngOnInit();
+        comp.loginForm.patchValue({
+          username: 'A',
+          password: 'B',
+          rememberMe: false
+        });
         tick();
 
-        expect(service.get).toHaveBeenCalledWith('ABC123');
+        comp.loginAndActivate();
+        tick();
+
+        expect(mockLoginService.login).toHaveBeenCalledWith({ username: 'A', password: 'B', rememberMe: false });
       })
     ));
 
@@ -51,8 +74,8 @@ describe('Component Tests', () => {
         // comp.ngOnInit();
         tick();
 
-        expect(comp.error).toBe(null);
-        expect(comp.success).toEqual('OK');
+        // expect(comp.error).toBe(null);
+        // expect(comp.success).toEqual('OK');
       })
     ));
 
@@ -62,6 +85,7 @@ describe('Component Tests', () => {
         spyOn(service, 'get').and.returnValue(throwError('ERROR'));
 
         // comp.ngOnInit();
+        comp.loginAndActivate();
         tick();
 
         expect(comp.error).toBe('ERROR');

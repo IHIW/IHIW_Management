@@ -9,10 +9,11 @@ import { IIhiwLab } from 'app/shared/model/ihiw-lab.model';
 })
 export class IhiwLabDetailComponent implements OnInit {
   ihiwLab: IIhiwLab;
-
+  legacy: Boolean;
   constructor(protected activatedRoute: ActivatedRoute) {}
 
   ngOnInit() {
+    this.legacy = false;
     this.activatedRoute.data.subscribe(({ ihiwLab }) => {
       this.ihiwLab = ihiwLab;
     });
@@ -20,5 +21,9 @@ export class IhiwLabDetailComponent implements OnInit {
 
   previousState() {
     window.history.back();
+  }
+
+  toggleLegacyFields() {
+    this.legacy = !this.legacy;
   }
 }

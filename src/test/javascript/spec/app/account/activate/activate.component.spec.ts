@@ -36,7 +36,7 @@ describe('Component Tests', () => {
       fakeAsync((service: ActivateService) => {
         spyOn(service, 'get').and.returnValue(of());
 
-        comp.ngOnInit();
+        // comp.ngOnInit();
         tick();
 
         expect(service.get).toHaveBeenCalledWith('ABC123');
@@ -48,7 +48,7 @@ describe('Component Tests', () => {
       fakeAsync((service: ActivateService) => {
         spyOn(service, 'get').and.returnValue(of({}));
 
-        comp.ngOnInit();
+        // comp.ngOnInit();
         tick();
 
         expect(comp.error).toBe(null);
@@ -61,7 +61,7 @@ describe('Component Tests', () => {
       fakeAsync((service: ActivateService) => {
         spyOn(service, 'get').and.returnValue(throwError('ERROR'));
 
-        comp.ngOnInit();
+        // comp.ngOnInit();
         tick();
 
         expect(comp.error).toBe('ERROR');

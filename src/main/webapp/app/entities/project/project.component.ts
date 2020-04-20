@@ -61,17 +61,17 @@ export class ProjectComponent implements OnInit, OnDestroy {
         (res: HttpResponse<IProject[]>) => this.onSuccess(res.body, res.headers),
         (res: HttpResponse<any>) => this.onError(res.body)
       );
-    this.ihiwUserService;
-    //   //.my()
-    //   .query({
-    //     page: this.page - 1,
-    //     size: this.itemsPerPage,
-    //     sort: this.sort()
-    //   })
-    //   .subscribe(
-    //     (res: HttpResponse<IIhiwUser[]>) => this.onSuccess(res.body, res.headers),
-    //     (res: HttpResponse<any>) => this.onError(res.body)
-    //   );
+    this.ihiwUserService
+      // .my()
+      .query({
+        page: this.page - 1,
+        size: this.itemsPerPage,
+        sort: ''
+      })
+      .subscribe(
+        (res: HttpResponse<IIhiwUser[]>) => this.onSuccess(res.body, res.headers),
+        (res: HttpResponse<any>) => this.onError(res.body)
+      );
   }
 
   ngOnInit() {

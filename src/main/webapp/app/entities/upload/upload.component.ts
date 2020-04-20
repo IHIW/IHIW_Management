@@ -88,7 +88,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   }
 
   transition() {
-    this.router.navigate(['/uploads'], {
+    this.router.navigate(['/upload'], {
       queryParams: {
         page: this.page,
         size: this.itemsPerPage,

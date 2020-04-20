@@ -166,12 +166,12 @@ public class UploadResource {
             pageable = Pageable.unpaged();
         }
 
-        List<Upload> result;
+        Page<Upload> result;
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
-            result = uploadRepository.findAll();
+            result = uploadRepository.findAll(pageable);
             //page = userService.getAllUploads(pageable);
         } else {
-            result = uploadRepository.findByCreatedByIn(colleages);
+            result = uploadRepository.findByCreatedByIn(colleages, pageable);
             //page = userService.getAllUploadsByUserId(pageable,collIds);
         }
 
@@ -183,7 +183,7 @@ public class UploadResource {
         }
         //return result;
         UploadMapper myMap = new UploadMapper();
-        List<UploadDTO> entityToDto = myMap.UploadsToUploadDTOs(result);
+        List<UploadDTO> entityToDto = myMap.UploadsToUploadDTOs(result); //FIXME Ioannis
         page = new PageImpl<>(entityToDto);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

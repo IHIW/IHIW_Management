@@ -199,6 +199,7 @@ public class UploadDTO {
     }
 
     public UploadDTO(Upload upload) {
+        this.id = upload.getId();
         this.type = upload.getType();
         this.createdAt = upload.getCreatedAt();
         this.modifiedAt = upload.getModifiedAt();

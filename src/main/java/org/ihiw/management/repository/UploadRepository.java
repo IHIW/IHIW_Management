@@ -19,7 +19,7 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface UploadRepository extends JpaRepository<Upload, Long> {
-    List<Upload> findByCreatedByIn(List<IhiwUser> users);
+    Page<Upload> findByCreatedByIn(List<IhiwUser> users, Pageable pageable);
 
 
     Optional<Upload> findById(Long id);
@@ -31,5 +31,5 @@ public interface UploadRepository extends JpaRepository<Upload, Long> {
 
     @Query("select upload from Upload upload WHERE upload.id in (:ids)")
     Page<Upload> findAllByUserId(Pageable pageable,@Param("ids") List<Long> ids);
-    
+
 }

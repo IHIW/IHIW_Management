@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 import org.ihiw.management.domain.enumeration.FileType;
 
 /**
- * A Upload.
+ * An Upload.
  */
 @Entity
 @Table(name = "upload")
@@ -48,8 +48,11 @@ public class Upload implements Serializable {
     @ManyToOne
     @JsonIgnoreProperties("uploads")
     private IhiwUser createdBy;
+    
+    @Column(name = "validation_feedback")
+    private String validationFeedback;
 
-    @Transient
+	@Transient
     @JsonProperty
     private String rawDownload;
 
@@ -157,6 +160,19 @@ public class Upload implements Serializable {
         this.createdBy = ihiwUser;
     }
 
+    public String getValidationFeedback() {
+		return validationFeedback;
+	}
+    
+    public Upload validationFeedback(String validationFeedback) {
+        this.validationFeedback = validationFeedback;
+        return this;
+    }
+
+	public void setValidationFeedback(String validationFeedback) {
+		this.validationFeedback = validationFeedback;
+	}    
+    
     public String getRawDownload() {
         return rawDownload;
     }
@@ -201,6 +217,7 @@ public class Upload implements Serializable {
             ", fileName='" + getFileName() + "'" +
             ", valid='" + isValid() + "'" +
             ", enabled='" + isEnabled() + "'" +
+            ", validationFeedback='" + getValidationFeedback() + "'" +
             "}";
     }
 }

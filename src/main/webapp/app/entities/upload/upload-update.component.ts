@@ -27,6 +27,7 @@ export class UploadUpdateComponent implements OnInit {
     modifiedAt: [],
     fileName: [],
     valid: [],
+    validationFeedback: [],
     enabled: [],
     createdBy: []
   });
@@ -53,6 +54,7 @@ export class UploadUpdateComponent implements OnInit {
       modifiedAt: upload.modifiedAt != null ? upload.modifiedAt.format(DATE_TIME_FORMAT) : null,
       fileName: upload.fileName,
       valid: upload.valid,
+      validationFeedback: upload.validationFeedback,
       enabled: upload.enabled,
       createdBy: upload.createdBy
     });

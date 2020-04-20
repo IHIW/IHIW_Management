@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,7 @@ import java.util.Optional;
 
 import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
 import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
+import static org.ihiw.management.security.AuthoritiesConstants.VALIDATION;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.Upload}.
@@ -76,7 +78,7 @@ public class UploadResource {
         upload.setCreatedBy(currentIhiwUser);
         upload.setCreatedAt(ZonedDateTime.now());
         upload.setModifiedAt(ZonedDateTime.now());
-        upload.setValid(true);
+        upload.setValid(false);
 
         Upload result = uploadRepository.save(upload);
 
@@ -131,6 +133,47 @@ public class UploadResource {
         }
         return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
     }
+    
+    
+    /**
+     * {@code PUT  /uploads/setvalidation} : Set validation status on an existing upload.
+     *
+     * @param upload the upload to update, containing the filename to be updated, a "valid" status, and "validationFeedback" with the reasons the file is invalid
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated upload,
+     * or with status {@code 400 (Bad Request)} if the user is not "validation" with admin permissions.
+     * or with status {@code 500 (Internal Server Error)} if the upload couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PutMapping("/uploads/setvalidation")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<Upload> setUploadValidation(@RequestBody Upload upload) throws URISyntaxException {
+        log.debug("REST request to set validation feedback for Upload : {}", upload);
+     
+        List<Upload> allUploads = uploadRepository.findAll();
+
+        Upload dbUpload = null;
+        for (Upload currentUpload : allUploads) {
+        	if(currentUpload.getFileName().equals(upload.getFileName())) {
+        		dbUpload=currentUpload;
+        	}
+        }
+        
+        if(dbUpload==null){
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString())).build();
+	    }	        
+        else {
+        	dbUpload.setValid(upload.isValid());
+        	dbUpload.setValidationFeedback(upload.getValidationFeedback());
+        }
+ 	        
+        Upload result = uploadRepository.save(dbUpload);        
+        log.debug("Upload saved:" + result.toString());
+		
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString()))
+            .body(result);
+    }
+
 
     /**
      * {@code GET  /uploads} : get all the uploads.

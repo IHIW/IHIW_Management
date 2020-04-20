@@ -13,6 +13,7 @@ export interface IUpload {
   modifiedAt?: Moment;
   fileName?: string;
   valid?: boolean;
+  validationFeedback?: string;
   enabled?: boolean;
   createdBy?: IIhiwUser;
   rawDownload?: string;
@@ -27,6 +28,7 @@ export class Upload implements IUpload {
     public modifiedAt?: Moment,
     public fileName?: string,
     public valid?: boolean,
+    public validationFeedback?: string,
     public enabled?: boolean,
     public createdBy?: IIhiwUser,
     public rawDownload?: string,

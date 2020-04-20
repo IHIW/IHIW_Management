@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,7 @@ import java.util.Optional;
 
 import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
 import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
+import static org.ihiw.management.security.AuthoritiesConstants.VALIDATION;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.Upload}.
@@ -143,48 +145,35 @@ public class UploadResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/uploads/setvalidation")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
     public ResponseEntity<Upload> setUploadValidation(@RequestBody Upload upload) throws URISyntaxException {
         log.debug("REST request to set validation feedback for Upload : {}", upload);
-        
-        Optional<User> currentUser = userService.getUserWithAuthorities();
-        if(currentUser==null || currentUser.get()==null) {
-        	throw new BadRequestAlertException("Null user id", ENTITY_NAME, "idnull");
-        }
-        else if(!currentUser.get().getLogin().equals("validation")) {
-        	throw new BadRequestAlertException("Incorrect user id:" + currentUser.get().getLogin().toString() , ENTITY_NAME, "idnull");
-        }
-        else if(!currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
-        	throw new BadRequestAlertException("Insufficient Permissions", ENTITY_NAME, "idnull");
-        }
-        else {
-        	log.debug("user " + currentUser.get().getLogin() + " is allowed to update validation status");
-	
-	        // get the upload ID.        
-	        List<Upload> allUploads = uploadRepository.findAll();
+     
+        List<Upload> allUploads = uploadRepository.findAll();
 
-	        Upload dbUpload = null;
-	        for (Upload currentUpload : allUploads) {
-	        	if(currentUpload.getFileName().equals(upload.getFileName())) {
-	        		dbUpload=currentUpload;
-	        	}
-	        }
-	        
-	        if(dbUpload==null){
-	        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString())).build();
-		    }	        
-	        else {
-	        	dbUpload.setValid(upload.isValid());
-	        	dbUpload.setValidationFeedback(upload.getValidationFeedback());
-	        }
-	 	        
-	        Upload result = uploadRepository.save(dbUpload);        
-	        log.debug("Upload saved:" + result.toString());
-			
-	        return ResponseEntity.ok()
-	            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString()))
-	            .body(result);
+        Upload dbUpload = null;
+        for (Upload currentUpload : allUploads) {
+        	if(currentUpload.getFileName().equals(upload.getFileName())) {
+        		dbUpload=currentUpload;
+        	}
         }
+        
+        if(dbUpload==null){
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString())).build();
+	    }	        
+        else {
+        	dbUpload.setValid(upload.isValid());
+        	dbUpload.setValidationFeedback(upload.getValidationFeedback());
+        }
+ 	        
+        Upload result = uploadRepository.save(dbUpload);        
+        log.debug("Upload saved:" + result.toString());
+		
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString()))
+            .body(result);
     }
+
 
     /**
      * {@code GET  /uploads} : get all the uploads.

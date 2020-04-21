@@ -23,7 +23,8 @@
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.upload.valid">Valid</span></dt>
                 <dd>
-                    <span class="badge badge-info">{{upload.valid}}</span>
+                    <span title="{{upload.validationFeedback}}" class="badge" [ngClass]="{'badge-danger': !upload.valid, 'badge-success': upload.valid}" *ngIf="upload.valid !== null">{{upload.valid}}</span>
+                    <span class="badge badge-warning" *ngIf="upload.valid === null">validating...</span>
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.upload.validationFeedback">Validation Feedback</span></dt>
                 <dd>

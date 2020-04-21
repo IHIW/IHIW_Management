@@ -79,7 +79,7 @@ public class UploadResource {
         upload.setCreatedBy(currentIhiwUser);
         upload.setCreatedAt(ZonedDateTime.now());
         upload.setModifiedAt(ZonedDateTime.now());
-        upload.setValid(false);
+        upload.setValid(null);
 
         Upload result = uploadRepository.save(upload);
 

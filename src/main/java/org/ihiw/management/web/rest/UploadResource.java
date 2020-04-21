@@ -73,7 +73,8 @@ public class UploadResource {
             throw new BadRequestAlertException("A new upload cannot already have an ID", ENTITY_NAME, "idexists");
         }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        String fileName = currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getType() + "_" + upload.getFileName();
+
+        String fileName = currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getType() + "_" + file.getOriginalFilename();
         upload.setFileName(fileName);
         upload.setCreatedBy(currentIhiwUser);
         upload.setCreatedAt(ZonedDateTime.now());
@@ -133,8 +134,8 @@ public class UploadResource {
         }
         return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
     }
-    
-    
+
+
     /**
      * {@code PUT  /uploads/setvalidation} : Set validation status on an existing upload.
      *
@@ -148,7 +149,7 @@ public class UploadResource {
     @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
     public ResponseEntity<Upload> setUploadValidation(@RequestBody Upload upload) throws URISyntaxException {
         log.debug("REST request to set validation feedback for Upload : {}", upload);
-     
+
         List<Upload> allUploads = uploadRepository.findAll();
 
         Upload dbUpload = null;
@@ -157,18 +158,18 @@ public class UploadResource {
         		dbUpload=currentUpload;
         	}
         }
-        
+
         if(dbUpload==null){
         	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString())).build();
-	    }	        
+	    }
         else {
         	dbUpload.setValid(upload.isValid());
         	dbUpload.setValidationFeedback(upload.getValidationFeedback());
         }
- 	        
-        Upload result = uploadRepository.save(dbUpload);        
+
+        Upload result = uploadRepository.save(dbUpload);
         log.debug("Upload saved:" + result.toString());
-		
+
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString()))
             .body(result);

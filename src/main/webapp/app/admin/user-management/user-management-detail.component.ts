@@ -17,4 +17,8 @@ export class UserMgmtDetailComponent implements OnInit {
       this.user = user.body ? user.body : user;
     });
   }
+
+  previousState() {
+    window.history.back();
+  }
 }

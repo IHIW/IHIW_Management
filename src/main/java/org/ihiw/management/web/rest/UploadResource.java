@@ -13,12 +13,14 @@ import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UploadRepository;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.service.dto.UploadDTO;
-import org.ihiw.management.service.mapper.UploadMapper;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -166,13 +168,13 @@ public class UploadResource {
             pageable = Pageable.unpaged();
         }
 
-        Page<Upload> result;
+        List<Upload> result;
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
-            result = uploadRepository.findAll(pageable);
-            //page = userService.getAllUploads(pageable);
+            result = uploadRepository.findAll();
+            page = userService.getAllUploads(pageable);
         } else {
-            result = uploadRepository.findByCreatedByIn(colleages, pageable);
-            //page = userService.getAllUploadsByUserId(pageable,collIds);
+            result = uploadRepository.findAllById(collIds);
+            page = userService.getAllUploadsByUserId(pageable,collIds);
         }
 
         for (Upload upload : result) {
@@ -182,9 +184,9 @@ public class UploadResource {
             }
         }
         //return result;
-        UploadMapper myMap = new UploadMapper();
-        List<UploadDTO> entityToDto = myMap.UploadsToUploadDTOs(result); //FIXME Ioannis
-        page = new PageImpl<>(entityToDto);
+        //UploadMapper myMap = new UploadMapper();
+        //List<UploadDTO> entityToDto = myMap.UploadsToUploadDTOs(result); 
+        //page = new PageImpl<>(entityToDto);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

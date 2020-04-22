@@ -24,12 +24,17 @@ public interface UploadRepository extends JpaRepository<Upload, Long> {
 
     Optional<Upload> findById(Long id);
 
-    Page<Upload> findAllById(Pageable pageable, Long id);
+    //Page<Upload> findAllById(Pageable pageable, Long id);
+
+    List<Upload> findAll();
+
+    List<Upload> findAllById(List<Long> ids);
+
 
     @Query("select upload from Upload upload")
-    Page<Upload> findAll(Pageable pageable);
+    Page<Upload> findAllUploads(Pageable pageable);
 
     @Query("select upload from Upload upload WHERE upload.id in (:ids)")
-    Page<Upload> findAllByUserId(Pageable pageable,@Param("ids") List<Long> ids);
+    Page<Upload> findAllUploadsByUserId(Pageable pageable,@Param("ids") List<Long> ids);
 
 }

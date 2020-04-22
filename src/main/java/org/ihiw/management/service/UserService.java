@@ -383,7 +383,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Page<UploadDTO> getAllUploadsByUserId(Pageable pageable,List<Long> ids) {
-        return  uploadRepository.findAllByUserId(pageable,ids).map(UploadDTO::new);
+        return  uploadRepository.findAllUploadsByUserId(pageable,ids).map(UploadDTO::new);
     }
 
     @Transactional(readOnly = true)

@@ -11,6 +11,7 @@ import { IhiwLabDetailComponent } from './ihiw-lab-detail.component';
 import { IhiwLabUpdateComponent } from './ihiw-lab-update.component';
 import { IhiwLabDeletePopupComponent } from './ihiw-lab-delete-dialog.component';
 import { IIhiwLab } from 'app/shared/model/ihiw-lab.model';
+import { JhiResolvePagingParams } from 'ng-jhipster';
 
 @Injectable({ providedIn: 'root' })
 export class IhiwLabResolve implements Resolve<IIhiwLab> {
@@ -32,6 +33,9 @@ export const ihiwLabRoute: Routes = [
   {
     path: '',
     component: IhiwLabComponent,
+    resolve: {
+      pagingParams: JhiResolvePagingParams
+    },
     data: {
       authorities: ['ROLE_USER'],
       pageTitle: 'ihiwManagementApp.ihiwLab.home.title'

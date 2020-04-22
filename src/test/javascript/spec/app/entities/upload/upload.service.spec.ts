@@ -27,7 +27,7 @@ describe('Service Tests', () => {
       httpMock = injector.get(HttpTestingController);
       currentDate = moment();
 
-      elemDefault = new Upload(0, FileType.HAML, currentDate, currentDate, 'AAAAAAA', false, false);
+      elemDefault = new Upload(0, FileType.HAML, currentDate, currentDate, 'AAAAAAA', false, 'false');
     });
 
     describe('Service methods', () => {

@@ -1,6 +1,7 @@
 package org.ihiw.management.web.rest;
 
 
+import io.github.jhipster.web.util.ResponseUtil;
 import org.ihiw.management.domain.Authority;
 import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.User;
@@ -26,6 +27,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.*;
+
+import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
+import static org.ihiw.management.security.AuthoritiesConstants.PI;
 
 /**
  * REST controller for managing the current user's account.
@@ -88,7 +92,7 @@ public class AccountResource {
             //send the activation mail to all PIs of the lab
             for (IhiwUser labUser : labUsers){
                 Optional<User> userFromIhiw = userRepository.findOneWithAuthoritiesById(labUser.getUser().getId());
-                if (userFromIhiw.get().getAuthorities().contains(new Authority(AuthoritiesConstants.PI))){
+                if (userFromIhiw.get().getAuthorities().contains(new Authority(PI))){
                     mailService.sendActivationEmail(user, labUser.getUser().getEmail(), userFromIhiw.get().getFirstName());
                     mailSent = true;
                 }
@@ -111,11 +115,25 @@ public class AccountResource {
 
     @GetMapping("/activate")
     public void activateAccount(@RequestParam(value = "key") String key) {
-        Optional<User> user = userService.activateRegistration(key);
-        if (!user.isPresent()) {
-            throw new AccountResourceException("No user was found for this activation key");
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        Optional<User> newUser = userRepository.findOneByActivationKey(key);
+        IhiwUser newIhiwUser = ihiwUserRepository.findByUser(newUser.get());
+
+        //admins can register everyone and PIs their staff
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            (currentUser.get().getAuthorities().contains(new Authority(PI)) && currentIhiwUser.getLab().equals(newIhiwUser.getLab()))){
+            Optional<User> user = userService.activateRegistration(key);
+            if (!user.isPresent()) {
+                throw new AccountResourceException("No user was found for this activation key");
+            }
+            mailService.sendActivationConfirmation(user.get());
         }
-        mailService.sendActivationConfirmation(user.get());
+        else {
+            throw new AccountResourceException("Not authorized to activate user");
+        }
+
     }
 
     /**

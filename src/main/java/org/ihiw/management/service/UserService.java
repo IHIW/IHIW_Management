@@ -11,10 +11,13 @@ import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
+import org.ihiw.management.service.dto.LabDTO;
 import org.ihiw.management.service.dto.UserDTO;
 import org.ihiw.management.service.util.RandomUtil;
-import org.ihiw.management.web.rest.errors.*;
-
+import org.ihiw.management.web.rest.errors.EmailAlreadyUsedException;
+import org.ihiw.management.web.rest.errors.InvalidPasswordException;
+import org.ihiw.management.web.rest.errors.LabDoesNotExistException;
+import org.ihiw.management.web.rest.errors.LoginAlreadyUsedException;
 import org.ihiw.management.web.rest.vm.ManagedUserVM;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -358,6 +361,12 @@ public class UserService {
     public Page<UserDTO> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAllByLoginNot(pageable, Constants.ANONYMOUS_USER).map(UserDTO::new);
     }
+
+    @Transactional(readOnly = true)
+    public Page<LabDTO> getAllLabs(Pageable pageable) {
+        return  ihiwLabRepository.findAll(pageable).map(LabDTO::new);
+    }
+
 
     @Transactional(readOnly = true)
     public Page<UserDTO> getMyManagedUsers(Pageable pageable, IhiwLab ihiwLab) {

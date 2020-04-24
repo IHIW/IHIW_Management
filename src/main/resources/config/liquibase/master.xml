@@ -30,7 +30,8 @@
     <include file="config/liquibase/changelog/20191210133500_project_component.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191210160201_project_subscription_status.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20200406120000_upload_validation_column.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20200420120000_upload_validation_role.xml" relativeToChangelogFile="false"/>  
+    <include file="config/liquibase/changelog/20200420120000_upload_validation_role.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200424120000_multiple_validations.xml" relativeToChangelogFile="false"/>
 
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

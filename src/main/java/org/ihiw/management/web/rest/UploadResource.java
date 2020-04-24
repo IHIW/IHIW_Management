@@ -1,13 +1,11 @@
 package org.ihiw.management.web.rest;
 
-import org.ihiw.management.domain.Authority;
-import org.ihiw.management.domain.IhiwUser;
-import org.ihiw.management.domain.Upload;
-import org.ihiw.management.domain.User;
+import org.ihiw.management.domain.*;
 import org.ihiw.management.domain.enumeration.FileType;
 import org.ihiw.management.repository.FileRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UploadRepository;
+import org.ihiw.management.repository.ValidationRepository;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
 
@@ -48,14 +46,16 @@ public class UploadResource {
     private String applicationName;
 
     private final UploadRepository uploadRepository;
+    private final ValidationRepository validationRepository;
     private final FileRepository fileRepository;
     private final IhiwUserRepository ihiwUserRepository;
     private final UserService userService;
 
-    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, UserService userService) {
+    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, ValidationRepository validationRepository, UserService userService) {
         this.uploadRepository = uploadRepository;
         this.fileRepository = fileRepository;
         this.ihiwUserRepository = ihiwUserRepository;
+        this.validationRepository = validationRepository;
         this.userService = userService;
     }
 
@@ -79,7 +79,6 @@ public class UploadResource {
         upload.setCreatedBy(currentIhiwUser);
         upload.setCreatedAt(ZonedDateTime.now());
         upload.setModifiedAt(ZonedDateTime.now());
-        upload.setValid(null);
 
         Upload result = uploadRepository.save(upload);
 
@@ -139,7 +138,7 @@ public class UploadResource {
     /**
      * {@code PUT  /uploads/setvalidation} : Set validation status on an existing upload.
      *
-     * @param upload the upload to update, containing the filename to be updated, a "valid" status, and "validationFeedback" with the reasons the file is invalid
+     * @param validation the validation object to append, containing the upload object with its filename (mandatory), a "validator", a "valid" status, and "validationFeedback" with the reasons the file is invalid
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated upload,
      * or with status {@code 400 (Bad Request)} if the user is not "validation" with admin permissions.
      * or with status {@code 500 (Internal Server Error)} if the upload couldn't be updated.
@@ -147,32 +146,43 @@ public class UploadResource {
      */
     @PutMapping("/uploads/setvalidation")
     @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
-    public ResponseEntity<Upload> setUploadValidation(@RequestBody Upload upload) throws URISyntaxException {
-        log.debug("REST request to set validation feedback for Upload : {}", upload);
+    public ResponseEntity<Validation> setUploadValidation(@RequestBody Validation validation) throws URISyntaxException {
+        log.debug("REST request to set validation feedback for Upload : {}", validation.getUpload());
 
-        List<Upload> allUploads = uploadRepository.findAll();
-
-        Upload dbUpload = null;
-        for (Upload currentUpload : allUploads) {
-        	if(currentUpload.getFileName().equals(upload.getFileName())) {
-        		dbUpload=currentUpload;
-        	}
+        List<Upload> allUploads = uploadRepository.findByFileName(validation.getUpload().getFileName());
+        if (allUploads.isEmpty() || allUploads.size() > 1){
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, validation.getUpload().getFileName())).build();
         }
 
-        if(dbUpload==null){
-        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString())).build();
-	    }
-        else {
-        	dbUpload.setValid(upload.isValid());
-        	dbUpload.setValidationFeedback(upload.getValidationFeedback());
+        Upload currentUpload = allUploads.get(0);
+
+        //if there is an existing validation
+        Validation updated = null;
+        if (!currentUpload.getValidations().isEmpty()){
+            for (Validation v : currentUpload.getValidations()){
+                if (validation.getValidator().equalsIgnoreCase(v.getValidator())){
+                    v.setValid(validation.getValid());
+                    v.setValidationFeedback(validation.getValidationFeedback());
+                    updated = validationRepository.save(v);
+                }
+            }
         }
+        //if there is no validation yet, create a new one
+        if (updated == null){
+            Validation v = new Validation();
+            v.setUpload(currentUpload);
+            v.setValid(validation.getValid());
+            v.setValidator(validation.getValidator());
+            v.setValidationFeedback(validation.getValidationFeedback());
+            updated = validationRepository.save(v);
+            currentUpload.getValidations().add(updated);
+        }
+        uploadRepository.save(currentUpload);
 
-        Upload result = uploadRepository.save(dbUpload);
-        log.debug("Upload saved:" + result.toString());
-
+        log.debug("Validation saved:" + updated.getValidator());
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getFileName().toString()))
-            .body(result);
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, updated.getValidator()))
+            .body(updated);
     }
 
 

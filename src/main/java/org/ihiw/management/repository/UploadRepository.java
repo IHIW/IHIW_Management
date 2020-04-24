@@ -15,4 +15,5 @@ import java.util.List;
 @Repository
 public interface UploadRepository extends JpaRepository<Upload, Long> {
     List<Upload> findByCreatedByIn(List<IhiwUser> users);
+    List<Upload> findByFileName(String filename);
 }

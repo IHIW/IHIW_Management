@@ -47,8 +47,11 @@ public class CacheConfiguration {
             createCache(cm, org.ihiw.management.domain.Project.class.getName() + ".labs");
             createCache(cm, org.ihiw.management.domain.Project.class.getName() + ".leaders");
             createCache(cm, org.ihiw.management.domain.Upload.class.getName());
+            createCache(cm, org.ihiw.management.domain.Upload.class.getName() + ".validations");
+            createCache(cm, org.ihiw.management.domain.Validation.class.getName());
             createCache(cm, org.ihiw.management.domain.IhiwLab.class.getName());
             createCache(cm, org.ihiw.management.domain.IhiwLab.class.getName() + ".projects");
+            createCache(cm, org.ihiw.management.domain.IhiwLab.class.getName() + ".ihiwUsers");
             createCache(cm, org.ihiw.management.domain.IhiwUser.class.getName());
             createCache(cm, org.ihiw.management.domain.IhiwUser.class.getName() + ".uploads");
             createCache(cm, org.ihiw.management.domain.IhiwUser.class.getName() + ".projectLeaderships");

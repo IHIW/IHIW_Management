@@ -33,7 +33,7 @@ export class UploadDetailComponent implements OnInit, OnDestroy {
       )
       .subscribe((upload: Upload) => {
         this.upload = upload;
-        if (this.upload.valid === null) {
+        if (this.upload.validations.length < 1) {
           setTimeout(() => {
             this.eventManager.broadcast({ name: 'uploadModification', content: 'Reload' });
           }, 5000);

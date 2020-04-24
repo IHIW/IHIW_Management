@@ -37,7 +37,7 @@
 <!--                <td>{{upload.modifiedAt | date:'short'}}</td>-->
                 <td>{{upload.fileName}}</td>
                 <td>
-                    <span title="{{upload.validationFeedback}}" class="badge" [ngClass]="{'badge-danger': !upload.valid, 'badge-success': upload.valid}" *ngIf="upload.valid !== null">{{upload.valid}}</span>
+                    <span class="badge" [ngClass]="{'badge-danger': !upload.valid, 'badge-success': upload.valid}" *ngIf="upload.valid !== null">{{upload.valid}}</span>
                     <span class="badge badge-warning" *ngIf="upload.valid === null">validating...</span>
                 </td>
                 <td><span class="badge" [ngClass]="{'badge-danger': !upload.enabled, 'badge-success': upload.enabled}">{{upload.enabled}}</span></td>

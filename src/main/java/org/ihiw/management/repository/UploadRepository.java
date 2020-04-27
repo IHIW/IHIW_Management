@@ -19,6 +19,8 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 @Repository
 public interface UploadRepository extends JpaRepository<Upload, Long> {
+    List<Upload> findByCreatedByIn(List<IhiwUser> users);
+    List<Upload> findByFileName(String filename);
     Page<Upload> findByCreatedByIn(List<IhiwUser> users, Pageable pageable);
 
 

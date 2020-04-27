@@ -40,7 +40,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let project of projects ;trackBy: trackId">
+            <tr *ngFor="let project of projects; trackBy: trackId">
                 <td><a [routerLink]="['/project', project.id, 'view' ]">{{project.id}}</a></td>
                 <td>{{project.name}}</td>
                 <td>{{project.component}}</td>
@@ -70,7 +70,7 @@
                         </span>
                 </td>
                 <td>
-                    <span *ngFor="let labWrapper of project.labs | status:'UNSUBSCRIBED'; let last = last">
+                    <span *ngFor="let labWrapper of project.labs |  status:'UNSUBSCRIBED'; let last = last">
                             <a class="form-control-static" [routerLink]="['/ihiw-lab', labWrapper.lab?.id, 'view' ]">
                                 {{labWrapper.lab.labCode}}
                                 <span class="badge badge-warning badge-pill" *ngIf="labWrapper.status === 'REQUESTED'">

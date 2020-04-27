@@ -26,7 +26,6 @@ export class UploadUpdateComponent implements OnInit {
     createdAt: [],
     modifiedAt: [],
     fileName: [],
-    valid: [],
     enabled: [],
     createdBy: []
   });
@@ -52,7 +51,6 @@ export class UploadUpdateComponent implements OnInit {
       createdAt: upload.createdAt != null ? upload.createdAt.format(DATE_TIME_FORMAT) : null,
       modifiedAt: upload.modifiedAt != null ? upload.modifiedAt.format(DATE_TIME_FORMAT) : null,
       fileName: upload.fileName,
-      valid: upload.valid,
       enabled: upload.enabled,
       createdBy: upload.createdBy
     });
@@ -88,7 +86,6 @@ export class UploadUpdateComponent implements OnInit {
       modifiedAt:
         this.editForm.get(['modifiedAt']).value != null ? moment(this.editForm.get(['modifiedAt']).value, DATE_TIME_FORMAT) : undefined,
       fileName: this.editForm.get(['fileName']).value,
-      valid: this.editForm.get(['valid']).value,
       enabled: this.editForm.get(['enabled']).value,
       createdBy: this.editForm.get(['createdBy']).value
     };

@@ -1,5 +1,6 @@
 package org.ihiw.management.web.rest;
 
+import org.ihiw.management.domain.*;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -11,6 +12,7 @@ import org.ihiw.management.domain.enumeration.FileType;
 import org.ihiw.management.repository.FileRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UploadRepository;
+import org.ihiw.management.repository.ValidationRepository;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.service.dto.UploadDTO;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
@@ -24,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -38,6 +41,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
+import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
+import static org.ihiw.management.security.AuthoritiesConstants.VALIDATION;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.Upload}.
@@ -54,14 +59,16 @@ public class UploadResource {
     private String applicationName;
 
     private final UploadRepository uploadRepository;
+    private final ValidationRepository validationRepository;
     private final FileRepository fileRepository;
     private final IhiwUserRepository ihiwUserRepository;
     private final UserService userService;
 
-    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, UserService userService) {
+    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, ValidationRepository validationRepository, UserService userService) {
         this.uploadRepository = uploadRepository;
         this.fileRepository = fileRepository;
         this.ihiwUserRepository = ihiwUserRepository;
+        this.validationRepository = validationRepository;
         this.userService = userService;
     }
 
@@ -79,12 +86,12 @@ public class UploadResource {
             throw new BadRequestAlertException("A new upload cannot already have an ID", ENTITY_NAME, "idexists");
         }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        String fileName = currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getType() + "_" + upload.getFileName();
+
+        String fileName = currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getType() + "_" + file.getOriginalFilename();
         upload.setFileName(fileName);
         upload.setCreatedBy(currentIhiwUser);
         upload.setCreatedAt(ZonedDateTime.now());
         upload.setModifiedAt(ZonedDateTime.now());
-        upload.setValid(true);
 
         Upload result = uploadRepository.save(upload);
 
@@ -140,6 +147,58 @@ public class UploadResource {
         return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
     }
 
+
+    /**
+     * {@code PUT  /uploads/setvalidation} : Set validation status on an existing upload.
+     *
+     * @param validation the validation object to append, containing the upload object with its filename (mandatory), a "validator", a "valid" status, and "validationFeedback" with the reasons the file is invalid
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated upload,
+     * or with status {@code 400 (Bad Request)} if the user is not "validation" with admin permissions.
+     * or with status {@code 500 (Internal Server Error)} if the upload couldn't be updated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PutMapping("/uploads/setvalidation")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<Validation> setUploadValidation(@RequestBody Validation validation) throws URISyntaxException {
+        log.debug("REST request to set validation feedback for Upload : {}", validation.getUpload());
+
+        List<Upload> allUploads = uploadRepository.findByFileName(validation.getUpload().getFileName());
+        if (allUploads.isEmpty() || allUploads.size() > 1){
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, validation.getUpload().getFileName())).build();
+        }
+
+        Upload currentUpload = allUploads.get(0);
+
+        //if there is an existing validation
+        Validation updated = null;
+        if (!currentUpload.getValidations().isEmpty()){
+            for (Validation v : currentUpload.getValidations()){
+                if (validation.getValidator().equalsIgnoreCase(v.getValidator())){
+                    v.setValid(validation.getValid());
+                    v.setValidationFeedback(validation.getValidationFeedback());
+                    updated = validationRepository.save(v);
+                }
+            }
+        }
+        //if there is no validation yet, create a new one
+        if (updated == null){
+            Validation v = new Validation();
+            v.setUpload(currentUpload);
+            v.setValid(validation.getValid());
+            v.setValidator(validation.getValidator());
+            v.setValidationFeedback(validation.getValidationFeedback());
+            updated = validationRepository.save(v);
+            currentUpload.getValidations().add(updated);
+        }
+        uploadRepository.save(currentUpload);
+
+        log.debug("Validation saved:" + updated.getValidator());
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, updated.getValidator()))
+            .body(updated);
+    }
+
+
     /**
      * {@code GET  /uploads} : get all the uploads.
      *
@@ -185,7 +244,7 @@ public class UploadResource {
         }
         //return result;
         //UploadMapper myMap = new UploadMapper();
-        //List<UploadDTO> entityToDto = myMap.UploadsToUploadDTOs(result); 
+        //List<UploadDTO> entityToDto = myMap.UploadsToUploadDTOs(result);
         //page = new PageImpl<>(entityToDto);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

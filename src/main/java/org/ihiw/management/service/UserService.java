@@ -8,6 +8,7 @@ import org.ihiw.management.domain.User;
 import org.ihiw.management.repository.*;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
+import org.ihiw.management.service.dto.LabDTO;
 import org.ihiw.management.service.dto.ProjectDTO;
 import org.ihiw.management.service.dto.UploadDTO;
 import org.ihiw.management.service.dto.UserDTO;
@@ -365,6 +366,12 @@ public class UserService {
     public Page<UserDTO> getAllManagedUsers(Pageable pageable) {
         return userRepository.findAllByLoginNot(pageable, Constants.ANONYMOUS_USER).map(UserDTO::new);
     }
+
+    @Transactional(readOnly = true)
+    public Page<LabDTO> getAllLabs(Pageable pageable) {
+        return  ihiwLabRepository.findAll(pageable).map(LabDTO::new);
+    }
+
 
     @Transactional(readOnly = true)
     public Page<UserDTO> getMyManagedUsers(Pageable pageable, IhiwLab ihiwLab) {

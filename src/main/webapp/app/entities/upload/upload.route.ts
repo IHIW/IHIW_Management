@@ -45,9 +45,6 @@ export const uploadRoute: Routes = [
   {
     path: ':id/view',
     component: UploadDetailComponent,
-    resolve: {
-      upload: UploadResolve
-    },
     data: {
       authorities: ['ROLE_USER'],
       pageTitle: 'ihiwManagementApp.upload.home.title'

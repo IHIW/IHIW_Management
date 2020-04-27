@@ -116,6 +116,11 @@ public class IhiwLab implements Serializable {
     @JsonBackReference
     private Set<ProjectIhiwLab> projects = new HashSet<>();
 
+    @OneToMany(mappedBy = "lab", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+//    @JsonBackReference
+    private Set<IhiwUser> ihiwUsers = new HashSet<>();
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -470,6 +475,14 @@ public class IhiwLab implements Serializable {
     public IhiwLab createdAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
         return this;
+    }
+
+    public Set<IhiwUser> getIhiwUsers() {
+        return ihiwUsers;
+    }
+
+    public void setIhiwUsers(Set<IhiwUser> ihiwUsers) {
+        this.ihiwUsers = ihiwUsers;
     }
 
     public void setCreatedAt(ZonedDateTime createdAt) {

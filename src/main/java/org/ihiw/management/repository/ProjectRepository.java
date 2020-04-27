@@ -22,6 +22,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findByCreatedBy(IhiwUser currentIhiwUser);
 
+    List<Project> findAllByLeaders(IhiwUser leader);
+
     List<Project> findAllByOrderByComponent();
 
     Optional<Project> findById(Long id);

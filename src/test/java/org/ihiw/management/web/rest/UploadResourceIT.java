@@ -5,6 +5,7 @@ import org.ihiw.management.domain.Upload;
 import org.ihiw.management.repository.FileRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UploadRepository;
+import org.ihiw.management.repository.ValidationRepository;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.ExceptionTranslator;
 
@@ -72,6 +73,9 @@ public class UploadResourceIT {
     private IhiwUserRepository ihiwUserRepository;
 
     @Autowired
+    private ValidationRepository validationRepository;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -96,7 +100,7 @@ public class UploadResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final UploadResource uploadResource = new UploadResource(uploadRepository, fileRepository, ihiwUserRepository, userService);
+        final UploadResource uploadResource = new UploadResource(uploadRepository, fileRepository, ihiwUserRepository, validationRepository, userService);
         this.restUploadMockMvc = MockMvcBuilders.standaloneSetup(uploadResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -117,7 +121,6 @@ public class UploadResourceIT {
             .createdAt(DEFAULT_CREATED_AT)
             .modifiedAt(DEFAULT_MODIFIED_AT)
             .fileName(DEFAULT_FILE_NAME)
-            .valid(DEFAULT_VALID)
             .enabled(DEFAULT_ENABLED);
         return upload;
     }
@@ -133,7 +136,6 @@ public class UploadResourceIT {
             .createdAt(UPDATED_CREATED_AT)
             .modifiedAt(UPDATED_MODIFIED_AT)
             .fileName(UPDATED_FILE_NAME)
-            .valid(UPDATED_VALID)
             .enabled(UPDATED_ENABLED);
         return upload;
     }
@@ -162,7 +164,6 @@ public class UploadResourceIT {
         assertThat(testUpload.getCreatedAt()).isEqualTo(DEFAULT_CREATED_AT);
         assertThat(testUpload.getModifiedAt()).isEqualTo(DEFAULT_MODIFIED_AT);
         assertThat(testUpload.getFileName()).isEqualTo(DEFAULT_FILE_NAME);
-        assertThat(testUpload.isValid()).isEqualTo(DEFAULT_VALID);
         assertThat(testUpload.isEnabled()).isEqualTo(DEFAULT_ENABLED);
     }
 
@@ -249,7 +250,6 @@ public class UploadResourceIT {
             .createdAt(UPDATED_CREATED_AT)
             .modifiedAt(UPDATED_MODIFIED_AT)
             .fileName(UPDATED_FILE_NAME)
-            .valid(UPDATED_VALID)
             .enabled(UPDATED_ENABLED);
 
         restUploadMockMvc.perform(put("/api/uploads")
@@ -265,7 +265,6 @@ public class UploadResourceIT {
         assertThat(testUpload.getCreatedAt()).isEqualTo(UPDATED_CREATED_AT);
         assertThat(testUpload.getModifiedAt()).isEqualTo(UPDATED_MODIFIED_AT);
         assertThat(testUpload.getFileName()).isEqualTo(UPDATED_FILE_NAME);
-        assertThat(testUpload.isValid()).isEqualTo(UPDATED_VALID);
         assertThat(testUpload.isEnabled()).isEqualTo(UPDATED_ENABLED);
     }
 

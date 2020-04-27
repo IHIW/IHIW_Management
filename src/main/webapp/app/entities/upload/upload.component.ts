@@ -54,7 +54,28 @@ export class UploadComponent implements OnInit, OnDestroy {
         sort: this.sort()
       })
       .subscribe(
-        (res: HttpResponse<IUpload[]>) => this.onSuccess(res.body, res.headers),
+        (res: HttpResponse<IUpload[]>) => {
+          this.onSuccess(res.body, res.headers);
+          let validationActive = false;
+          for (const upload of this.uploads) {
+            upload.valid = null;
+            for (const validation of upload.validations) {
+              if (upload.valid == null) {
+                upload.valid = validation.valid;
+              } else {
+                upload.valid = upload.valid && validation.valid;
+              }
+            }
+            if (upload.validations.length < 1) {
+              validationActive = true;
+            }
+          }
+          if (validationActive) {
+            setTimeout(() => {
+              this.eventManager.broadcast({ name: 'uploadListModification', content: 'Reload' });
+            }, 5000);
+          }
+        },
         (res: HttpResponse<any>) => this.onError(res.body)
       );
   }

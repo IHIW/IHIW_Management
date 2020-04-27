@@ -21,9 +21,33 @@
                 <dd>
                     <span>{{upload.fileName}}</span>
                 </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.upload.valid">Valid</span></dt>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.valid">Validation</span></dt>
                 <dd>
-                    <span class="badge badge-info">{{upload.valid}}</span>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th><span>Validator</span></th>
+                                <th><span>Valid</span></th>
+                                <th><span>Feedback</span></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let validation of this.upload.validations">
+                                <td>
+                                    <span class="badge badge-info">{{validation.validator}}</span>
+                                </td>
+                                <td>
+                                    <span class="badge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}" *ngIf="validation.valid !== null">{{validation.valid}}</span>
+                                    <span class="badge badge-warning" *ngIf="validation.valid === null">validating...</span>
+                                </td>
+                                <td>
+                                    {{validation.validationFeedback}}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.upload.enabled">Enabled</span></dt>
                 <dd>

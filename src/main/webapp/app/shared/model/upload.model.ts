@@ -1,5 +1,6 @@
 import { Moment } from 'moment';
 import { IIhiwUser } from 'app/shared/model/ihiw-user.model';
+import { IValidation } from 'app/shared/model/validation.model';
 
 export const enum FileType {
   HAML = 'HAML',
@@ -12,11 +13,12 @@ export interface IUpload {
   createdAt?: Moment;
   modifiedAt?: Moment;
   fileName?: string;
-  valid?: boolean;
+  validations?: IValidation[];
   enabled?: boolean;
   createdBy?: IIhiwUser;
   rawDownload?: string;
   convertedDownload?: string;
+  valid?: boolean;
 }
 
 export class Upload implements IUpload {
@@ -27,6 +29,7 @@ export class Upload implements IUpload {
     public modifiedAt?: Moment,
     public fileName?: string,
     public valid?: boolean,
+    public validationFeedback?: string,
     public enabled?: boolean,
     public createdBy?: IIhiwUser,
     public rawDownload?: string,

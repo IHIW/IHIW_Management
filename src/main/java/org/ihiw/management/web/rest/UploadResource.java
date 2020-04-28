@@ -218,7 +218,7 @@ public class UploadResource {
             collIds.add((collIterator.next().getId()));
         }
 
-        Page<UploadDTO> page = null;
+        Page<UploadDTO> page;
         Pageable pageable;
         if(offset != null && size != null) {
             Sort sorting  = Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]);
@@ -227,25 +227,19 @@ public class UploadResource {
             pageable = Pageable.unpaged();
         }
 
-        List<Upload> result;
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
-            result = uploadRepository.findAll();
             page = userService.getAllUploads(pageable);
         } else {
-            result = uploadRepository.findAllById(collIds);
             page = userService.getAllUploadsByUserId(pageable,collIds);
         }
 
-        for (Upload upload : result) {
+        for (UploadDTO upload : page) {
             upload.setRawDownload(fileRepository.rawUrl(upload.getFileName()));
             if (upload.getType().equals(FileType.HAML)){
                 upload.setConvertedDownload(fileRepository.rawUrl(upload.getFileName() + ".haml"));
             }
         }
-        //return result;
-        //UploadMapper myMap = new UploadMapper();
-        //List<UploadDTO> entityToDto = myMap.UploadsToUploadDTOs(result);
-        //page = new PageImpl<>(entityToDto);
+
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

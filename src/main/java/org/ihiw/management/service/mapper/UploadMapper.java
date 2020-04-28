@@ -1,8 +1,6 @@
 package org.ihiw.management.service.mapper;
 
-import org.ihiw.management.domain.Project;
 import org.ihiw.management.domain.Upload;
-import org.ihiw.management.service.dto.ProjectDTO;
 import org.ihiw.management.service.dto.UploadDTO;
 
 import java.util.List;
@@ -37,7 +35,6 @@ public class UploadMapper {
             upload.setCreatedAt(uploadDTO.getCreatedAt());
             upload.setFileName(uploadDTO.getFileName());
             upload.setModifiedAt(uploadDTO.getModifiedAt());
-            upload.setValid(uploadDTO.isValid());
             upload.setEnabled(uploadDTO.isEnabled());
             upload.setType(uploadDTO.getType());
 

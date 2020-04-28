@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.Upload;
+import org.ihiw.management.domain.Validation;
 import org.ihiw.management.domain.enumeration.FileType;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Set;
 
 public class UploadDTO {
 
@@ -20,19 +23,9 @@ public class UploadDTO {
     @Enumerated(EnumType.STRING)
     private FileType type;
 
-
     private ZonedDateTime createdAt;
-
-
     private ZonedDateTime modifiedAt;
-
-
     private String fileName;
-
-
-    private Boolean valid;
-
-
     private Boolean enabled;
 
     @ManyToOne
@@ -46,6 +39,10 @@ public class UploadDTO {
     @Transient
     @JsonProperty
     private String convertedDownload;
+
+    @Transient
+    @JsonProperty
+    private Set<Validation> validations;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -108,19 +105,6 @@ public class UploadDTO {
         this.fileName = fileName;
     }
 
-    public Boolean isValid() {
-        return valid;
-    }
-
-    public UploadDTO valid(Boolean valid) {
-        this.valid = valid;
-        return this;
-    }
-
-    public void setValid(Boolean valid) {
-        this.valid = valid;
-    }
-
     public Boolean isEnabled() {
         return enabled;
     }
@@ -163,6 +147,14 @@ public class UploadDTO {
         this.convertedDownload = convertedDownload;
     }
 
+    public Set<Validation> getValidations() {
+        return validations;
+    }
+
+    public void setValidations(Set<Validation> validations) {
+        this.validations = validations;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -189,7 +181,6 @@ public class UploadDTO {
             ", createdAt='" + getCreatedAt() + "'" +
             ", modifiedAt='" + getModifiedAt() + "'" +
             ", fileName='" + getFileName() + "'" +
-            ", valid='" + isValid() + "'" +
             ", enabled='" + isEnabled() + "'" +
             "}";
     }
@@ -204,11 +195,11 @@ public class UploadDTO {
         this.createdAt = upload.getCreatedAt();
         this.modifiedAt = upload.getModifiedAt();
         this.fileName = upload.getFileName();
-        this.valid = upload.isValid();
         this.enabled = upload.isEnabled();
         this.createdBy = upload.getCreatedBy();
         this.rawDownload = upload.getRawDownload();
         this.convertedDownload = upload.getConvertedDownload();
+        this.validations = upload.getValidations();
     }
 
 

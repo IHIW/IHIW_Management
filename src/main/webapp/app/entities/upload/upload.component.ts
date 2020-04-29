@@ -26,6 +26,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   reverse: any;
   totalItems: any;
   eventSubscriber: Subscription;
+  refreshing: boolean;
 
   constructor(
     protected uploadService: UploadService,
@@ -44,6 +45,7 @@ export class UploadComponent implements OnInit, OnDestroy {
       this.reverse = data['pagingParams'].ascending;
       this.predicate = data['pagingParams'].predicate;
     });
+    this.refreshing = false;
   }
 
   loadAll() {
@@ -70,7 +72,8 @@ export class UploadComponent implements OnInit, OnDestroy {
               validationActive = true;
             }
           }
-          if (validationActive) {
+          if (validationActive && !this.refreshing) {
+            this.refreshing = true;
             setTimeout(() => {
               this.eventManager.broadcast({ name: 'uploadListModification', content: 'Reload' });
             }, 5000);
@@ -97,7 +100,10 @@ export class UploadComponent implements OnInit, OnDestroy {
   }
 
   registerChangeInUploads() {
-    this.eventSubscriber = this.eventManager.subscribe('uploadListModification', response => this.loadAll());
+    this.eventSubscriber = this.eventManager.subscribe('uploadListModification', response => {
+      this.refreshing = false;
+      this.loadAll();
+    });
   }
 
   sort() {

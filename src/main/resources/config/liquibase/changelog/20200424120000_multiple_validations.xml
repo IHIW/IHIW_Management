@@ -29,14 +29,5 @@
             <column name="validation_feedback"/>
         </dropColumn>
     </changeSet>
-    
-    <changeSet author="bmatern" id="addValidationForeignKey">
-		<addForeignKeyConstraint baseColumnNames="upload_id"
-            baseTableName="validation"
-            constraintName="fk_validation_upload_id"
-            onDelete="CASCADE"
-            referencedColumnNames="id"
-            referencedTableName="upload"/>  
-    </changeSet>
-    
+
 </databaseChangeLog>

@@ -13,6 +13,7 @@ import { ProjectDeletePopupComponent } from './project-delete-dialog.component';
 import { ProjectSubscribePopupComponent } from './project-subscribe-dialog.component';
 import { ProjectUnsubscribePopupComponent } from './project-unsubscribe-dialog.component';
 import { IProject } from 'app/shared/model/project.model';
+import { JhiResolvePagingParams } from 'ng-jhipster';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectResolve implements Resolve<IProject> {
@@ -34,6 +35,9 @@ export const projectRoute: Routes = [
   {
     path: '',
     component: ProjectComponent,
+    resolve: {
+      pagingParams: JhiResolvePagingParams
+    },
     data: {
       authorities: ['ROLE_USER'],
       pageTitle: 'ihiwManagementApp.project.home.title'

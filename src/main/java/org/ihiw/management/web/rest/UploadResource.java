@@ -1,29 +1,42 @@
 package org.ihiw.management.web.rest;
 
 import org.ihiw.management.domain.*;
+import io.github.jhipster.web.util.HeaderUtil;
+import io.github.jhipster.web.util.PaginationUtil;
+import io.github.jhipster.web.util.ResponseUtil;
+import org.ihiw.management.domain.Authority;
+import org.ihiw.management.domain.IhiwUser;
+import org.ihiw.management.domain.Upload;
+import org.ihiw.management.domain.User;
 import org.ihiw.management.domain.enumeration.FileType;
 import org.ihiw.management.repository.FileRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UploadRepository;
 import org.ihiw.management.repository.ValidationRepository;
 import org.ihiw.management.service.UserService;
+import org.ihiw.management.service.dto.UploadDTO;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
-
-import io.github.jhipster.web.util.HeaderUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -193,26 +206,42 @@ public class UploadResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of uploads in body.
      */
     @GetMapping("/uploads")
-    public List<Upload> getAllUploads() {
+    public ResponseEntity<List<UploadDTO>> getAllUploads(@RequestParam(value = "page" , required = false) Integer offset,
+                                                         @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sort", required = false) String sort) {
         log.debug("REST request to get all Uploads");
         Optional<User> currentUser = userService.getUserWithAuthorities();
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentIhiwUser.getLab());
-
-        List<Upload> result;
-        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
-            result = uploadRepository.findAll();
-        } else {
-            result = uploadRepository.findByCreatedByIn(colleages);
+        List<Long> collIds = new ArrayList();
+        Iterator<IhiwUser> collIterator = colleages.iterator();
+        while (collIterator.hasNext()) {
+            collIds.add((collIterator.next().getId()));
         }
 
-        for (Upload upload : result) {
+        Page<UploadDTO> page;
+        Pageable pageable;
+        if(offset != null && size != null) {
+            Sort sorting  = Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]);
+            pageable = PageRequest.of(offset, size, sorting);
+        } else {
+            pageable = Pageable.unpaged();
+        }
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
+            page = userService.getAllUploads(pageable);
+        } else {
+            page = userService.getAllUploadsByUserId(pageable,collIds);
+        }
+
+        for (UploadDTO upload : page) {
             upload.setRawDownload(fileRepository.rawUrl(upload.getFileName()));
             if (upload.getType().equals(FileType.HAML)){
                 upload.setConvertedDownload(fileRepository.rawUrl(upload.getFileName() + ".haml"));
             }
         }
-        return result;
+
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
     /**

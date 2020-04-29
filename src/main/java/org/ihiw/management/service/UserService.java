@@ -5,13 +5,12 @@ import org.ihiw.management.domain.Authority;
 import org.ihiw.management.domain.IhiwLab;
 import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.User;
-import org.ihiw.management.repository.AuthorityRepository;
-import org.ihiw.management.repository.IhiwLabRepository;
-import org.ihiw.management.repository.IhiwUserRepository;
-import org.ihiw.management.repository.UserRepository;
+import org.ihiw.management.repository.*;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
 import org.ihiw.management.service.dto.LabDTO;
+import org.ihiw.management.service.dto.ProjectDTO;
+import org.ihiw.management.service.dto.UploadDTO;
 import org.ihiw.management.service.dto.UserDTO;
 import org.ihiw.management.service.util.RandomUtil;
 import org.ihiw.management.web.rest.errors.EmailAlreadyUsedException;
@@ -46,9 +45,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final ProjectRepository projectRepository;
+
     private final IhiwUserRepository ihiwUserRepository;
 
     private final IhiwLabRepository ihiwLabRepository;
+
+    private final UploadRepository uploadRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -56,10 +59,12 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
-    public UserService(UserRepository userRepository, IhiwUserRepository ihiwUserRepository, IhiwLabRepository ihiwLabRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, CacheManager cacheManager) {
+    public UserService(UploadRepository uploadRepository, UserRepository userRepository, ProjectRepository projectRepository, IhiwUserRepository ihiwUserRepository, IhiwLabRepository ihiwLabRepository, PasswordEncoder passwordEncoder, AuthorityRepository authorityRepository, CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.ihiwLabRepository = ihiwLabRepository;
         this.ihiwUserRepository = ihiwUserRepository;
+        this.projectRepository = projectRepository;
+        this.uploadRepository = uploadRepository;
         this.passwordEncoder = passwordEncoder;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
@@ -379,6 +384,16 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Page<UploadDTO> getAllUploads(Pageable pageable) {
+        return  uploadRepository.findAll(pageable).map(UploadDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UploadDTO> getAllUploadsByUserId(Pageable pageable,List<Long> ids) {
+        return  uploadRepository.findAllUploadsByUserId(pageable,ids).map(UploadDTO::new);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
         return userRepository.findOneWithAuthoritiesByLogin(login);
     }
@@ -387,6 +402,12 @@ public class UserService {
     public Optional<User> getUserWithAuthorities(Long id) {
         return userRepository.findOneWithAuthoritiesById(id);
     }
+
+    @Transactional(readOnly = true)
+    public Page<ProjectDTO> getAllProjects(Pageable pageable) {
+        return  projectRepository.findAll(pageable).map(ProjectDTO::new);
+    }
+
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {

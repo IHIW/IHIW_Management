@@ -115,7 +115,7 @@
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.leader" for="field_leader">Add Leader</label>
                     <select class="form-control" id="field_leader" name="leader" (change)="addProjectLeader($event)">
                         <option></option>
-                        <option *ngFor="let ihiwUserOption of ihiwusers">{{ihiwUserOption.user.firstName}} {{ihiwUserOption.user.lastName}}</option>
+                        <option *ngFor="let ihiwUserOption of ihiwusers">{{ihiwUserOption.user.lastName}}, {{ihiwUserOption.user.firstName}}</option>
                     </select>
                 </div>
             </div>

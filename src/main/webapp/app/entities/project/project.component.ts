@@ -61,17 +61,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
         (res: HttpResponse<IProject[]>) => this.onSuccess(res.body, res.headers),
         (res: HttpResponse<any>) => this.onError(res.body)
       );
-    this.ihiwUserService
-      // .my()
-      .query({
-        page: this.page - 1,
-        size: this.itemsPerPage,
-        sort: ''
-      })
-      .subscribe(
-        (res: HttpResponse<IIhiwUser[]>) => this.onSuccess(res.body, res.headers),
-        (res: HttpResponse<any>) => this.onError(res.body)
-      );
   }
 
   ngOnInit() {
@@ -104,7 +93,6 @@ export class ProjectComponent implements OnInit, OnDestroy {
     this.projectService.update(project).subscribe(response => {
       if (response.status === 200) {
         this.loadAll();
-      } else {
       }
     });
   }

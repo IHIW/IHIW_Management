@@ -212,11 +212,6 @@ public class UploadResource {
         Optional<User> currentUser = userService.getUserWithAuthorities();
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
         List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentIhiwUser.getLab());
-        List<Long> collIds = new ArrayList();
-        Iterator<IhiwUser> collIterator = colleages.iterator();
-        while (collIterator.hasNext()) {
-            collIds.add((collIterator.next().getId()));
-        }
 
         Page<UploadDTO> page;
         Pageable pageable;
@@ -230,7 +225,7 @@ public class UploadResource {
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
             page = userService.getAllUploads(pageable);
         } else {
-            page = userService.getAllUploadsByUserId(pageable,collIds);
+            page = userService.getAllUploadsByUserId(pageable, colleages);
         }
 
         for (UploadDTO upload : page) {

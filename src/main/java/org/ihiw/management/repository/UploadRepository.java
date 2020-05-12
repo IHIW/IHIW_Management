@@ -35,8 +35,4 @@ public interface UploadRepository extends JpaRepository<Upload, Long> {
 
     @Query("select upload from Upload upload")
     Page<Upload> findAllUploads(Pageable pageable);
-
-    @Query("select upload from Upload upload WHERE upload.id in (:ids)")
-    Page<Upload> findAllUploadsByUserId(Pageable pageable,@Param("ids") List<Long> ids);
-
 }

@@ -389,8 +389,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UploadDTO> getAllUploadsByUserId(Pageable pageable,List<Long> ids) {
-        return  uploadRepository.findAllUploadsByUserId(pageable,ids).map(UploadDTO::new);
+    public Page<UploadDTO> getAllUploadsByUserId(Pageable pageable, List<IhiwUser> users) {
+        return  uploadRepository.findByCreatedByIn(users, pageable).map(UploadDTO::new);
     }
 
     @Transactional(readOnly = true)

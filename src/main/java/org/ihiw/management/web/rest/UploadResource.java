@@ -211,25 +211,27 @@ public class UploadResource {
         log.debug("REST request to get all Uploads");
         Optional<User> currentUser = userService.getUserWithAuthorities();
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentIhiwUser.getLab());
-        List<Long> collIds = new ArrayList();
-        Iterator<IhiwUser> collIterator = colleages.iterator();
-        while (collIterator.hasNext()) {
-            collIds.add((collIterator.next().getId()));
-        }
-
+         
         Page<UploadDTO> page;
         Pageable pageable;
+        
         if(offset != null && size != null) {
             Sort sorting  = Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]);
             pageable = PageRequest.of(offset, size, sorting);
         } else {
             pageable = Pageable.unpaged();
         }
-
-        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))) {
+        
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))
+        		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
             page = userService.getAllUploads(pageable);
         } else {
+            List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentIhiwUser.getLab());
+            List<Long> collIds = new ArrayList();
+            Iterator<IhiwUser> collIterator = colleages.iterator();
+            while (collIterator.hasNext()) {
+                collIds.add((collIterator.next().getId()));
+            }
             page = userService.getAllUploadsByUserId(pageable,collIds);
         }
 

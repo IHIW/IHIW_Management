@@ -230,12 +230,7 @@ public class UploadResource {
         	log.debug("Current Lab:" + currentLab.toString());
             List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentLab);
         	log.debug("Colleagues Found:" + colleages.toString());
-            List<Long> collIds = new ArrayList();
-            Iterator<IhiwUser> collIterator = colleages.iterator();
-            while (collIterator.hasNext()) {
-                collIds.add((collIterator.next().getId()));
-            }
-            page = userService.getAllUploadsByUserId(pageable,collIds);
+            page = userService.getAllUploadsByUserId(pageable,colleages);
         }
 
         for (UploadDTO upload : page) {

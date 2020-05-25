@@ -226,7 +226,10 @@ public class UploadResource {
         		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
             page = userService.getAllUploads(pageable);
         } else {
-            List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentIhiwUser.getLab());
+        	IhiwLab currentLab = currentIhiwUser.getLab();
+        	log.debug("Current Lab:" + currentLab.toString());
+            List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentLab);
+        	log.debug("Colleagues Found:" + colleages.toString());
             List<Long> collIds = new ArrayList();
             Iterator<IhiwUser> collIterator = colleages.iterator();
             while (collIterator.hasNext()) {

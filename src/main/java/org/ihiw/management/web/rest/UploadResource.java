@@ -211,7 +211,7 @@ public class UploadResource {
         log.debug("REST request to get all Uploads");
         Optional<User> currentUser = userService.getUserWithAuthorities();
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-         
+
         Page<UploadDTO> page;
         Pageable pageable;
         

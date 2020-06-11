@@ -61,6 +61,18 @@ export class ProjectComponent implements OnInit, OnDestroy {
         (res: HttpResponse<IProject[]>) => this.onSuccess(res.body, res.headers),
         (res: HttpResponse<any>) => this.onError(res.body)
       );
+    this.ihiwUserService
+      .my()
+      .pipe(
+        filter((res: HttpResponse<IIhiwUser>) => res.ok),
+        map((res: HttpResponse<IIhiwUser>) => res.body)
+      )
+      .subscribe(
+        (res: IIhiwUser) => {
+          this.ihiwUser = res;
+        },
+        (res: HttpErrorResponse) => this.onError(res.message)
+      );
   }
 
   ngOnInit() {

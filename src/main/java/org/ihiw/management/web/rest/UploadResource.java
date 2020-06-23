@@ -272,6 +272,7 @@ public class UploadResource {
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 
+    
     @PutMapping("/uploads/makeentry")
     @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
     public ResponseEntity<NewEntry> makeEntry(@RequestBody Upload upload) throws URISyntaxException {
@@ -364,19 +365,21 @@ public class UploadResource {
                 .body(fileNewEntry);
         }
     }
+    
 
     @PutMapping("/uploads/makeentry2")
-    public ResponseEntity<NewEntry> makeNewEntry(@RequestBody String oldfileName) throws URISyntaxException {
+    //4@PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<NewEntry> makeNewEntry(@RequestBody Upload upload) throws URISyntaxException {
 
-        log.debug("REST request to make an entry for Upload : {}", oldfileName);
+        log.debug("REST request to make an entry for Upload : {}", upload.getFileName());
 
-        List<Upload> allUploads = uploadRepository.findByFileName(oldfileName);
+        List<Upload> allUploads = uploadRepository.findByFileName(upload.getFileName());
         NewEntry fileNewEntry = null;
         Upload result = null;
 
         if (allUploads.isEmpty())
         {
-            return ResponseEntity.notFound().headers(HeaderUtil.createAlert(applicationName,  ENTITY_NAME, oldfileName)).build();
+            return ResponseEntity.notFound().headers(HeaderUtil.createAlert(applicationName,  ENTITY_NAME, upload.getFileName())).build();
         }
 
         Upload oldUpload = allUploads.get(0);  //fetch the csv upload, like in setUploadValidation.

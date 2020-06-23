@@ -50,11 +50,11 @@ public class Project implements Serializable {
     private ZonedDateTime modifiedAt;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = "projects", allowSetters = true)
+    @JsonIgnoreProperties(value = {"projects", "user"}, allowSetters = true)
     private IhiwUser createdBy;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = "projects", allowSetters = true)
+    @JsonIgnoreProperties(value = {"projects", "user"}, allowSetters = true)
     private IhiwUser modifiedBy;
 
     @Column(name= "activated")

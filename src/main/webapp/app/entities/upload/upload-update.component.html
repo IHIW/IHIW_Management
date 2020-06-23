@@ -24,7 +24,7 @@
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.lab" for="field_project">Project</label>
                     <select class="form-control" id="field_project" name="project" (change)="setProject($event)">
-                        <option></option>
+                        <option>Select project</option>
                         <option *ngFor="let project of projects">{{project.name}}</option>
                     </select>
                 </div>

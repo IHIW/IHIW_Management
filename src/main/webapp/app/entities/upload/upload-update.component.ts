@@ -31,7 +31,7 @@ export class UploadUpdateComponent implements OnInit {
     fileName: [],
     enabled: [],
     createdBy: [],
-    project: []
+    project: [null, [Validators.required]]
   });
 
   constructor(
@@ -48,11 +48,7 @@ export class UploadUpdateComponent implements OnInit {
       this.updateForm(upload);
     });
     this.projectService
-      .query({
-        page: 0,
-        size: 1000,
-        sort: ['name', 'asc']
-      })
+      .getMy()
       .subscribe((res: HttpResponse<IProject[]>) => (this.projects = res.body), (res: HttpResponse<any>) => this.onError(res.body));
   }
 

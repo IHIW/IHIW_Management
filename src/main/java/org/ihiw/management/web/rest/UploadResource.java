@@ -9,10 +9,8 @@ import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.Upload;
 import org.ihiw.management.domain.User;
 import org.ihiw.management.domain.enumeration.FileType;
-import org.ihiw.management.repository.FileRepository;
-import org.ihiw.management.repository.IhiwUserRepository;
-import org.ihiw.management.repository.UploadRepository;
-import org.ihiw.management.repository.ValidationRepository;
+import org.ihiw.management.domain.enumeration.ProjectSubscriptionStatus;
+import org.ihiw.management.repository.*;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.service.dto.UploadDTO;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
@@ -63,13 +61,16 @@ public class UploadResource {
     private final FileRepository fileRepository;
     private final IhiwUserRepository ihiwUserRepository;
     private final UserService userService;
+    private final ProjectIhiwLabRepository projectIhiwLabRepository;
 
-    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, ValidationRepository validationRepository, UserService userService) {
+
+    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, ValidationRepository validationRepository, UserService userService, ProjectIhiwLabRepository projectIhiwLabRepository) {
         this.uploadRepository = uploadRepository;
         this.fileRepository = fileRepository;
         this.ihiwUserRepository = ihiwUserRepository;
         this.validationRepository = validationRepository;
         this.userService = userService;
+        this.projectIhiwLabRepository = projectIhiwLabRepository;
     }
 
     /**
@@ -85,7 +86,21 @@ public class UploadResource {
         if (upload.getId() != null) {
             throw new BadRequestAlertException("A new upload cannot already have an ID", ENTITY_NAME, "idexists");
         }
+        if (upload.getProject() == null) {
+            throw new BadRequestAlertException("No project selected for upload", ENTITY_NAME, "missingproject");
+        }
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        boolean projectMember = false;
+        for (ProjectIhiwLab pil : projectIhiwLabRepository.findByLab(currentIhiwUser.getLab())){
+            if (pil.getStatus().equals(ProjectSubscriptionStatus.SUBSCRIBED)){
+                projectMember = true;
+            }
+        }
+
+        if (!projectMember) {
+            throw new BadRequestAlertException("You are not subscribed to the project", ENTITY_NAME, "missingsubscription");
+        }
 
         String fileName = currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getType() + "_" + file.getOriginalFilename();
         upload.setFileName(fileName);

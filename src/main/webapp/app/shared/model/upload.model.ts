@@ -1,6 +1,7 @@
 import { Moment } from 'moment';
 import { IIhiwUser } from 'app/shared/model/ihiw-user.model';
 import { IValidation } from 'app/shared/model/validation.model';
+import { IProject } from 'app/shared/model/project.model';
 
 export const enum FileType {
   HAML = 'HAML',
@@ -19,6 +20,7 @@ export interface IUpload {
   rawDownload?: string;
   convertedDownload?: string;
   valid?: boolean;
+  project?: IProject;
 }
 
 export class Upload implements IUpload {
@@ -33,7 +35,8 @@ export class Upload implements IUpload {
     public enabled?: boolean,
     public createdBy?: IIhiwUser,
     public rawDownload?: string,
-    public convertedDownload?: string
+    public convertedDownload?: string,
+    public project?: IProject
   ) {
     this.valid = this.valid || false;
     this.enabled = this.enabled || false;

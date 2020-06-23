@@ -83,6 +83,10 @@ export class UploadComponent implements OnInit, OnDestroy {
       );
   }
 
+  sortBy(list, prop: string) {
+    return list.sort((a, b) => (a[prop] > b[prop] ? 1 : a[prop] === b[prop] ? 0 : -1));
+  }
+
   ngOnInit() {
     this.loadAll();
     this.accountService.identity().then(account => {

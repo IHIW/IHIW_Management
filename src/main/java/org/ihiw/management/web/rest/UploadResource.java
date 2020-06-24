@@ -16,6 +16,7 @@ import org.ihiw.management.repository.ValidationRepository;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.service.dto.UploadDTO;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -366,12 +367,11 @@ public class UploadResource {
     }
 
     @PutMapping("/uploads/makeentry2")
-    public ResponseEntity<NewEntry> makeNewEntry(@RequestBody String oldfileName) throws URISyntaxException {
+    public ResponseEntity<Upload> makeNewEntry(@RequestBody String oldfileName, @RequestBody FileType newType) throws URISyntaxException {
 
         log.debug("REST request to make an entry for Upload : {}", oldfileName);
 
         List<Upload> allUploads = uploadRepository.findByFileName(oldfileName);
-        NewEntry fileNewEntry = null;
         Upload result = null;
 
         if (allUploads.isEmpty())
@@ -389,28 +389,28 @@ public class UploadResource {
         }
         //one entry exists, everything seems ok
         else if (allUploads.size() == 1) {
-            fileNewEntry = new NewEntry(oldUpload);
+            Upload currentUpload = new Upload(); //Not sure this will work..but I think so.
+            int iend = oldUpload.getFileName().indexOf("."); //this finds the first occurrence of "."
+            String newName = null;
+            if (iend != -1)
+            {
+                newName = oldUpload.getFileName().substring(0 , iend) + "." + newType.toString() ; //this will give abc
+            }
+            else {
+                newName = oldUpload.getFileName()+ "." + newType.toString() ;
+            }
+            currentUpload.setFileName(newName); // like in createUpload
+            currentUpload.setCreatedBy(ihiwUserRepository.findByUserIsCurrentUser());
+            currentUpload.setCreatedAt(ZonedDateTime.now());
+            currentUpload.setModifiedAt(ZonedDateTime.now());
+            currentUpload.setType(newType);
+            result = uploadRepository.save(currentUpload);
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldUpload.getFileName()))
-                .body(fileNewEntry);
+                .body(result);
         }
-        //no entry exists lets make it
         else {
-
-            Upload currentUpload = new Upload(); //Not sure this will work..but I think so.
-            currentUpload.setFileName(oldUpload.getFileName()); // like in createUpload
-            currentUpload.setCreatedBy(oldUpload.getCreatedBy());
-            currentUpload.setCreatedAt(oldUpload.getCreatedAt());
-            currentUpload.setModifiedAt(oldUpload.getModifiedAt());
-            if(allUploads.size() == 0){
-                result = uploadRepository.save(currentUpload);
-            }
-            fileNewEntry = new NewEntry(currentUpload);
-
-            log.debug("Entry added:" + fileNewEntry.getName());
-            return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, fileNewEntry.getName()))
-                .body(fileNewEntry);
+            return ResponseEntity.noContent().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldUpload.getFileName())).build();
         }
     }
 

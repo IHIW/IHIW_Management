@@ -4,10 +4,7 @@ import org.ihiw.management.domain.*;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
-import org.ihiw.management.domain.Authority;
-import org.ihiw.management.domain.IhiwUser;
-import org.ihiw.management.domain.Upload;
-import org.ihiw.management.domain.User;
+
 import org.ihiw.management.domain.enumeration.FileType;
 import org.ihiw.management.repository.FileRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
@@ -366,8 +363,9 @@ public class UploadResource {
         }
     }
 
-    @PutMapping("/uploads/makeentry2")
-    public ResponseEntity<Upload> makeNewEntry(@RequestBody String oldfileName, @RequestBody FileType newType) throws URISyntaxException {
+    @PutMapping("/uploads/copyupload")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<Upload> copyUpload(@RequestParam(required = true) String oldfileName, @RequestParam(required = true) FileType newType) throws URISyntaxException {
 
         log.debug("REST request to make an entry for Upload : {}", oldfileName);
 
@@ -400,9 +398,11 @@ public class UploadResource {
                 newName = oldUpload.getFileName()+ "." + newType.toString() ;
             }
             currentUpload.setFileName(newName); // like in createUpload
-            currentUpload.setCreatedBy(ihiwUserRepository.findByUserIsCurrentUser());
+            IhiwUser currentUser = oldUpload.getCreatedBy();
+            currentUpload.setCreatedBy(currentUser);
             currentUpload.setCreatedAt(ZonedDateTime.now());
             currentUpload.setModifiedAt(ZonedDateTime.now());
+            currentUpload.setEnabled(oldUpload.getEnabled());
             currentUpload.setType(newType);
             result = uploadRepository.save(currentUpload);
             return ResponseEntity.ok()

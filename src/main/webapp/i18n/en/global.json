@@ -168,7 +168,8 @@
     "userexists": "Login name already used!",
     "emailexists": "Email is already in use!",
     "idexists": "A new {{ entityName }} cannot already have an ID",
-    "idnull": "Invalid ID"
+    "idnull": "Invalid ID",
+    "missingproject": "No project selected for upload."
   },
   "footer": "This is your footer"
 }

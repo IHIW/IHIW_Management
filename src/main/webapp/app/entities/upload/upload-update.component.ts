@@ -10,7 +10,8 @@ import { JhiAlertService } from 'ng-jhipster';
 import { IUpload, Upload } from 'app/shared/model/upload.model';
 import { UploadService } from './upload.service';
 import { IIhiwUser } from 'app/shared/model/ihiw-user.model';
-import { IhiwUserService } from 'app/entities/ihiw-user';
+import { IProject } from 'app/shared/model/project.model';
+import { ProjectService } from 'app/entities/project';
 
 @Component({
   selector: 'jhi-upload-update',
@@ -20,6 +21,8 @@ export class UploadUpdateComponent implements OnInit {
   isSaving: boolean;
   file: File;
 
+  projects: IProject[];
+
   editForm = this.fb.group({
     id: [],
     type: [],
@@ -27,10 +30,12 @@ export class UploadUpdateComponent implements OnInit {
     modifiedAt: [],
     fileName: [],
     enabled: [],
-    createdBy: []
+    createdBy: [],
+    project: [null, [Validators.required]]
   });
 
   constructor(
+    protected projectService: ProjectService,
     protected jhiAlertService: JhiAlertService,
     protected uploadService: UploadService,
     protected activatedRoute: ActivatedRoute,
@@ -42,6 +47,9 @@ export class UploadUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ upload }) => {
       this.updateForm(upload);
     });
+    this.projectService
+      .getMy()
+      .subscribe((res: HttpResponse<IProject[]>) => (this.projects = res.body), (res: HttpResponse<any>) => this.onError(res.body));
   }
 
   updateForm(upload: IUpload) {
@@ -52,7 +60,8 @@ export class UploadUpdateComponent implements OnInit {
       modifiedAt: upload.modifiedAt != null ? upload.modifiedAt.format(DATE_TIME_FORMAT) : null,
       fileName: upload.fileName,
       enabled: upload.enabled,
-      createdBy: upload.createdBy
+      createdBy: upload.createdBy,
+      project: upload.project
     });
   }
 
@@ -87,7 +96,8 @@ export class UploadUpdateComponent implements OnInit {
         this.editForm.get(['modifiedAt']).value != null ? moment(this.editForm.get(['modifiedAt']).value, DATE_TIME_FORMAT) : undefined,
       fileName: this.editForm.get(['fileName']).value,
       enabled: this.editForm.get(['enabled']).value,
-      createdBy: this.editForm.get(['createdBy']).value
+      createdBy: this.editForm.get(['createdBy']).value,
+      project: this.editForm.get(['project']).value
     };
   }
 
@@ -105,6 +115,10 @@ export class UploadUpdateComponent implements OnInit {
   }
   protected onError(errorMessage: string) {
     this.jhiAlertService.error(errorMessage, null, null);
+  }
+
+  setProject(event: any) {
+    this.editForm.get(['project']).setValue(this.projects[event.target.selectedIndex - 1]);
   }
 
   trackIhiwUserById(index: number, item: IIhiwUser) {

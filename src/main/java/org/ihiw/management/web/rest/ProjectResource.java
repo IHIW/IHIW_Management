@@ -94,8 +94,6 @@ public class ProjectResource {
     }
 
     @PostMapping("/projects/{projectId}/subscribe")
-    //FIXME: why the heck is preauthorize not working for the PI?
-//    @PreAuthorize("hasAnyRole('" + AuthoritiesConstants.PI + "', '" + AuthoritiesConstants.PROJECT_LEADER + "')")
     public ResponseEntity<ProjectIhiwLab> subscribeProject(@PathVariable long projectId) throws URISyntaxException {
         log.debug("REST request to subscribe to Project : {}", projectId);
         Optional<User> currentUser = userService.getUserWithAuthorities();
@@ -191,13 +189,13 @@ public class ProjectResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of projects in body.
      */
     @GetMapping("/projects")
-    public ResponseEntity<List<ProjectDTO>> getAllProjectsOrderByComponent(@RequestParam(value = "page" , required = false) Integer offset,
+    public ResponseEntity<List<ProjectDTO>> getAllProjects(@RequestParam(value = "page" , required = false) Integer offset,
                                                         @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sort", required = false) String sort, @RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all Projects");
 
         Page<ProjectDTO> page = null;
         Pageable pageable;
-        List<Project> allProjects = null;
+        List<Project> allProjects;
         if(offset != null && size != null) {
             Sort sorting  = Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]);
             pageable = PageRequest.of(offset, size, sorting);
@@ -210,7 +208,6 @@ public class ProjectResource {
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR)) ||
                 currentUser.get().getAuthorities().contains(new Authority(PI))){
-                    //allProjects = projectRepository.findAllByOrderByComponent();
                     page = userService.getAllProjects(pageable);
         }
 
@@ -228,7 +225,20 @@ public class ProjectResource {
         }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
 
+    @GetMapping("/projects/my")
+    public List<Project> getMyProjects() {
+        log.debug("REST request to get my Projects");
+
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        List<Project> result = new ArrayList<>();
+        for (ProjectIhiwLab pil : projectIhiwLabRepository.findByLab(currentIhiwUser.getLab())){
+            if (pil.getStatus().equals(ProjectSubscriptionStatus.SUBSCRIBED)){
+                result.add(pil.getProject());
+            }
+        }
+        return result;
     }
 
     /**

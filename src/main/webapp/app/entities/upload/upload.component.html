@@ -24,6 +24,7 @@
                 <th jhiSortBy="fileName"><span jhiTranslate="ihiwManagementApp.upload.fileName">File Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th><span jhiTranslate="ihiwManagementApp.upload.valid">Valid</span></th>
                 <th jhiSortBy="enabled"><span jhiTranslate="ihiwManagementApp.upload.enabled">Enabled</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="project"><span jhiTranslate="ihiwManagementApp.upload.project">Project</span> <fa-icon [icon]="'sort'"></fa-icon></th>
                 <th jhiSortBy="createdBy"><span jhiTranslate="ihiwManagementApp.upload.createdBy">Created By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th><span >Download</span></th>
             <th></th>
@@ -48,6 +49,11 @@
                     <span class="badge badge-warning" *ngIf="upload.validations.length < 1">validating...</span>
                 </td>
                 <td><span class="badge" [ngClass]="{'badge-danger': !upload.enabled, 'badge-success': upload.enabled}">{{upload.enabled}}</span></td>
+                <td>
+                    <div *ngIf="upload.project">
+                        <a [routerLink]="['/project', upload.project?.id, 'view' ]" >{{upload.project?.name}}</a>
+                    </div>
+                </td>
                 <td>
                     <div *ngIf="upload.createdBy">
                         <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view' ]" >{{upload.createdBy?.user.firstName}} {{upload.createdBy?.user.lastName}}</a>

@@ -42,8 +42,8 @@ export class UploadComponent implements OnInit, OnDestroy {
     this.routeData = this.activatedRoute.data.subscribe(data => {
       this.page = data['pagingParams'].page;
       this.previousPage = data['pagingParams'].page;
-      this.reverse = data['pagingParams'].ascending;
-      this.predicate = data['pagingParams'].predicate;
+      this.reverse = false;
+      this.predicate = 'id';
     });
     this.refreshing = false;
   }
@@ -113,7 +113,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   sort() {
     const result = [this.predicate + ',' + (this.reverse ? 'asc' : 'desc')];
     if (this.predicate !== 'id') {
-      result.push('id');
+      result.push('id,desc');
     }
     return result;
   }

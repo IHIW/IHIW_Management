@@ -4,10 +4,7 @@ import org.ihiw.management.domain.*;
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.PaginationUtil;
 import io.github.jhipster.web.util.ResponseUtil;
-import org.ihiw.management.domain.Authority;
-import org.ihiw.management.domain.IhiwUser;
-import org.ihiw.management.domain.Upload;
-import org.ihiw.management.domain.User;
+
 import org.ihiw.management.domain.enumeration.FileType;
 import org.ihiw.management.domain.enumeration.ProjectSubscriptionStatus;
 import org.ihiw.management.repository.*;
@@ -288,101 +285,16 @@ public class UploadResource {
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 
-    @PutMapping("/uploads/makeentry")
+    /**
+     * {@code PUT  /uploads/copyupload} : copy the upload, and make a new upload object with a specified Filetype extension.
+     *
+     * @param oldfileName the name of the previous upload
+     * @param newType the filetype of the new file, to assign the new extension.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body of the new upload, or with status {@code 404 (Not Found)}.
+     */
+    @PutMapping("/uploads/copyupload")
     @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
-    public ResponseEntity<NewEntry> makeEntry(@RequestBody Upload upload) throws URISyntaxException {
-
-        log.debug("REST request to make an entry for Upload : {}", upload.getFileName());
-
-        List<Upload> allUploads = uploadRepository.findByFileName(upload.getFileName());
-        NewEntry fileNewEntry = null;
-        //two entries of this file exist, something is going wrong
-        if (allUploads.size() > 1) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getFileName())).build();
-        }
-        //one entry exists, everything seems ok
-        else if (allUploads.size() == 1) {
-            fileNewEntry = new NewEntry(upload);
-            return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getFileName()))
-                .body(fileNewEntry);
-        }
-        //no entry exists lets make it
-        else {
-
-            Connection conn = null;
-            Statement stmt = null;
-
-            try {
-                //STEP 2: Register JDBC driver
-                Class.forName(JDBC_DRIVER);
-
-                //STEP 3: Open a connection
-                System.out.println("Connecting to a selected database...");
-                conn = DriverManager.getConnection(
-                    JDBC_DRIVER, USER, PASS);
-                System.out.println("Connected database successfully...");
-
-                //STEP 4: Execute a query
-                System.out.println("Creating entry in given table...");
-                stmt = conn.createStatement();
-
-
-                // this statement creates the correct id value for the upcoming insert. Combination of
-                //https://stackoverflow.com/questions/3552260/plsql-jdbc-how-to-get-last-row-id
-                // and https://stackoverflow.com/questions/6881424/how-can-i-select-the-row-with-the-highest-id-in-mysql/20904650#:~:text=The%20LIMIT%20clause%20can%20be,returned%20by%20the%20SELECT%20statement.&text=SELECT%20*%20FROM%20permlog%20WHERE%20id,not%20constrained%20to%20be%20unique.
-                String sql = "SELECT MAX(ID) FROM `ihiwmanagement`.`upload` ";
-                ResultSet rs = stmt.executeQuery(sql);
-                int newid = 0;
-                while(rs.next()){
-                    newid = (rs.getInt(1));
-                }
-
-                newid++;
-
-
-                //this statement actually inserts the new entry
-                sql = String.format("INSERT INTO `ihiwmanagement`.`upload` "
-                    + "(`id`, `type`, `created_at`, `modified_at`) "
-                    + "VALUES "
-                    + "%d %s %s %s ",newid ,upload.getType(),upload.getCreatedAt(),upload.getModifiedAt());
-
-
-                stmt.executeUpdate(sql);
-                System.out.println("Created entry in given table...");
-            } catch (SQLException se) {
-                //Handle errors for JDBC
-                se.printStackTrace();
-            } catch (Exception e) {
-                //Handle errors for Class.forName
-                e.printStackTrace();
-            } finally {
-                //finally block used to close resources
-                try {
-                    if (stmt != null) {
-                        conn.close();
-                    }
-                } catch (SQLException se) {
-                }// do nothing
-                try {
-                    if (conn != null) {
-                        conn.close();
-                    }
-                } catch (SQLException se) {
-                    se.printStackTrace();
-                }//end finally try
-            }//end try
-
-
-            log.debug("Entry added:" + fileNewEntry.getName());
-            return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, fileNewEntry.getName()))
-                .body(fileNewEntry);
-        }
-    }
-
-    @PutMapping("/uploads/makeentry2")
-    public ResponseEntity<Upload> makeNewEntry(@RequestBody String oldfileName, @RequestBody FileType newType) throws URISyntaxException {
+    public ResponseEntity<Upload> copyUpload(@RequestParam(required = true) String oldfileName, @RequestParam(required = true) FileType newType) throws URISyntaxException {
 
         log.debug("REST request to make an entry for Upload : {}", oldfileName);
 
@@ -396,32 +308,25 @@ public class UploadResource {
 
         Upload oldUpload = allUploads.get(0);  //fetch the csv upload, like in setUploadValidation.
 
-
-
         //two entries of this file exist, something is going wrong
         if (allUploads.size() > 1) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldUpload.getFileName())).build();
         }
         //one entry exists, everything seems ok
         else if (allUploads.size() == 1) {
-            Upload currentUpload = new Upload(); //Not sure this will work..but I think so.
-            int iend = oldUpload.getFileName().indexOf("."); //this finds the first occurrence of "."
-            String newName = null;
-            if (iend != -1)
-            {
-                newName = oldUpload.getFileName().substring(0 , iend) + "." + newType.toString() ; //this will give abc
-            }
-            else {
-                newName = oldUpload.getFileName()+ "." + newType.toString() ;
-            }
-            currentUpload.setFileName(newName); // like in createUpload
-            currentUpload.setCreatedBy(ihiwUserRepository.findByUserIsCurrentUser());
+            Upload currentUpload = new Upload();
+            String newName = oldUpload.getFileName()+ "." + newType.toString().toLowerCase();
+            currentUpload.setFileName(newName);
+            IhiwUser currentUser = oldUpload.getCreatedBy();
+            currentUpload.setCreatedBy(currentUser);
             currentUpload.setCreatedAt(ZonedDateTime.now());
             currentUpload.setModifiedAt(ZonedDateTime.now());
+            currentUpload.setEnabled(oldUpload.getEnabled());
             currentUpload.setType(newType);
+            currentUpload.setProject(oldUpload.getProject());
             result = uploadRepository.save(currentUpload);
             return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldUpload.getFileName()))
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, currentUpload.getFileName()))
                 .body(result);
         }
         else {

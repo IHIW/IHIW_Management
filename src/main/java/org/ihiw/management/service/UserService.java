@@ -1,10 +1,7 @@
 package org.ihiw.management.service;
 
 import org.ihiw.management.config.Constants;
-import org.ihiw.management.domain.Authority;
-import org.ihiw.management.domain.IhiwLab;
-import org.ihiw.management.domain.IhiwUser;
-import org.ihiw.management.domain.User;
+import org.ihiw.management.domain.*;
 import org.ihiw.management.repository.*;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.security.SecurityUtils;
@@ -407,7 +404,6 @@ public class UserService {
     public Page<ProjectDTO> getAllProjects(Pageable pageable) {
         return  projectRepository.findAll(pageable).map(ProjectDTO::new);
     }
-
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {

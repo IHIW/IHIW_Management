@@ -56,7 +56,13 @@
                 <dt><span jhiTranslate="ihiwManagementApp.upload.createdBy">Created By</span></dt>
                 <dd>
                     <div *ngIf="upload.createdBy">
-                        <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view']">{{upload.createdBy?.id}}</a>
+                        <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view']">{{upload.createdBy?.user.firstName}} {{upload.createdBy?.user.lastName}}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.project">Project</span></dt>
+                <dd>
+                    <div *ngIf="upload.project">
+                        <a [routerLink]="['/project', upload.project?.id, 'view']">{{upload.project?.name}}</a>
                     </div>
                 </dd>
             </dl>

@@ -3,6 +3,7 @@ package org.ihiw.management.service.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.ihiw.management.domain.IhiwUser;
+import org.ihiw.management.domain.Project;
 import org.ihiw.management.domain.Upload;
 import org.ihiw.management.domain.Validation;
 import org.ihiw.management.domain.enumeration.FileType;
@@ -43,6 +44,10 @@ public class UploadDTO {
     @Transient
     @JsonProperty
     private Set<Validation> validations;
+
+    @Transient
+    @JsonProperty
+    private Project project;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -155,6 +160,14 @@ public class UploadDTO {
         this.validations = validations;
     }
 
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -200,6 +213,7 @@ public class UploadDTO {
         this.rawDownload = upload.getRawDownload();
         this.convertedDownload = upload.getConvertedDownload();
         this.validations = upload.getValidations();
+        this.project = upload.getProject();
     }
 
 

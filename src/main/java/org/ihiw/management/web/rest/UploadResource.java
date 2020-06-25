@@ -11,7 +11,6 @@ import org.ihiw.management.repository.*;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.service.dto.UploadDTO;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,15 +29,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.*;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
 import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
-import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
 import static org.ihiw.management.security.AuthoritiesConstants.VALIDATION;
 
 /**
@@ -51,13 +46,6 @@ public class UploadResource {
     private final Logger log = LoggerFactory.getLogger(UploadResource.class);
 
     private static final String ENTITY_NAME = "upload";
-
-    static final String JDBC_DRIVER = "org.mariadb.jdbc.Driver";
-    static final String DB_URL = "jdbc:mariadb://localhost:3306";
-
-    //  Database credentials
-    static final String USER = "root";
-    static final String PASS = "";
 
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
@@ -299,44 +287,42 @@ public class UploadResource {
      */
     @PutMapping("/uploads/copyupload")
     @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
-    public ResponseEntity<Upload> copyUpload(@RequestParam(required = true) String oldfileName, @RequestParam(required = true) FileType newType) throws URISyntaxException {
+    public ResponseEntity<Upload> copyUpload(@RequestParam String oldfileName, @RequestParam FileType newType) {
 
         log.debug("REST request to make an entry for Upload : {}", oldfileName);
 
         List<Upload> allUploads = uploadRepository.findByFileName(oldfileName);
         Upload result = null;
 
-        if (allUploads.isEmpty())
-        {
+        if (allUploads.isEmpty()) {
             return ResponseEntity.notFound().headers(HeaderUtil.createAlert(applicationName,  ENTITY_NAME, oldfileName)).build();
         }
 
-        Upload oldUpload = allUploads.get(0);  //fetch the csv upload, like in setUploadValidation.
-
         //two entries of this file exist, something is going wrong
         if (allUploads.size() > 1) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldUpload.getFileName())).build();
+            return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldfileName)).build();
         }
+
+        //fetch the csv upload, like in setUploadValidation.
+        Upload oldUpload = allUploads.get(0);
+
         //one entry exists, everything seems ok
-        else if (allUploads.size() == 1) {
-            Upload currentUpload = new Upload();
-            String newName = oldUpload.getFileName()+ "." + newType.toString().toLowerCase();
-            currentUpload.setFileName(newName);
-            IhiwUser currentUser = oldUpload.getCreatedBy();
-            currentUpload.setCreatedBy(currentUser);
-            currentUpload.setCreatedAt(ZonedDateTime.now());
-            currentUpload.setModifiedAt(ZonedDateTime.now());
-            currentUpload.setEnabled(oldUpload.getEnabled());
-            currentUpload.setType(newType);
-            currentUpload.setProject(oldUpload.getProject());
-            result = uploadRepository.save(currentUpload);
-            return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, currentUpload.getFileName()))
-                .body(result);
-        }
-        else {
-            return ResponseEntity.noContent().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldUpload.getFileName())).build();
-        }
+        String newName = oldUpload.getFileName()+ "." + newType.toString().toLowerCase();
+        IhiwUser currentUser = oldUpload.getCreatedBy();
+
+        Upload currentUpload = new Upload();
+        currentUpload.setFileName(newName);
+        currentUpload.setCreatedBy(currentUser);
+        currentUpload.setCreatedAt(ZonedDateTime.now());
+        currentUpload.setModifiedAt(ZonedDateTime.now());
+        currentUpload.setEnabled(oldUpload.getEnabled());
+        currentUpload.setType(newType);
+        currentUpload.setProject(oldUpload.getProject());
+
+        result = uploadRepository.save(currentUpload);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, currentUpload.getFileName()))
+            .body(result);
     }
 
     /**

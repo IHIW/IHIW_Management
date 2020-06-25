@@ -53,6 +53,9 @@ public class Upload implements Serializable {
     @JsonIgnoreProperties("uploads")
     private IhiwUser createdBy;
 
+    @ManyToOne
+    private Project project;
+
 	@Transient
     @JsonProperty
     private String rawDownload;
@@ -174,6 +177,14 @@ public class Upload implements Serializable {
 
     public void setValidations(Set<Validation> validations) {
         this.validations = validations;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove

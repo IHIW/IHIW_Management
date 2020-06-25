@@ -1,4 +1,5 @@
 package org.ihiw.management.domain;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.annotations.ApiModel;
@@ -49,11 +50,11 @@ public class Project implements Serializable {
     private ZonedDateTime modifiedAt;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = "projects", allowSetters = true)
+    @JsonIgnoreProperties(value = {"projects", "user"}, allowSetters = true)
     private IhiwUser createdBy;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = "projects", allowSetters = true)
+    @JsonIgnoreProperties(value = {"projects", "user"}, allowSetters = true)
     private IhiwUser modifiedBy;
 
     @Column(name= "activated")
@@ -70,6 +71,11 @@ public class Project implements Serializable {
         joinColumns = @JoinColumn(name = "project_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "ihiw_user_id", referencedColumnName = "id"))
     private Set<IhiwUser> leaders = new HashSet<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JsonIgnore
+    private Set<Upload> uploads = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -234,6 +240,27 @@ public class Project implements Serializable {
     public void setLeaders(Set<IhiwUser> leaders) {
         this.leaders = leaders;
     }
+
+    public Set<Upload> getUploads() {
+        return uploads;
+    }
+
+    public void setUploads(Set<Upload> uploads) {
+        this.uploads = uploads;
+    }
+
+    public Project addUpload(Upload upload) {
+        this.uploads.add(upload);
+        upload.setProject(this);
+        return this;
+    }
+
+    public Project removeUpload(Upload upload) {
+        this.uploads.remove(upload);
+        upload.setProject(null);
+        return this;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override

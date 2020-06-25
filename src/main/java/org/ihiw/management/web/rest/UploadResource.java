@@ -285,7 +285,13 @@ public class UploadResource {
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
 
-   
+    /**
+     * {@code PUT  /uploads/copyupload} : copy the upload, and make a new upload object with a specified Filetype extension.
+     *
+     * @param oldfileName the name of the previous upload
+     * @param newType the filetype of the new file, to assign the new extension.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body of the new upload, or with status {@code 404 (Not Found)}.
+     */
     @PutMapping("/uploads/copyupload")
     @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
     public ResponseEntity<Upload> copyUpload(@RequestParam(required = true) String oldfileName, @RequestParam(required = true) FileType newType) throws URISyntaxException {
@@ -309,7 +315,7 @@ public class UploadResource {
         //one entry exists, everything seems ok
         else if (allUploads.size() == 1) {
             Upload currentUpload = new Upload();
-            String newName = oldUpload.getFileName()+ "." + newType.toString();
+            String newName = oldUpload.getFileName()+ "." + newType.toString().toLowerCase();
             currentUpload.setFileName(newName);
             IhiwUser currentUser = oldUpload.getCreatedBy();
             currentUpload.setCreatedBy(currentUser);
@@ -317,9 +323,10 @@ public class UploadResource {
             currentUpload.setModifiedAt(ZonedDateTime.now());
             currentUpload.setEnabled(oldUpload.getEnabled());
             currentUpload.setType(newType);
+            currentUpload.setProject(oldUpload.getProject());
             result = uploadRepository.save(currentUpload);
             return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldUpload.getFileName()))
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, currentUpload.getFileName()))
                 .body(result);
         }
         else {

@@ -7,12 +7,12 @@
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <changeSet author="bmatern" id="increaseValidationFieldSize">
-    
+
         <modifyDataType
         columnName="validation_feedback"
-        newDataType="varchar(3000)"
+        newDataType="TEXT"
         tableName="validation"/>
 
-    </changeSet>    
+    </changeSet>
 
 </databaseChangeLog>

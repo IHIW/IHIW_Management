@@ -365,16 +365,13 @@ public class UploadResource {
 
         List<Upload> uploads = uploadRepository.findByFileName(fileName);
 
-        if(uploads.size()==0)
-        {
+        if(uploads.size()==0) {
         	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, fileName.toString())).build();
         }
-        else if(uploads.size() > 1)
-        {
+        else if(uploads.size() > 1) {
         	return ResponseEntity.notFound().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, "Multiple Uploads Found:" + fileName.toString())).build();
         }
-        else
-        {
+        else {
         	Optional<Upload> upload = Optional.of(uploads.get(0));
         	return ResponseUtil.wrapOrNotFound(upload);       	
         }

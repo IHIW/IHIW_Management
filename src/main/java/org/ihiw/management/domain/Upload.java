@@ -64,7 +64,7 @@ public class Upload implements Serializable {
     @JsonProperty
     private String convertedDownload;
 
-    @Column(name = "parent_upload_id")
+    @ManyToOne
     private Upload parentUpload;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

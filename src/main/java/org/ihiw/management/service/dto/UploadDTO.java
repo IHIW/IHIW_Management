@@ -49,6 +49,10 @@ public class UploadDTO {
     @JsonProperty
     private Project project;
 
+    @Transient
+    @JsonProperty
+    private Upload parentUpload;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -168,6 +172,14 @@ public class UploadDTO {
         this.project = project;
     }
 
+    public Upload getParentUpload() {
+        return parentUpload;
+    }
+
+    public void setParentUpload(Upload parentUpload) {
+        this.parentUpload = parentUpload;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
     @Override
@@ -214,6 +226,7 @@ public class UploadDTO {
         this.convertedDownload = upload.getConvertedDownload();
         this.validations = upload.getValidations();
         this.project = upload.getProject();
+        this.parentUpload = upload.getParentUpload();
     }
 
 

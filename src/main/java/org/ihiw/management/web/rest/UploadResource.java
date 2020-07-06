@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -339,9 +340,18 @@ public class UploadResource {
 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+
+        	// Delete each child of this parent upload.
+        	for (Upload childUpload : uploadRepository.findChildrenById(id)) {
+        		log.debug("Upload " + id.toString() + " has a child upload which will be deleted: " + childUpload.toString());
+        		fileRepository.deleteFile(childUpload.getFileName());
+        		uploadRepository.deleteById(childUpload.getId());
+        	}
+        	
+        	// Then delete this parent upload.
             fileRepository.deleteFile(upload.get().getFileName());
-            fileRepository.deleteFile(upload.get().getFileName() + ".haml");
             uploadRepository.deleteById(id);
+
             return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();

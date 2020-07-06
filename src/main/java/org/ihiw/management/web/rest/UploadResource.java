@@ -281,37 +281,34 @@ public class UploadResource {
     /**
      * {@code PUT  /uploads/copyupload} : copy the upload, and make a new upload object with a specified Filetype extension.
      *
-     * @param oldfileName the name of the previous upload
-     * @param newType the filetype of the new file, to assign the new extension.
+     * @param oldFileName the name of the previous (parent) upload
+     * @param newFileName the name of the new (child) upload
+     * @param newType the FileType of the new child upload, to assign the new extension.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body of the new upload, or with status {@code 404 (Not Found)}.
      */
     @PutMapping("/uploads/copyupload")
     @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
-    public ResponseEntity<Upload> copyUpload(@RequestParam String oldfileName, @RequestParam FileType newType) {
+    public ResponseEntity<Upload> copyUpload(@RequestParam String oldFileName, @RequestParam String newFileName, @RequestParam FileType newType) {
 
-        log.debug("REST request to make an entry for Upload : {}", oldfileName);
+        log.debug("REST request to make an entry for Upload : {}", oldFileName);
 
-        List<Upload> allUploads = uploadRepository.findByFileName(oldfileName);
+        List<Upload> allUploads = uploadRepository.findByFileName(oldFileName);
         Upload result = null;
 
         if (allUploads.isEmpty()) {
-            return ResponseEntity.notFound().headers(HeaderUtil.createAlert(applicationName,  ENTITY_NAME, oldfileName)).build();
+            return ResponseEntity.notFound().headers(HeaderUtil.createAlert(applicationName,  ENTITY_NAME, oldFileName)).build();
         }
 
         //two entries of this file exist, something is going wrong
         if (allUploads.size() > 1) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldfileName)).build();
+            return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldFileName)).build();
         }
 
-        //fetch the csv upload, like in setUploadValidation.
         Upload parentUpload = allUploads.get(0);
-
-        //one entry exists, everything seems ok
-        String newName = parentUpload.getFileName()+ "." + newType.toString().toLowerCase();
         IhiwUser creator = parentUpload.getCreatedBy();
 
         Upload currentUpload = new Upload();
-        currentUpload.setFileName(newName);
+        currentUpload.setFileName(newFileName);
         currentUpload.setCreatedBy(creator);
         currentUpload.setCreatedAt(ZonedDateTime.now());
         currentUpload.setModifiedAt(ZonedDateTime.now());
@@ -319,6 +316,8 @@ public class UploadResource {
         currentUpload.setType(newType);
         currentUpload.setProject(parentUpload.getProject());
         currentUpload.setParentUpload(parentUpload);
+        
+        log.debug("Saving new child upload : {}", newFileName);
 
         result = uploadRepository.save(currentUpload);
         return ResponseEntity.ok()

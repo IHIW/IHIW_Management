@@ -181,7 +181,7 @@ export class UploadComponent implements OnInit, OnDestroy {
     }
   }
 
-  private toggleChildren(parent) {
+  toggleChildren(parent) {
     this.currentUploadChildren = [];
     if (this.openedUpload === parent.id) {
       this.openedUpload = 0;

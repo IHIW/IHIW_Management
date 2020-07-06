@@ -298,9 +298,7 @@ public class UploadResource {
         if (allUploads.isEmpty()) {
             return ResponseEntity.notFound().headers(HeaderUtil.createAlert(applicationName,  ENTITY_NAME, oldFileName)).build();
         }
-
-        //two entries of this file exist, something is going wrong
-        if (allUploads.size() > 1) {
+        else if (allUploads.size() > 1) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, oldFileName)).build();
         }
 

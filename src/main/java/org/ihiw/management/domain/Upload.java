@@ -64,6 +64,9 @@ public class Upload implements Serializable {
     @JsonProperty
     private String convertedDownload;
 
+    @ManyToOne
+    private Upload parentUpload;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -185,6 +188,14 @@ public class Upload implements Serializable {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Upload getParentUpload() {
+        return parentUpload;
+    }
+
+    public void setParentUpload(Upload parentUpload) {
+        this.parentUpload = parentUpload;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove

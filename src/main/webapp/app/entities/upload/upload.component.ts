@@ -17,6 +17,12 @@ import { IProject } from 'app/shared/model/project.model';
 })
 export class UploadComponent implements OnInit, OnDestroy {
   uploads: IUpload[];
+  uploadParents: IUpload[];
+  topUploadParents: IUpload[];
+  bottomUploadParents: IUpload[];
+  allUploadChildren: IUpload[];
+  currentUploadChildren: IUpload[];
+  openedUpload: number;
   currentAccount: any;
   predicate: any;
   routeData: any;
@@ -88,6 +94,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.currentUploadChildren = [];
     this.loadAll();
     this.accountService.identity().then(account => {
       this.currentAccount = account;
@@ -139,6 +146,54 @@ export class UploadComponent implements OnInit, OnDestroy {
   private onSuccess(data, headers) {
     this.totalItems = headers.get('X-Total-Count');
     this.uploads = data;
+    this.uploadParents = [];
+    this.allUploadChildren = [];
+    for (const upload of this.uploads) {
+      if (upload.parentUpload === null) {
+        this.uploadParents.push(upload);
+      } else {
+        this.allUploadChildren.push(upload);
+      }
+    }
+    for (const child of this.allUploadChildren) {
+      for (const parent of this.uploadParents) {
+        if (child.parentUpload.id === parent.id) {
+          parent.hasChildren = true;
+        }
+      }
+    }
+    this.spliceUploadParents();
+  }
+
+  private spliceUploadParents() {
+    this.topUploadParents = [];
+    this.bottomUploadParents = [];
+    let isTop = true;
+    for (const parent of this.uploadParents) {
+      if (isTop) {
+        this.topUploadParents.push(parent);
+      } else {
+        this.bottomUploadParents.push(parent);
+      }
+      if (parent.id === this.openedUpload) {
+        isTop = false;
+      }
+    }
+  }
+
+  private toggleChildren(parent) {
+    this.currentUploadChildren = [];
+    if (this.openedUpload === parent.id) {
+      this.openedUpload = 0;
+    } else {
+      this.openedUpload = parent.id;
+      for (const child of this.allUploadChildren) {
+        if (child.parentUpload.id === this.openedUpload) {
+          this.currentUploadChildren.push(child);
+        }
+      }
+    }
+    this.spliceUploadParents();
   }
 
   protected onError(errorMessage: string) {

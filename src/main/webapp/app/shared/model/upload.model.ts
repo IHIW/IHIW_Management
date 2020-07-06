@@ -21,6 +21,8 @@ export interface IUpload {
   convertedDownload?: string;
   valid?: boolean;
   project?: IProject;
+  parentUpload?: IUpload;
+  hasChildren?: boolean;
 }
 
 export class Upload implements IUpload {
@@ -36,7 +38,8 @@ export class Upload implements IUpload {
     public createdBy?: IIhiwUser,
     public rawDownload?: string,
     public convertedDownload?: string,
-    public project?: IProject
+    public project?: IProject,
+    public upload?: IUpload
   ) {
     this.valid = this.valid || false;
     this.enabled = this.enabled || false;

@@ -223,14 +223,14 @@ public class UploadResource {
 
         Page<UploadDTO> page;
         Pageable pageable;
-        
+
         if(offset != null && size != null) {
             Sort sorting  = Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]);
             pageable = PageRequest.of(offset, size, sorting);
         } else {
             pageable = Pageable.unpaged();
         }
-        
+
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))
         		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
             page = userService.getAllUploads(pageable);
@@ -304,20 +304,21 @@ public class UploadResource {
         }
 
         //fetch the csv upload, like in setUploadValidation.
-        Upload oldUpload = allUploads.get(0);
+        Upload parentUpload = allUploads.get(0);
 
         //one entry exists, everything seems ok
-        String newName = oldUpload.getFileName()+ "." + newType.toString().toLowerCase();
-        IhiwUser currentUser = oldUpload.getCreatedBy();
+        String newName = parentUpload.getFileName()+ "." + newType.toString().toLowerCase();
+        IhiwUser creator = parentUpload.getCreatedBy();
 
         Upload currentUpload = new Upload();
         currentUpload.setFileName(newName);
-        currentUpload.setCreatedBy(currentUser);
+        currentUpload.setCreatedBy(creator);
         currentUpload.setCreatedAt(ZonedDateTime.now());
         currentUpload.setModifiedAt(ZonedDateTime.now());
-        currentUpload.setEnabled(oldUpload.getEnabled());
+        currentUpload.setEnabled(parentUpload.getEnabled());
         currentUpload.setType(newType);
-        currentUpload.setProject(oldUpload.getProject());
+        currentUpload.setProject(parentUpload.getProject());
+        currentUpload.setParentUpload(parentUpload);
 
         result = uploadRepository.save(currentUpload);
         return ResponseEntity.ok()

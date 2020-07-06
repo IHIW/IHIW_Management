@@ -93,6 +93,10 @@ Generic styles
   border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
 
+.no-link {
+  color: white !important;
+}
+
 .hand,
 [jhisortby] {
   cursor: pointer;
@@ -182,6 +186,22 @@ ui bootstrap tweaks
 /* ========= Application styles ========== */
 .squarebadge {
   width: 18px;
+}
+
+.child-element {
+  vertical-align: super;
+}
+
+.child-rows:nth-of-type(2n) {
+  background-color: lightblue !important;
+}
+.child-rows:nth-of-type(2n + 1) {
+  background-color: lightskyblue !important;
+}
+
+.upload-id-column {
+  width: 36px;
+  min-width: 36px;
 }
 
 /* jhipster-needle-scss-add-main JHipster will add new css style */

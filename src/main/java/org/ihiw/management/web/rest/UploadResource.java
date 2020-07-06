@@ -348,4 +348,33 @@ public class UploadResource {
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
+    
+    /**
+     * {@code GET  /uploads/getbyfilename/:fileName} : get the "fileName" upload.
+     *
+     * @param fileName the fileName of the upload to retrieve.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the upload, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/uploads/getbyfilename/{fileName}")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<Upload> getUploadByFilename(@PathVariable String fileName) {
+        log.debug("REST request to get Upload by fileName : {}", fileName);
+        if (fileName == null) {
+            throw new BadRequestAlertException("Invalid fileName", ENTITY_NAME, "filenamenull");
+        }
+
+        List<Upload> uploads = uploadRepository.findByFileName(fileName);
+
+        if(uploads.size()==0) {
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, fileName.toString())).build();
+        }
+        else if(uploads.size() > 1) {
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, "Multiple Uploads Found:" + fileName.toString())).build();
+        }
+        else {
+        	Optional<Upload> upload = Optional.of(uploads.get(0));
+        	return ResponseUtil.wrapOrNotFound(upload);       	
+        }
+
+    }
 }

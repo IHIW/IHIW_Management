@@ -18,7 +18,6 @@ export interface IUpload {
   enabled?: boolean;
   createdBy?: IIhiwUser;
   rawDownload?: string;
-  convertedDownload?: string;
   valid?: boolean;
   project?: IProject;
   parentUpload?: IUpload;
@@ -37,7 +36,6 @@ export class Upload implements IUpload {
     public enabled?: boolean,
     public createdBy?: IIhiwUser,
     public rawDownload?: string,
-    public convertedDownload?: string,
     public project?: IProject,
     public upload?: IUpload
   ) {

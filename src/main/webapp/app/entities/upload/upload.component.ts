@@ -168,6 +168,7 @@ export class UploadComponent implements OnInit, OnDestroy {
   private spliceUploadParents() {
     this.topUploadParents = [];
     this.bottomUploadParents = [];
+    this.currentUploadChildren = [];
     let isTop = true;
     for (const parent of this.uploadParents) {
       if (isTop) {
@@ -179,19 +180,18 @@ export class UploadComponent implements OnInit, OnDestroy {
         isTop = false;
       }
     }
+    for (const child of this.allUploadChildren) {
+      if (child.parentUpload.id === this.openedUpload) {
+        this.currentUploadChildren.push(child);
+      }
+    }
   }
 
   toggleChildren(parent) {
-    this.currentUploadChildren = [];
     if (this.openedUpload === parent.id) {
       this.openedUpload = 0;
     } else {
       this.openedUpload = parent.id;
-      for (const child of this.allUploadChildren) {
-        if (child.parentUpload.id === this.openedUpload) {
-          this.currentUploadChildren.push(child);
-        }
-      }
     }
     this.spliceUploadParents();
   }

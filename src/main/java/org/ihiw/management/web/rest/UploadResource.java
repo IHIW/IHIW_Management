@@ -245,9 +245,6 @@ public class UploadResource {
 
         for (UploadDTO upload : page) {
             upload.setRawDownload(fileRepository.rawUrl(upload.getFileName()));
-            if (upload.getType().equals(FileType.HAML)){
-                upload.setConvertedDownload(fileRepository.rawUrl(upload.getFileName() + ".haml"));
-            }
         }
 
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
@@ -271,9 +268,6 @@ public class UploadResource {
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
             upload.get().setRawDownload(fileRepository.rawUrl(upload.get().getFileName()));
-            if (upload.get().getType().equals(FileType.HAML)){
-                upload.get().setConvertedDownload(fileRepository.rawUrl(upload.get().getFileName() + ".haml"));
-            }
             return ResponseUtil.wrapOrNotFound(upload);
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
@@ -315,7 +309,7 @@ public class UploadResource {
         currentUpload.setType(newType);
         currentUpload.setProject(parentUpload.getProject());
         currentUpload.setParentUpload(parentUpload);
-        
+
         log.debug("Saving new child upload : {}", newFileName);
 
         result = uploadRepository.save(currentUpload);
@@ -347,7 +341,7 @@ public class UploadResource {
         		fileRepository.deleteFile(childUpload.getFileName());
         		uploadRepository.deleteById(childUpload.getId());
         	}
-        	
+
         	// Then delete this parent upload.
             fileRepository.deleteFile(upload.get().getFileName());
             uploadRepository.deleteById(id);
@@ -356,7 +350,7 @@ public class UploadResource {
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
-    
+
     /**
      * {@code GET  /uploads/getbyfilename/:fileName} : get the "fileName" upload.
      *
@@ -381,7 +375,7 @@ public class UploadResource {
         }
         else {
         	Optional<Upload> upload = Optional.of(uploads.get(0));
-        	return ResponseUtil.wrapOrNotFound(upload);       	
+        	return ResponseUtil.wrapOrNotFound(upload);
         }
 
     }

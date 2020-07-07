@@ -39,10 +39,6 @@ public class UploadDTO {
 
     @Transient
     @JsonProperty
-    private String convertedDownload;
-
-    @Transient
-    @JsonProperty
     private Set<Validation> validations;
 
     @Transient
@@ -148,14 +144,6 @@ public class UploadDTO {
         this.rawDownload = rawDownload;
     }
 
-    public String getConvertedDownload() {
-        return convertedDownload;
-    }
-
-    public void setConvertedDownload(String convertedDownload) {
-        this.convertedDownload = convertedDownload;
-    }
-
     public Set<Validation> getValidations() {
         return validations;
     }
@@ -223,7 +211,6 @@ public class UploadDTO {
         this.enabled = upload.isEnabled();
         this.createdBy = upload.getCreatedBy();
         this.rawDownload = upload.getRawDownload();
-        this.convertedDownload = upload.getConvertedDownload();
         this.validations = upload.getValidations();
         this.project = upload.getProject();
         this.parentUpload = upload.getParentUpload();

@@ -30,7 +30,6 @@ public class UploadMapper {
             Upload upload = new Upload();
             upload.setId(uploadDTO.getId());
             upload.setCreatedBy(uploadDTO.getCreatedBy());
-            upload.setConvertedDownload(uploadDTO.getConvertedDownload());
             upload.setRawDownload(uploadDTO.getRawDownload());
             upload.setCreatedAt(uploadDTO.getCreatedAt());
             upload.setFileName(uploadDTO.getFileName());

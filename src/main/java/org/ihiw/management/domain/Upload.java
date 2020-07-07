@@ -60,10 +60,6 @@ public class Upload implements Serializable {
     @JsonProperty
     private String rawDownload;
 
-    @Transient
-    @JsonProperty
-    private String convertedDownload;
-
     @ManyToOne
     private Upload parentUpload;
 
@@ -160,14 +156,6 @@ public class Upload implements Serializable {
 
     public void setRawDownload(String rawDownload) {
         this.rawDownload = rawDownload;
-    }
-
-    public String getConvertedDownload() {
-        return convertedDownload;
-    }
-
-    public void setConvertedDownload(String convertedDownload) {
-        this.convertedDownload = convertedDownload;
     }
 
     public Boolean getEnabled() {

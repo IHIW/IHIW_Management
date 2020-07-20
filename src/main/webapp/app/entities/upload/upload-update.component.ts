@@ -79,7 +79,7 @@ export class UploadUpdateComponent implements OnInit {
     this.isSaving = true;
     const upload = this.createFromForm();
     if (upload.id !== undefined) {
-      this.subscribeToSaveResponse(this.uploadService.update(upload));
+      this.subscribeToSaveResponse(this.uploadService.update(upload, this.file));
     } else {
       this.subscribeToSaveResponse(this.uploadService.createWithFile(upload, this.file));
     }

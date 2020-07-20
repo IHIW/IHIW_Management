@@ -126,7 +126,7 @@ public class UploadResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/uploads")
-    public ResponseEntity<Upload> updateUpload(@RequestBody Upload upload, @RequestPart MultipartFile file) throws URISyntaxException {
+    public ResponseEntity<Upload> updateUpload(@RequestPart Upload upload, @RequestPart MultipartFile file) throws URISyntaxException {
         log.debug("REST request to update Upload : {}", upload);
         if (upload.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -141,15 +141,15 @@ public class UploadResource {
             dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
 
             fileRepository.deleteFile(dbUpload.get().getFileName());
-            fileRepository.deleteFile(dbUpload.get().getFileName() + ".haml");
-
+            
+            Upload result = uploadRepository.save(upload);
+            
             try {
                 fileRepository.storeFile(upload.getFileName(), file.getBytes());
             } catch (IOException e) {
                 log.error("File could not be uploaded: " + upload.getFileName());
             }
 
-            Upload result = uploadRepository.save(upload);
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))
                 .body(result);

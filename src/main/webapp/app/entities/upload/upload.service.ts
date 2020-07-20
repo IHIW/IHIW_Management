@@ -43,10 +43,21 @@ export class UploadService {
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
-  update(upload: IUpload): Observable<EntityResponseType> {
+  update(upload: IUpload, file: File): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(upload);
+
+    const uploadMultipartFormParam = 'upload';
+    const fileMultipartFormParam = 'file';
+    const formData: FormData = new FormData();
+    const uploadAsJsonBlob: Blob = new Blob([JSON.stringify(copy)], { type: 'application/json' });
+
+    formData.append(uploadMultipartFormParam, uploadAsJsonBlob);
+    if (file !== undefined) {
+      formData.append(fileMultipartFormParam, file);
+    }
+
     return this.http
-      .put<IUpload>(this.resourceUrl, copy, { observe: 'response' })
+      .put<IUpload>(this.resourceUrl, formData, { observe: 'response' })
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 

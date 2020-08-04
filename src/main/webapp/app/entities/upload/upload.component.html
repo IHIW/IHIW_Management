@@ -99,7 +99,7 @@
                 <td>{{upload.fileName}}</td>
                 <td>
                     <span *ngFor="let validation of sortBy(upload.validations, 'id')" class="badge squarebadge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}">
-                        <span *ngIf="validation.valid" title="{{validation.validator + ': valid'}}">
+                        <span *ngIf="validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">
                             V
                         </span>
                         <span *ngIf="!validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">

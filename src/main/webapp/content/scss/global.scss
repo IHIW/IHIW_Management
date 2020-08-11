@@ -204,4 +204,9 @@ ui bootstrap tweaks
   min-width: 36px;
 }
 
+.break-line-breaks {
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
 /* jhipster-needle-scss-add-main JHipster will add new css style */

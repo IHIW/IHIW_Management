@@ -49,7 +49,7 @@ import {
   faPlusSquare,
   faMinusSquare,
   faClock,
-  faQuestion
+  faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons';
 
 // Adds the SVG icon to the library so you can use it in your page
@@ -96,6 +96,6 @@ library.add(faPlusSquare);
 library.add(faMinusSquare);
 library.add(faClock);
 library.add(faFileDownload);
-library.add(faQuestion);
+library.add(faQuestionCircle);
 
 // jhipster-needle-add-element-to-vendor - JHipster will add new menu items here

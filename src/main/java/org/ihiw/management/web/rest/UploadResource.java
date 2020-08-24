@@ -31,6 +31,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -97,8 +98,7 @@ public class UploadResource {
             throw new BadRequestAlertException("You are not subscribed to the project", ENTITY_NAME, "missingsubscription");
         }
 
-        String fileName = currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getType() + "_" + file.getOriginalFilename();
-        upload.setFileName(fileName);
+        upload.setFileName(getFileName(currentIhiwUser, upload, file));
         upload.setCreatedBy(currentIhiwUser);
         upload.setCreatedAt(ZonedDateTime.now());
         upload.setModifiedAt(ZonedDateTime.now());
@@ -106,7 +106,7 @@ public class UploadResource {
         Upload result = uploadRepository.save(upload);
 
         try {
-            fileRepository.storeFile(fileName, file.getBytes());
+            fileRepository.storeFile(result.getFileName(), file.getBytes());
         } catch (IOException e) {
             log.error("File could not be uploaded: " + upload.getFileName());
         }
@@ -114,6 +114,10 @@ public class UploadResource {
         return ResponseEntity.created(new URI("/api/uploads/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
             .body(result);
+    }
+
+    private String getFileName(IhiwUser currentIhiwUser, Upload upload, MultipartFile file) {
+        return currentIhiwUser.getId() + "_" + System.currentTimeMillis() + "_" + upload.getType() + "_" + file.getOriginalFilename();
     }
 
     /**
@@ -126,7 +130,7 @@ public class UploadResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/uploads")
-    public ResponseEntity<Upload> updateUpload(@RequestPart Upload upload, @RequestPart MultipartFile file) throws URISyntaxException {
+    public ResponseEntity<Upload> updateUpload(@RequestPart Upload upload, @RequestPart(required = false) MultipartFile file) throws URISyntaxException {
         log.debug("REST request to update Upload : {}", upload);
         if (upload.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -140,15 +144,34 @@ public class UploadResource {
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
 
-            fileRepository.deleteFile(dbUpload.get().getFileName());
-            
-            Upload result = uploadRepository.save(upload);
-            
-            try {
-                fileRepository.storeFile(upload.getFileName(), file.getBytes());
-            } catch (IOException e) {
-                log.error("File could not be uploaded: " + upload.getFileName());
+
+            if (file != null){
+                try {
+                    upload.setFileName(getFileName(currentIhiwUser, upload, file));
+                    fileRepository.deleteFile(dbUpload.get().getFileName());
+                    fileRepository.storeFile(upload.getFileName(), file.getBytes());
+                    upload.setValidations(new HashSet<>());
+                } catch (IOException e) {
+                    log.error("File could not be uploaded: " + upload.getFileName());
+                }
+            } else {
+                if (dbUpload.get().getType() != upload.getType()){
+                    //update file type in file name
+                    String[] components = upload.getFileName().split("_");
+                    if (components.length > 2) {
+                        components[2] = upload.getType().name();
+                    }
+                    String concatFileName = "";
+                    for (String k : components){
+                        concatFileName += k + "_";
+                    }
+                    concatFileName = concatFileName.substring(0, concatFileName.length() - 1);
+                    fileRepository.renameFile(dbUpload.get().getFileName(), concatFileName);
+                    upload.setFileName(concatFileName);
+                    upload.setValidations(new HashSet<>());
+                }
             }
+            Upload result = uploadRepository.save(upload);
 
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))

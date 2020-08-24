@@ -19,6 +19,7 @@ import { ProjectService } from 'app/entities/project';
 })
 export class UploadUpdateComponent implements OnInit {
   isSaving: boolean;
+  noFileSelected: boolean;
   file: File;
 
   projects: IProject[];
@@ -44,8 +45,12 @@ export class UploadUpdateComponent implements OnInit {
 
   ngOnInit() {
     this.isSaving = false;
+    this.noFileSelected = true;
     this.activatedRoute.data.subscribe(({ upload }) => {
       this.updateForm(upload);
+      if (upload.id !== undefined) {
+        this.noFileSelected = false;
+      }
     });
     this.projectService
       .getMy()
@@ -72,6 +77,7 @@ export class UploadUpdateComponent implements OnInit {
   onFileChange(event) {
     if (event.target.files.length > 0) {
       this.file = event.target.files[0];
+      this.noFileSelected = false;
     }
   }
 
@@ -119,9 +125,5 @@ export class UploadUpdateComponent implements OnInit {
 
   setProject(event: any) {
     this.editForm.get(['project']).setValue(this.projects[event.target.selectedIndex - 1]);
-  }
-
-  trackIhiwUserById(index: number, item: IIhiwUser) {
-    return item.id;
   }
 }

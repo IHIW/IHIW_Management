@@ -166,9 +166,10 @@ public class UploadResource {
                         concatFileName += k + "_";
                     }
                     concatFileName = concatFileName.substring(0, concatFileName.length() - 1);
-                    fileRepository.renameFile(dbUpload.get().getFileName(), concatFileName);
                     upload.setFileName(concatFileName);
                     upload.setValidations(new HashSet<>());
+                    uploadRepository.save(upload);
+                    fileRepository.renameFile(dbUpload.get().getFileName(), concatFileName);
                 }
             }
             Upload result = uploadRepository.save(upload);

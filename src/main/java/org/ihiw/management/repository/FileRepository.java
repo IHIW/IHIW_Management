@@ -2,6 +2,7 @@ package org.ihiw.management.repository;
 
 import com.amazonaws.services.s3.AbstractAmazonS3;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -42,6 +43,13 @@ public class FileRepository {
         if (s3.doesObjectExist(bucket, fileName)){
             s3.deleteObject(bucket, fileName);
         }
+    }
+
+    public void renameFile(String oldFileName, String newFileName) {
+        CopyObjectRequest copyObjRequest = new CopyObjectRequest(bucket,
+            oldFileName, bucket, newFileName);
+        s3.copyObject(copyObjRequest);
+        deleteFile(oldFileName);
     }
 
     public String rawUrl(String fileName) {

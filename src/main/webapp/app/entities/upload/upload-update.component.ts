@@ -20,7 +20,7 @@ import { ProjectService } from 'app/entities/project';
 export class UploadUpdateComponent implements OnInit {
   isSaving: boolean;
   noFileSelected: boolean;
-  file: File;
+  files: FileList;
 
   projects: IProject[];
 
@@ -76,7 +76,7 @@ export class UploadUpdateComponent implements OnInit {
 
   onFileChange(event) {
     if (event.target.files.length > 0) {
-      this.file = event.target.files[0];
+      this.files = event.target.files;
       this.noFileSelected = false;
     }
   }
@@ -85,9 +85,13 @@ export class UploadUpdateComponent implements OnInit {
     this.isSaving = true;
     const upload = this.createFromForm();
     if (upload.id !== undefined) {
-      this.subscribeToSaveResponse(this.uploadService.update(upload, this.file));
+      let file = null;
+      if (this.files !== undefined && this.files.length > 0) {
+        file = this.files[0];
+      }
+      this.subscribeToSaveResponse(this.uploadService.update(upload, file));
     } else {
-      this.subscribeToSaveResponse(this.uploadService.createWithFile(upload, this.file));
+      this.subscribeToSaveResponse(this.uploadService.createWithFile(upload, this.files));
     }
   }
 

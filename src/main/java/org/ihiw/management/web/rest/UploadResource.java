@@ -77,7 +77,7 @@ public class UploadResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/uploads")
-    public ResponseEntity<Upload> createUpload(@RequestPart Upload upload, @RequestPart MultipartFile file) throws URISyntaxException {
+    public ResponseEntity<Upload> createUpload(@RequestPart Upload upload, @RequestPart List<MultipartFile> files) throws URISyntaxException {
         log.debug("REST request to save Upload : {}", upload);
         if (upload.getId() != null) {
             throw new BadRequestAlertException("A new upload cannot already have an ID", ENTITY_NAME, "idexists");
@@ -93,22 +93,29 @@ public class UploadResource {
                 projectMember = true;
             }
         }
-
         if (!projectMember) {
             throw new BadRequestAlertException("You are not subscribed to the project", ENTITY_NAME, "missingsubscription");
         }
 
-        upload.setFileName(getFileName(currentIhiwUser, upload, file));
-        upload.setCreatedBy(currentIhiwUser);
-        upload.setCreatedAt(ZonedDateTime.now());
-        upload.setModifiedAt(ZonedDateTime.now());
+        Upload result = null;
+        for (MultipartFile file : files){
+            Upload currentUpload = new Upload();
+            currentUpload.setEnabled(upload.getEnabled());
+            currentUpload.setProject(upload.getProject());
+            currentUpload.setType(upload.getType());
 
-        Upload result = uploadRepository.save(upload);
+            currentUpload.setFileName(getFileName(currentIhiwUser, upload, file));
+            currentUpload.setCreatedBy(currentIhiwUser);
+            currentUpload.setCreatedAt(ZonedDateTime.now());
+            currentUpload.setModifiedAt(ZonedDateTime.now());
 
-        try {
-            fileRepository.storeFile(result.getFileName(), file.getBytes());
-        } catch (IOException e) {
-            log.error("File could not be uploaded: " + upload.getFileName());
+            result = uploadRepository.save(currentUpload);
+
+            try {
+                fileRepository.storeFile(result.getFileName(), file.getBytes());
+            } catch (IOException e) {
+                log.error("File could not be uploaded: " + upload.getFileName());
+            }
         }
 
         return ResponseEntity.created(new URI("/api/uploads/" + result.getId()))

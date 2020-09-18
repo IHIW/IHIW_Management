@@ -33,7 +33,8 @@
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="field_file">File</label>
-                    <input id="field_file" type="file" (change)="onFileChange($event)"/>
+                    <input *ngIf="editForm.get('id').value === undefined" id="field_files" type="file" (change)="onFileChange($event)" multiple/>
+                    <input *ngIf="editForm.get('id').value !== undefined" id="field_file" type="file" (change)="onFileChange($event)"/>
                 </div>
             </div>
             <div>

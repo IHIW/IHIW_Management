@@ -5,6 +5,7 @@
       "password": "Password",
       "password.placeholder": "Your password",
       "rememberme": "Remember me",
+      "consent": "I agree to the <a href=\"https://www.ihiw18.org/privacy-policy/\">Privacy Policy</a>.",
       "button": "Sign in"
     },
     "messages": {

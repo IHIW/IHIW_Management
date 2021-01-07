@@ -8,6 +8,7 @@ import org.ihiw.management.repository.AuthorityRepository;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
+import org.ihiw.management.security.BlacklistManager;
 import org.ihiw.management.service.MailService;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.service.dto.PasswordChangeDTO;
@@ -87,10 +88,10 @@ public class AccountResourceIT {
         MockitoAnnotations.initMocks(this);
         doNothing().when(mockMailService).sendActivationEmail(any(), any(), any());
         AccountResource accountResource =
-            new AccountResource(userRepository, ihiwUserRepository, userService, mockMailService, activationEmail);
+            new AccountResource(userRepository, ihiwUserRepository, userService, mockMailService, activationEmail, new BlacklistManager(1000, 1000L));
 
         AccountResource accountUserMockResource =
-            new AccountResource(userRepository, ihiwUserRepository, mockUserService, mockMailService, activationEmail);
+            new AccountResource(userRepository, ihiwUserRepository, mockUserService, mockMailService, activationEmail, new BlacklistManager(1000, 1000L));
         this.restMvc = MockMvcBuilders.standaloneSetup(accountResource)
             .setMessageConverters(httpMessageConverters)
             .setControllerAdvice(exceptionTranslator)

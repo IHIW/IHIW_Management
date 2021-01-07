@@ -8,6 +8,7 @@ import org.ihiw.management.domain.User;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
+import org.ihiw.management.security.BlacklistManager;
 import org.ihiw.management.security.SecurityUtils;
 import org.ihiw.management.service.MailService;
 import org.ihiw.management.service.UserService;
@@ -56,16 +57,16 @@ public class AccountResource {
 
     private final String activationEmail;
 
+    private final BlacklistManager blacklistManager;
 
-
-    public AccountResource(UserRepository userRepository, IhiwUserRepository ihiwUserRepository, UserService userService, MailService mailService, @Qualifier("activationEmail") String activationEmail) {
+    public AccountResource(UserRepository userRepository, IhiwUserRepository ihiwUserRepository, UserService userService, MailService mailService, @Qualifier("activationEmail") String activationEmail, BlacklistManager blacklistManager) {
 
         this.userRepository = userRepository;
         this.ihiwUserRepository = ihiwUserRepository;
         this.userService = userService;
         this.mailService = mailService;
         this.activationEmail = activationEmail;
-
+        this.blacklistManager = blacklistManager;
 
     }
 
@@ -79,7 +80,9 @@ public class AccountResource {
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM) {
+    public void registerAccount(@Valid @RequestBody ManagedUserVM managedUserVM, HttpServletRequest request) {
+        blacklistManager.checkRequest(request);
+
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }

@@ -33,7 +33,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr *ngFor="let validation of this.upload.validations">
+                            <tr *ngFor="let validation of sortBy(this.upload.validations,'validator')">
                                 <td>
                                     <span class="badge badge-info">{{validation.validator}}</span>
                                 </td>

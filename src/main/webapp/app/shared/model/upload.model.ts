@@ -5,7 +5,13 @@ import { IProject } from 'app/shared/model/project.model';
 
 export const enum FileType {
   HAML = 'HAML',
-  HML = 'HML'
+  HML = 'HML',
+  PED = 'PED',
+  PROJECT_DATA_MATRIX = 'PROJECT_DATA_MATRIX',
+  XLSX = 'XLSX',
+  ANTIBODY_CSV = 'ANTIBODY_CSV',
+  FASTQ = 'FASTQ',
+  OTHER = 'OTHER'
 }
 
 export interface IUpload {

@@ -40,7 +40,7 @@
 <!--                <td>{{upload.modifiedAt | date:'short'}}</td>-->
                 <td class="long-text">{{upload.fileName}}</td>
                 <td>
-                    <span *ngFor="let validation of sortBy(upload.validations, 'id')" class="badge squarebadge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}">
+                    <span *ngFor="let validation of sortBy(upload.validations, 'validator')" class="badge squarebadge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}">
                         <span *ngIf="validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">
                             V
                         </span>

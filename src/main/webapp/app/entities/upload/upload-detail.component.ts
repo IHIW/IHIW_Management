@@ -45,6 +45,10 @@ export class UploadDetailComponent implements OnInit, OnDestroy {
     this.eventSubscriber = this.eventManager.subscribe('uploadModification', response => this.loadAll());
   }
 
+  sortBy(list, prop: string) {
+    return list.sort((a, b) => (a[prop] > b[prop] ? 1 : a[prop] === b[prop] ? 0 : -1));
+  }
+
   ngOnDestroy() {
     this.eventManager.destroy(this.eventSubscriber);
   }

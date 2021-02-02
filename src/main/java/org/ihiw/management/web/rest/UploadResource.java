@@ -364,6 +364,7 @@ public class UploadResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+        	currentUser.get().getAuthorities().contains(new Authority(VALIDATION)) ||
             upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
 
         	// Delete each child of this parent upload.

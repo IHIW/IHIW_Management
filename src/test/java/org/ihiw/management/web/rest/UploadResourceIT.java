@@ -73,6 +73,9 @@ public class UploadResourceIT {
     private ValidationRepository validationRepository;
 
     @Autowired
+    private ProjectRepository projectRepository;  
+    
+    @Autowired
     private ProjectIhiwLabRepository projectIhiwLabRepository;
 
     @Autowired
@@ -100,7 +103,7 @@ public class UploadResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final UploadResource uploadResource = new UploadResource(uploadRepository, fileRepository, ihiwUserRepository, validationRepository, userService, projectIhiwLabRepository);
+        final UploadResource uploadResource = new UploadResource(uploadRepository, fileRepository, ihiwUserRepository, validationRepository, userService, projectRepository, projectIhiwLabRepository);
         this.restUploadMockMvc = MockMvcBuilders.standaloneSetup(uploadResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

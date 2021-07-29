@@ -374,10 +374,13 @@ public class UploadResource {
 
         Optional<User> currentUser = userService.getUserWithAuthorities();
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        log.debug("Delete Upload, the currentIhiwUser was found : {}", currentIhiwUser.getUser().getLogin().toString());
+        log.debug("Delete Upload, the user has these authorities : {}", currentUser.get().getAuthorities().toString());
 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
         	currentUser.get().getAuthorities().contains(new Authority(VALIDATION)) ||
             upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+        	log.debug("User has authority to delete the upload : ", currentUser.get().getLogin().toString());
 
         	// Delete each child of this parent upload.
         	for (Upload childUpload : uploadRepository.findChildrenById(id)) {
@@ -391,6 +394,9 @@ public class UploadResource {
             uploadRepository.deleteById(id);
 
             return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        }
+        else {
+        	log.debug("User does not have authority to delete the upload : ", currentUser.get().getLogin().toString());
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }

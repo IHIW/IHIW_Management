@@ -37,6 +37,7 @@ import java.util.Optional;
 
 import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
 import static org.ihiw.management.security.AuthoritiesConstants.VALIDATION;
+import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.Upload}.
@@ -57,15 +58,17 @@ public class UploadResource {
     private final FileRepository fileRepository;
     private final IhiwUserRepository ihiwUserRepository;
     private final UserService userService;
+    private final ProjectRepository projectRepository;
     private final ProjectIhiwLabRepository projectIhiwLabRepository;
 
 
-    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, ValidationRepository validationRepository, UserService userService, ProjectIhiwLabRepository projectIhiwLabRepository) {
+    public UploadResource(UploadRepository uploadRepository, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, ValidationRepository validationRepository, UserService userService, ProjectRepository projectRepository, ProjectIhiwLabRepository projectIhiwLabRepository) {
         this.uploadRepository = uploadRepository;
         this.fileRepository = fileRepository;
         this.ihiwUserRepository = ihiwUserRepository;
         this.validationRepository = validationRepository;
         this.userService = userService;
+        this.projectRepository = projectRepository;
         this.projectIhiwLabRepository = projectIhiwLabRepository;
     }
 
@@ -269,9 +272,18 @@ public class UploadResource {
         } else {
         	IhiwLab currentLab = currentIhiwUser.getLab();
         	log.debug("Current Lab:" + currentLab.toString());
-            List<IhiwUser> colleages = ihiwUserRepository.findByLab(currentLab);
-        	log.debug("Colleagues Found:" + colleages.toString());
-            page = userService.getAllUploadsByUserId(pageable,colleages);
+            List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
+        	log.debug("Colleagues Found:" + colleagues.toString());
+        	
+        	// Project leaders need to see uploads for their own projects.
+        	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {            	
+        	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);      
+                log.debug("Projects Found:" + projects.toString());
+                page = userService.getAllUploadsByUsersAndProjects(pageable, colleagues, projects);       
+            }
+        	else {
+        		page = userService.getAllUploadsByUserId(pageable, colleagues);       
+        	}         
         }
 
         for (UploadDTO upload : page) {

@@ -144,9 +144,9 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
 
         MultipartConfigFactory factory = new MultipartConfigFactory();
 
-        factory.setMaxFileSize("10MB");
+        factory.setMaxFileSize("150MB");
 
-        factory.setMaxRequestSize("10MB");
+        factory.setMaxRequestSize("150MB");
 
         return factory.createMultipartConfig();
 

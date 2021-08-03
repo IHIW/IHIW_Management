@@ -23,10 +23,10 @@ public interface UploadRepository extends JpaRepository<Upload, Long> {
     List<Upload> findByFileName(String filename);
     Page<Upload> findByCreatedByIn(List<IhiwUser> users, Pageable pageable);
 
+    @Query("select upload from Upload upload where upload.createdBy.id in ?1 or upload.project.id in ?2")
+    Page<Upload> findByUsersAndProjects(List<Long> userIds, List<Long> projectIds, Pageable pageable);
 
     Optional<Upload> findById(Long id);
-
-    //Page<Upload> findAllById(Pageable pageable, Long id);
 
     List<Upload> findAll();
 

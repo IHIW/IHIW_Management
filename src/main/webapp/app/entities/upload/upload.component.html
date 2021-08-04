@@ -156,7 +156,7 @@
                 <td><span class="badge badge-info" jhiTranslate="{{'ihiwManagementApp.FileType.' + upload.type}}">{{upload.type}}</span></td>
                 <td>{{upload.createdAt | date:'short'}}</td>
                 <!--                <td>{{upload.modifiedAt | date:'short'}}</td>-->
-                <td>{{upload.fileName}}</td>
+                <td class="long-text">{{upload.fileName}}</td>
                 <td>
                     <span *ngFor="let validation of sortBy(upload.validations, 'id')" class="badge squarebadge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}">
                         <span *ngIf="validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">

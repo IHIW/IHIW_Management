@@ -4,13 +4,14 @@ import { IValidation } from 'app/shared/model/validation.model';
 import { IProject } from 'app/shared/model/project.model';
 
 export const enum FileType {
+  ANTIBODY_CSV = 'ANTIBODY_CSV',
+  INFO_CSV = 'INFO_CSV',
+  FASTQ = 'FASTQ',
   HAML = 'HAML',
   HML = 'HML',
   PED = 'PED',
   PROJECT_DATA_MATRIX = 'PROJECT_DATA_MATRIX',
   XLSX = 'XLSX',
-  ANTIBODY_CSV = 'ANTIBODY_CSV',
-  FASTQ = 'FASTQ',
   OTHER = 'OTHER'
 }
 

@@ -4,5 +4,5 @@ package org.ihiw.management.domain.enumeration;
  * The FileType enumeration.
  */
 public enum FileType {
-    HAML, HML, PED, PROJECT_DATA_MATRIX, XLSX, ANTIBODY_CSV, FASTQ, OTHER
+    ANTIBODY_CSV, FASTQ, HAML, HML, INFO_CSV, PED, PROJECT_DATA_MATRIX, XLSX, OTHER
 }

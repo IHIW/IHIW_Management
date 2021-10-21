@@ -20,11 +20,11 @@
             <column name="id" type="bigint" />
         </addColumn>
         <sql>
-            SET @row=0;
-            UPDATE project_lab SET id = (SELECT @row:=@row+1 AS row)
+            SET @currentrow=0;
+            UPDATE project_lab SET id = (SELECT @currentrow:=@currentrow+1 AS currentrow);
         </sql>
         <sql>
-            UPDATE project_lab SET status='SUBSCRIBED'
+            UPDATE project_lab SET status='SUBSCRIBED';
         </sql>
         <addNotNullConstraint tableName="project_lab" columnName="id" columnDataType="bigint"/>
         <dropPrimaryKey tableName="project_lab"/>

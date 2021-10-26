@@ -41,7 +41,7 @@ public class Upload implements Serializable {
 
     @Column(name = "file_name")
     private String fileName;
-
+    
     @Column(name = "enabled")
     private Boolean enabled;
 
@@ -52,6 +52,10 @@ public class Upload implements Serializable {
     @ManyToOne
     @JsonIgnoreProperties("uploads")
     private IhiwUser createdBy;
+    
+	@Transient
+    @JsonProperty
+    private String labCode;
 
     @ManyToOne
     private Project project;
@@ -114,7 +118,7 @@ public class Upload implements Serializable {
     public String getFileName() {
         return fileName;
     }
-
+    
     public Upload fileName(String fileName) {
         this.fileName = fileName;
         return this;
@@ -140,16 +144,21 @@ public class Upload implements Serializable {
     public IhiwUser getCreatedBy() {
         return createdBy;
     }
-
+    
+    public String getLabCode() {
+    	return labCode;
+    }
+    
     public Upload createdBy(IhiwUser ihiwUser) {
         this.createdBy = ihiwUser;
         return this;
     }
-
+    
     public void setCreatedBy(IhiwUser ihiwUser) {
         this.createdBy = ihiwUser;
+        this.labCode = ihiwUser.getLab().getLabCode();
     }
-
+    
     public String getRawDownload() {
         return rawDownload;
     }

@@ -28,6 +28,7 @@ public class UploadDTO {
     private ZonedDateTime modifiedAt;
     private String fileName;
     private Boolean enabled;
+    private String labCode;
 
     @ManyToOne
     @JsonIgnoreProperties("uploads")
@@ -143,6 +144,14 @@ public class UploadDTO {
     public void setRawDownload(String rawDownload) {
         this.rawDownload = rawDownload;
     }
+    
+    public String getLabCode() {
+        return labCode;
+    }
+
+    public void setLabCode(String labCode) {
+        this.labCode = labCode;
+    }
 
     public Set<Validation> getValidations() {
         return validations;
@@ -214,6 +223,7 @@ public class UploadDTO {
         this.validations = upload.getValidations();
         this.project = upload.getProject();
         this.parentUpload = upload.getParentUpload();
+        
     }
 
 

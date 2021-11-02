@@ -74,7 +74,7 @@ public class Project implements Serializable {
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JsonManagedReference
+    @JsonIgnore
     private Set<Upload> uploads = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

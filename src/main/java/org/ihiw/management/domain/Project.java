@@ -72,9 +72,9 @@ public class Project implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "ihiw_user_id", referencedColumnName = "id"))
     private Set<IhiwUser> leaders = new HashSet<>();
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JsonIgnore
+    @JsonManagedReference
     private Set<Upload> uploads = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

@@ -86,8 +86,6 @@ public class ProjectDTO {
         this.labs = project.getLabs();
         this.leaders = project.getLeaders();
         this.uploads = project.getUploads();
-        System.out.println("I found these uploads:" + this.uploads.toString());
-
     }
 
 

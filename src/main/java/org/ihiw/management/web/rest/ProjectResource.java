@@ -174,6 +174,7 @@ public class ProjectResource {
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             projectFromDB.get().getLeaders().contains(currentIhiwUser)) {
+            project.setUploads(projectFromDB.get().getUploads());
             Project result = projectRepository.save(project);
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, project.getId().toString()))

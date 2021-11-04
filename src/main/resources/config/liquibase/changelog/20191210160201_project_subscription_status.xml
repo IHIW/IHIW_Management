@@ -7,6 +7,7 @@
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <changeSet author="mniemann" id="addProjectSubcriptionStatus">
+    	<validCheckSum>8:b81eb5a32a690b989a6bf0f35a603785</validCheckSum>
         <dropForeignKeyConstraint
             constraintName="fk_project_lab_lab_id"
             baseTableName="project_lab"/>

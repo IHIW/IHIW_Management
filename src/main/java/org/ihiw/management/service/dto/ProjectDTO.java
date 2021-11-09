@@ -1,12 +1,10 @@
 package org.ihiw.management.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ihiw.management.domain.IhiwUser;
 import org.ihiw.management.domain.Project;
-import org.ihiw.management.domain.Upload;
 import org.ihiw.management.domain.ProjectIhiwLab;
 import org.ihiw.management.domain.enumeration.ProjectComponent;
 
@@ -64,11 +62,6 @@ public class ProjectDTO {
         inverseJoinColumns = @JoinColumn(name = "ihiw_user_id", referencedColumnName = "id"))
     private Set<IhiwUser> leaders = new HashSet<>();
     
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @JsonIgnore
-    private Set<Upload> uploads = new HashSet<>();
-
     public ProjectDTO() {
         // Empty constructor needed for Jackson.
     }
@@ -85,7 +78,6 @@ public class ProjectDTO {
         this.modifiedBy = project.getModifiedBy();
         this.labs = project.getLabs();
         this.leaders = project.getLeaders();
-        this.uploads = project.getUploads();
     }
 
 
@@ -253,19 +245,6 @@ public class ProjectDTO {
         this.leaders = leaders;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
-
-    
-    public Set<Upload> getUploads() {
-        return uploads;
-    }
-
-    public void setUploads(Set<Upload> uploads) {
-        this.uploads = uploads;
-    }
-
- 
-    
-    
     
     @Override
     public boolean equals(Object o) {

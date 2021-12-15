@@ -315,6 +315,35 @@ public class UploadResource {
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
+    
+    
+    
+    /**
+     * {@code GET  /uploads/children/:id} : get the children of the parent "id" upload.
+     *
+     * @param id the id of the parent upload, we find the children of.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the upload, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/uploads/children/{id}")
+    public ResponseEntity<Upload> getChildren(@PathVariable Long id) {
+        log.debug("REST request to get Child Uploads by Parent ID : {}", id);
+        /*
+        Optional<Upload> upload = uploadRepository.findById(id);
+
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            upload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+            upload.get().setRawDownload(fileRepository.rawUrl(upload.get().getFileName()));
+            return ResponseUtil.wrapOrNotFound(upload);
+        }
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        
+        */
+        return null;
+        
+    }
 
     /**
      * {@code PUT  /uploads/copyupload} : copy the upload, and make a new upload object with a specified Filetype extension.

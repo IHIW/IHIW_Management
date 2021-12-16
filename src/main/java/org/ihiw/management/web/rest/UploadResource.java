@@ -315,6 +315,26 @@ public class UploadResource {
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
     }
+    
+    
+    
+    /**
+     * {@code GET  /uploads/children/:id} : get the children of the parent "id" upload.
+     *
+     * @param id the id of the parent upload, we find the children of.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body of the child uploads.
+     */
+    @GetMapping("/uploads/children/{id}")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<List<Upload>> getChildren(@PathVariable Long id) {
+        log.debug("REST request to get Child Uploads by Parent ID : {}", id);
+
+        List<Upload> childUploads = uploadRepository.findChildrenById(id);
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, childUploads.toString()))
+            .body(childUploads);        
+    }
 
     /**
      * {@code PUT  /uploads/copyupload} : copy the upload, and make a new upload object with a specified Filetype extension.

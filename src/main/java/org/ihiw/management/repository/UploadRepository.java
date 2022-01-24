@@ -32,6 +32,8 @@ public interface UploadRepository extends JpaRepository<Upload, Long> {
 
     List<Upload> findAllById(List<Long> ids);
     
+    List<Upload> findAllByProjectId(Long projectId);
+    
     @Query("select upload from Upload upload where upload.parentUpload.id = ?1")
     List<Upload> findChildrenById(Long id);
 

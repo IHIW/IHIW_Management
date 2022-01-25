@@ -443,4 +443,33 @@ public class UploadResource {
         }
 
     }
+    
+    
+    /**
+     * {@code GET  /uploads/getbyproject/:projectId} : get the "projectId" uploads.
+     *
+     * @param projectId the projectId assigned to the uploads
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the upload, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/uploads/getbyproject/{projectId}")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<List<Upload>> getUploadsByProject(@PathVariable Long projectId) {
+        log.debug("REST request to get Upload by project ID : {}", projectId);
+        if (projectId == null) {
+            throw new BadRequestAlertException("Invalid projectId", ENTITY_NAME, "projectidnull");
+        }
+
+        List<Upload> uploads = uploadRepository.findAllByProjectId(projectId);
+
+        if(uploads.size()==0) {
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, projectId.toString())).build();
+        }
+        else {
+            return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, projectId.toString()))
+                .body(uploads);    
+        }
+
+    }
+    
 }

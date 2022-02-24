@@ -265,15 +265,17 @@ public class UploadResource {
         } else {
             pageable = Pageable.unpaged();
         }
+        
+        log.debug("Pageable object:" + pageable.toString());
 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))
         		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
             page = userService.getAllUploads(pageable);
         } else {
         	IhiwLab currentLab = currentIhiwUser.getLab();
-        	log.debug("Current Lab:" + currentLab.toString());
+        	//log.debug("Current Lab:" + currentLab.toString());
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
-        	log.debug("Colleagues Found:" + colleagues.toString());
+        	//log.debug("Colleagues Found:" + colleagues.toString());
         	
         	// Project leaders need to see uploads for their own projects.
         	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {            	

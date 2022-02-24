@@ -152,6 +152,7 @@ public class UploadResource {
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+        	currentUser.get().getAuthorities().contains(new Authority(VALIDATION)) ||
             dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
 
 

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,7 +31,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -265,35 +266,43 @@ public class UploadResource {
         } else {
             pageable = Pageable.unpaged();
         }
-        
-        log.debug("Pageable object:" + pageable.toString());
-
+                
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))
         		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
             page = userService.getAllUploads(pageable);
         } else {
         	IhiwLab currentLab = currentIhiwUser.getLab();
-        	//log.debug("Current Lab:" + currentLab.toString());
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
-        	//log.debug("Colleagues Found:" + colleagues.toString());
         	
-        	// Project leaders need to see uploads for their own projects.
         	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {            	
         	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);      
-                log.debug("Projects Found:" + projects.toString());
                 page = userService.getAllUploadsByUsersAndProjects(pageable, colleagues, projects);       
             }
         	else {
         		page = userService.getAllUploadsByUserId(pageable, colleagues);       
         	}         
         }
-
+        
+        // Iterate children to create a new "Page" including the Parents with their Children  
+        List<UploadDTO> allChildren = new ArrayList<UploadDTO>();
         for (UploadDTO upload : page) {
+        	List<Upload> childUploads = userService.getAllUploadsByParentId(upload.getId());
+            for (Upload childUpload : childUploads) {
+            	allChildren.add(new UploadDTO(childUpload));
+            }        	
+        }
+        
+        // The Content page contains combined Parent and Children uploads.
+        allChildren.addAll(page.getContent());
+        Page<UploadDTO> pageWithChildren = new PageImpl<UploadDTO>(allChildren, Pageable.unpaged(), allChildren.size());
+
+        for (UploadDTO upload : pageWithChildren) {
             upload.setRawDownload(fileRepository.rawUrl(upload.getFileName()));
         }
 
+        // HTTP Headers use indexing from original page, which indexed only the parent uploads.
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(pageWithChildren.getContent(), headers, HttpStatus.OK);
     }
 
     /**

@@ -387,7 +387,12 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Page<UploadDTO> getAllUploadsByUserId(Pageable pageable, List<IhiwUser> users) {
-        return  uploadRepository.findByCreatedByIn(users, pageable).map(UploadDTO::new);
+        return uploadRepository.findByCreatedByIn(users, pageable).map(UploadDTO::new);
+    }
+    
+    public List<Upload> getAllUploadsByParentId(long parentId) { 	
+    	List<Upload> childUploads = uploadRepository.findChildrenById(parentId);     	
+    	return childUploads;
     }
     
     @Transactional(readOnly = true)
@@ -398,6 +403,7 @@ public class UserService {
         	userIds.add(ihiwUser.getId());
         }
        	List<Long> projectIds = new ArrayList<Long>();
+       	projectIds.add(new Long(-1)); // Default Value, because findByUsersAndProjects crashes with an empty projectIDs list(Which is possible in some cases)
         for (Project project : projects) {
         	projectIds.add(project.getId());
         }

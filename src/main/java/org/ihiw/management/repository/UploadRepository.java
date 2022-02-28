@@ -23,10 +23,10 @@ public interface UploadRepository extends JpaRepository<Upload, Long> {
     List<Upload> findByFileName(String filename);
     
     @Query("select upload from Upload upload where upload.createdBy in ?1 and upload.parentUpload.id is null")
-    Page<Upload> findByCreatedByIn(List<IhiwUser> users, Pageable pageable);
+    Page<Upload> findParentlessByCreatedByIn(List<IhiwUser> users, Pageable pageable);
 
     @Query("select upload from Upload upload where upload.parentUpload.id is null and (upload.createdBy.id in ?1 or upload.project.id in ?2)")
-    Page<Upload> findByUsersAndProjects(List<Long> userIds, List<Long> projectIds, Pageable pageable);
+    Page<Upload> findParentlessByUsersAndProjects(List<Long> userIds, List<Long> projectIds, Pageable pageable);
 
     Optional<Upload> findById(Long id);
 
@@ -40,5 +40,5 @@ public interface UploadRepository extends JpaRepository<Upload, Long> {
     List<Upload> findChildrenById(Long id);
 
     @Query("select upload from Upload upload where upload.parentUpload.id is null")
-    Page<Upload> findAll(Pageable pageable);
+    Page<Upload> findParentless(Pageable pageable);
 }

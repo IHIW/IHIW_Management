@@ -269,17 +269,17 @@ public class UploadResource {
                 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))
         		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
-            page = userService.getAllUploads(pageable);
+            page = userService.getParentlessUploads(pageable);
         } else {
         	IhiwLab currentLab = currentIhiwUser.getLab();
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
         	
         	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {            	
         	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);      
-                page = userService.getAllUploadsByUsersAndProjects(pageable, colleagues, projects);       
+                page = userService.getParentlessUploadsByUsersAndProjects(pageable, colleagues, projects);       
             }
         	else {
-        		page = userService.getAllUploadsByUserId(pageable, colleagues);       
+        		page = userService.getParentlessUploadsByUserId(pageable, colleagues);       
         	}         
         }
         

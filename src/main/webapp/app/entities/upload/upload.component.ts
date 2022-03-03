@@ -44,7 +44,7 @@ export class UploadComponent implements OnInit, OnDestroy {
     private parseLinks: JhiParseLinks,
     private modalService: NgbModal
   ) {
-    this.itemsPerPage = 500;
+    this.itemsPerPage = 100;
     this.routeData = this.activatedRoute.data.subscribe(data => {
       this.page = data['pagingParams'].page;
       this.previousPage = data['pagingParams'].page;

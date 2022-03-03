@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,6 +32,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
+<<<<<<< HEAD
+=======
+import java.util.ArrayList;
+>>>>>>> develop
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -271,17 +276,14 @@ public class UploadResource {
         } else {
             pageable = Pageable.unpaged();
         }
-
+                
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))
         		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
-            page = userService.getAllUploads(pageable);
+            page = userService.getParentlessUploads(pageable);
         } else {
         	IhiwLab currentLab = currentIhiwUser.getLab();
-        	log.debug("Current Lab:" + currentLab.toString());
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
-        	log.debug("Colleagues Found:" + colleagues.toString());
-
-        	// Project leaders need to see uploads for their own projects.
+            
         	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
         	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);
                 log.debug("Projects Found:" + projects.toString());
@@ -291,13 +293,27 @@ public class UploadResource {
         		page = userService.getAllUploadsByUserId(pageable, colleagues);
         	}
         }
-
+        
+        // Iterate children to create a new "Page" including the Parents with their Children  
+        List<UploadDTO> allChildren = new ArrayList<UploadDTO>();
         for (UploadDTO upload : page) {
+        	List<Upload> childUploads = userService.getAllUploadsByParentId(upload.getId());
+            for (Upload childUpload : childUploads) {
+            	allChildren.add(new UploadDTO(childUpload));
+            }        	
+        }
+        
+        // The Content page contains combined Parent and Children uploads.
+        allChildren.addAll(page.getContent());
+        Page<UploadDTO> pageWithChildren = new PageImpl<UploadDTO>(allChildren, Pageable.unpaged(), allChildren.size());
+
+        for (UploadDTO upload : pageWithChildren) {
             upload.setRawDownload(fileRepository.rawUrl(upload.getFileName()));
         }
 
+        // HTTP Headers use indexing from original page, which indexed only the parent uploads.
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(pageWithChildren.getContent(), headers, HttpStatus.OK);
     }
 
     /**
@@ -320,6 +336,26 @@ public class UploadResource {
             return ResponseUtil.wrapOrNotFound(upload);
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+    }
+    
+    
+    
+    /**
+     * {@code GET  /uploads/children/:id} : get the children of the parent "id" upload.
+     *
+     * @param id the id of the parent upload, we find the children of.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body of the child uploads.
+     */
+    @GetMapping("/uploads/children/{id}")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<List<Upload>> getChildren(@PathVariable Long id) {
+        log.debug("REST request to get Child Uploads by Parent ID : {}", id);
+
+        List<Upload> childUploads = uploadRepository.findChildrenById(id);
+
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, childUploads.toString()))
+            .body(childUploads);        
     }
 
     /**
@@ -429,4 +465,33 @@ public class UploadResource {
         }
 
     }
+    
+    
+    /**
+     * {@code GET  /uploads/getbyproject/:projectId} : get the "projectId" uploads.
+     *
+     * @param projectId the projectId assigned to the uploads
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the upload, or with status {@code 404 (Not Found)}.
+     */
+    @GetMapping("/uploads/getbyproject/{projectId}")
+    @PreAuthorize("hasRole(\"" + VALIDATION + "\")")
+    public ResponseEntity<List<Upload>> getUploadsByProject(@PathVariable Long projectId) {
+        log.debug("REST request to get Upload by project ID : {}", projectId);
+        if (projectId == null) {
+            throw new BadRequestAlertException("Invalid projectId", ENTITY_NAME, "projectidnull");
+        }
+
+        List<Upload> uploads = uploadRepository.findAllByProjectId(projectId);
+
+        if(uploads.size()==0) {
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, projectId.toString())).build();
+        }
+        else {
+            return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, projectId.toString()))
+                .body(uploads);    
+        }
+
+    }
+    
 }

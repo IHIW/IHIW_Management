@@ -381,27 +381,40 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UploadDTO> getAllUploads(Pageable pageable) {
-        return  uploadRepository.findAll(pageable).map(UploadDTO::new);
+    public Page<UploadDTO> getParentlessUploads(Pageable pageable) {
+        return  uploadRepository.findParentless(pageable).map(UploadDTO::new);
     }
 
     @Transactional(readOnly = true)
-    public Page<UploadDTO> getAllUploadsByUserId(Pageable pageable, List<IhiwUser> users) {
-        return  uploadRepository.findByCreatedByIn(users, pageable).map(UploadDTO::new);
+    public Page<UploadDTO> getParentlessUploadsByUserId(Pageable pageable, List<IhiwUser> users) {
+        return uploadRepository.findParentlessByCreatedByIn(users, pageable).map(UploadDTO::new);
+    }
+    
+    public List<Upload> getAllUploadsByParentId(long parentId) { 	
+    	List<Upload> childUploads = uploadRepository.findChildrenById(parentId);     	
+    	return childUploads;
     }
     
     @Transactional(readOnly = true)
-    public Page<UploadDTO> getAllUploadsByUsersAndProjects(Pageable pageable, List<IhiwUser> users, List<Project> projects) {
-
+    public Page<UploadDTO> getParentlessUploadsByUsersAndProjects(Pageable pageable, List<IhiwUser> users, List<Project> projects) {
+    	
     	List<Long> userIds = new ArrayList<Long>();      	
         for (IhiwUser ihiwUser : users) {
         	userIds.add(ihiwUser.getId());
         }
+        
        	List<Long> projectIds = new ArrayList<Long>();
         for (Project project : projects) {
         	projectIds.add(project.getId());
         }
-        return  uploadRepository.findByUsersAndProjects(userIds, projectIds, pageable).map(UploadDTO::new);
+        
+        if(projectIds.size() < 1) {
+          	return uploadRepository.findParentlessByCreatedByIn(users, pageable).map(UploadDTO::new);	
+        }
+        else {
+        	return uploadRepository.findParentlessByUsersAndProjects(userIds, projectIds, pageable).map(UploadDTO::new);
+        }
+
     }
 
     @Transactional(readOnly = true)

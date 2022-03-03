@@ -32,10 +32,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
-<<<<<<< HEAD
-=======
+
 import java.util.ArrayList;
->>>>>>> develop
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -279,25 +277,24 @@ public class UploadResource {
                 
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))
         		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
-            page = userService.getParentlessUploads(pageable);
+            page = uploadService.getParentlessUploads(pageable);
         } else {
         	IhiwLab currentLab = currentIhiwUser.getLab();
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
             
         	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
         	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);
-                log.debug("Projects Found:" + projects.toString());
-                page = userService.getAllUploadsByUsersAndProjects(pageable, colleagues, projects);
+                page = uploadService.getParentlessUploadsByUsersAndProjects(pageable, colleagues, projects);
             }
         	else {
-        		page = userService.getAllUploadsByUserId(pageable, colleagues);
+        		page = uploadService.getParentlessUploadsByUserId(pageable, colleagues);
         	}
         }
         
         // Iterate children to create a new "Page" including the Parents with their Children  
         List<UploadDTO> allChildren = new ArrayList<UploadDTO>();
         for (UploadDTO upload : page) {
-        	List<Upload> childUploads = userService.getAllUploadsByParentId(upload.getId());
+        	List<Upload> childUploads = uploadService.getAllUploadsByParentId(upload.getId());
             for (Upload childUpload : childUploads) {
             	allChildren.add(new UploadDTO(childUpload));
             }        	

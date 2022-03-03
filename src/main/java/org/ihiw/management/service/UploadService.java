@@ -68,9 +68,6 @@ public class UploadService {
     }
 
 
-
-
-
     public Upload createUpload(UploadDTO uploadDTO) {
         Upload upload = new Upload();
 
@@ -89,28 +86,6 @@ public class UploadService {
         log.debug("Created Information for Upload: {}", upload);
         return upload;
     }
-
-    /**
-     * Update basic information (first name, last name, email, language) for the current user.
-     *
-     * @param firstName first name of user.
-     * @param lastName  last name of user.
-     * @param email     email id of user.
-     * @param langKey   language key.
-     * @param imageUrl  image URL of user.
-     */
-    /*public void updateUpload(String firstName, String lastName, String email, String langKey, String imageUrl) {
-        SecurityUtils.getCurrentUserLogin()
-            .flatMap(userRepository::findOneByLogin)
-            .ifPresent(user -> {
-                user.setFirstName(firstName);
-                user.setLastName(lastName);
-                user.setEmail(email.toLowerCase());
-                user.setLangKey(langKey);
-                user.setImageUrl(imageUrl);
-                log.debug("Changed Information for User: {}", user);
-            });
-    }*/
 
     /**
      * Update all information for a specific user, and return the modified user.
@@ -133,42 +108,29 @@ public class UploadService {
                 upload.setCreatedBy(uploadDTO.getCreatedBy());
                 upload.setModifiedAt(uploadDTO.getModifiedAt());
                 upload.setType(uploadDTO.getType());
-                //upload.setValidations(uploadDTO.getValidations());
-
-                /*uploadDTO.getAuthorities().stream()
-                    .map(authorityRepository::findById)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(managedAuthorities::add);*/
                 log.debug("Changed Information for Upload: {}", uploadDTO);
                 return upload;
             })
             .map(UploadDTO::new);
     }
 
-    public void deleteUser(String login) {
-        userRepository.findOneByLogin(login).ifPresent(user -> {
-            userRepository.delete(user);
-            log.debug("Deleted User: {}", user);
-        });
-    }
-
-
-
-
-
     @Transactional(readOnly = true)
-    public Page<UploadDTO> getAllUploads(Pageable pageable) {
-        return  uploadRepository.findAll(pageable).map(UploadDTO::new);
+    public Page<UploadDTO> getParentlessUploads(Pageable pageable) {
+        return  uploadRepository.findParentless(pageable).map(UploadDTO::new);
     }
-
+    
     @Transactional(readOnly = true)
-    public Page<UploadDTO> getAllUploadsByUserId(Pageable pageable, List<IhiwUser> users) {
-        return  uploadRepository.findByCreatedByIn(users, pageable).map(UploadDTO::new);
+    public Page<UploadDTO> getParentlessUploadsByUserId(Pageable pageable, List<IhiwUser> users) {
+        return  uploadRepository.findParentlessByCreatedByIn(users, pageable).map(UploadDTO::new);
+    }
+    
+    public List<Upload> getAllUploadsByParentId(long parentId) { 	
+    	List<Upload> childUploads = uploadRepository.findChildrenById(parentId);     	
+    	return childUploads;
     }
 
     @Transactional(readOnly = true)
-    public Page<UploadDTO> getAllUploadsByUsersAndProjects(Pageable pageable, List<IhiwUser> users, List<Project> projects) {
+    public Page<UploadDTO> getParentlessUploadsByUsersAndProjects(Pageable pageable, List<IhiwUser> users, List<Project> projects) {
 
     	List<Long> userIds = new ArrayList<Long>();
         for (IhiwUser ihiwUser : users) {
@@ -178,33 +140,7 @@ public class UploadService {
         for (Project project : projects) {
         	projectIds.add(project.getId());
         }
-        return  uploadRepository.findByUsersAndProjects(userIds, projectIds, pageable).map(UploadDTO::new);
+        return  uploadRepository.findParentlessByUsersAndProjects(userIds, projectIds, pageable).map(UploadDTO::new);
     }
-
-    @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-        return userRepository.findOneWithAuthoritiesByLogin(login);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthorities(Long id) {
-        return userRepository.findOneWithAuthoritiesById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<ProjectDTO> getAllProjects(Pageable pageable) {
-        return  projectRepository.findAll(pageable).map(ProjectDTO::new);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<User> getUserWithAuthorities() {
-        return SecurityUtils.getCurrentUserLogin().flatMap(userRepository::findOneWithAuthoritiesByLogin);
-    }
-
-
-
-
-
-
 
 }

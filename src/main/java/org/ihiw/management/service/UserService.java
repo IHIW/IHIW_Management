@@ -380,43 +380,7 @@ public class UserService {
         return userRepository.findByUserInIds(pageable, ids).map(UserDTO::new);
     }
 
-    @Transactional(readOnly = true)
-    public Page<UploadDTO> getParentlessUploads(Pageable pageable) {
-        return  uploadRepository.findParentless(pageable).map(UploadDTO::new);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<UploadDTO> getParentlessUploadsByUserId(Pageable pageable, List<IhiwUser> users) {
-        return uploadRepository.findParentlessByCreatedByIn(users, pageable).map(UploadDTO::new);
-    }
     
-    public List<Upload> getAllUploadsByParentId(long parentId) { 	
-    	List<Upload> childUploads = uploadRepository.findChildrenById(parentId);     	
-    	return childUploads;
-    }
-    
-    @Transactional(readOnly = true)
-    public Page<UploadDTO> getParentlessUploadsByUsersAndProjects(Pageable pageable, List<IhiwUser> users, List<Project> projects) {
-    	
-    	List<Long> userIds = new ArrayList<Long>();      	
-        for (IhiwUser ihiwUser : users) {
-        	userIds.add(ihiwUser.getId());
-        }
-        
-       	List<Long> projectIds = new ArrayList<Long>();
-        for (Project project : projects) {
-        	projectIds.add(project.getId());
-        }
-        
-        if(projectIds.size() < 1) {
-          	return uploadRepository.findParentlessByCreatedByIn(users, pageable).map(UploadDTO::new);	
-        }
-        else {
-        	return uploadRepository.findParentlessByUsersAndProjects(userIds, projectIds, pageable).map(UploadDTO::new);
-        }
-
-    }
-
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
         return userRepository.findOneWithAuthoritiesByLogin(login);

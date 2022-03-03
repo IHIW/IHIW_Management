@@ -180,6 +180,7 @@ public class UploadResource {
                     concatFileName = concatFileName.substring(0, concatFileName.length() - 1);
                     upload.setFileName(concatFileName);
                     upload.setValidations(new HashSet<>());
+                    upload.setValidations(dbUpload.get().getValidations());
                     uploadRepository.save(upload);
                     fileRepository.renameFile(dbUpload.get().getFileName(), concatFileName);
                 }

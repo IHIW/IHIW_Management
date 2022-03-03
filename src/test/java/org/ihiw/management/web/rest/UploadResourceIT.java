@@ -3,6 +3,7 @@ package org.ihiw.management.web.rest;
 import org.ihiw.management.IhiwManagementApp;
 import org.ihiw.management.domain.Upload;
 import org.ihiw.management.repository.*;
+import org.ihiw.management.service.UploadService;
 import org.ihiw.management.service.UserService;
 import org.ihiw.management.web.rest.errors.ExceptionTranslator;
 
@@ -73,8 +74,8 @@ public class UploadResourceIT {
     private ValidationRepository validationRepository;
 
     @Autowired
-    private ProjectRepository projectRepository;  
-    
+    private ProjectRepository projectRepository;
+
     @Autowired
     private ProjectIhiwLabRepository projectIhiwLabRepository;
 
@@ -96,6 +97,9 @@ public class UploadResourceIT {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UploadService uploadService;
+
     private MockMvc restUploadMockMvc;
 
     private Upload upload;
@@ -103,7 +107,7 @@ public class UploadResourceIT {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final UploadResource uploadResource = new UploadResource(uploadRepository, fileRepository, ihiwUserRepository, validationRepository, userService, projectRepository, projectIhiwLabRepository);
+        final UploadResource uploadResource = new UploadResource(uploadRepository, uploadService, fileRepository, ihiwUserRepository, validationRepository, userService, projectRepository, projectIhiwLabRepository);
         this.restUploadMockMvc = MockMvcBuilders.standaloneSetup(uploadResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

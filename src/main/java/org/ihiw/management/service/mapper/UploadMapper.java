@@ -38,6 +38,7 @@ public class UploadMapper {
             upload.setType(uploadDTO.getType());
             upload.setProject(uploadDTO.getProject());
             upload.setParentUpload(uploadDTO.getParentUpload());
+            upload.setValidations(uploadDTO.getValidations());
             return upload;
         }
     }

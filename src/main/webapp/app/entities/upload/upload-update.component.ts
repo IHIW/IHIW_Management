@@ -3,7 +3,7 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, isEmpty, map } from 'rxjs/operators';
 import * as moment from 'moment';
 import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService } from 'ng-jhipster';
@@ -12,6 +12,7 @@ import { UploadService } from './upload.service';
 import { IIhiwUser } from 'app/shared/model/ihiw-user.model';
 import { IProject } from 'app/shared/model/project.model';
 import { ProjectService } from 'app/entities/project';
+import { isNull } from 'util';
 
 @Component({
   selector: 'jhi-upload-update',
@@ -32,7 +33,8 @@ export class UploadUpdateComponent implements OnInit {
     fileName: [],
     enabled: [],
     createdBy: [],
-    project: [null, [Validators.required]]
+    project: [null, [Validators.required]],
+    validations: []
   });
 
   constructor(
@@ -66,7 +68,8 @@ export class UploadUpdateComponent implements OnInit {
       fileName: upload.fileName,
       enabled: upload.enabled,
       createdBy: upload.createdBy,
-      project: upload.project
+      project: upload.project,
+      validations: upload.validations
     });
   }
 
@@ -83,12 +86,17 @@ export class UploadUpdateComponent implements OnInit {
 
   save() {
     this.isSaving = true;
+
     const upload = this.createFromForm();
+
+    console.error('BENS validations: ');
+
     if (upload.id !== undefined) {
       let file = null;
       if (this.files !== undefined && this.files.length > 0) {
         file = this.files[0];
       }
+      /*console.error(upload.project.name+upload.validations[0].validationFeedback+upload.id)*/
       this.subscribeToSaveResponse(this.uploadService.update(upload, file));
     } else {
       this.subscribeToSaveResponse(this.uploadService.createWithFile(upload, this.files));
@@ -107,7 +115,8 @@ export class UploadUpdateComponent implements OnInit {
       fileName: this.editForm.get(['fileName']).value,
       enabled: this.editForm.get(['enabled']).value,
       createdBy: this.editForm.get(['createdBy']).value,
-      project: this.editForm.get(['project']).value
+      project: this.editForm.get(['project']).value,
+      validations: this.editForm.get(['validations']).value
     };
   }
 

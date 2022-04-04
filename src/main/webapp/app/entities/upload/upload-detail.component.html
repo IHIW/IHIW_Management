@@ -1,4 +1,9 @@
 <div class="row justify-content-center">
+    <style>
+        #myDiv {
+            margin: 0cm 0cm 0cm 91%;
+        }
+    </style>
     <div class="col-8">
         <div *ngIf="upload">
             <h2><span jhiTranslate="ihiwManagementApp.upload.detail.title">Upload</span> {{upload.id}}</h2>
@@ -21,7 +26,12 @@
                 <dd>
                     <span>{{upload.fileName}}</span>
                 </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.upload.valid">Validation</span></dt>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.valid">Validation</span>
+                    <button type="button"
+                            class="btn btn-primary" id="myDiv" (click)="validateAgain()">
+                        <div  jhiTranslate="Re-Validate"> Re-validate </div>
+                    </button>
+                </dt>
                 <dd>
                     <div class="table-responsive">
                         <table class="table table-striped break-line-breaks">

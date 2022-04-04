@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { IUpload, Upload } from 'app/shared/model/upload.model';
 import { JhiEventManager } from 'ng-jhipster';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UploadService } from 'app/entities/upload/upload.service';
 import { HttpResponse } from '@angular/common/http';
 import { filter, map } from 'rxjs/operators';
@@ -55,5 +55,23 @@ export class UploadDetailComponent implements OnInit, OnDestroy {
 
   previousState() {
     window.history.back();
+  }
+
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<IUpload>>) {
+    result.subscribe(() => this.onSaveSuccess(), () => this.onSaveError());
+  }
+
+  protected onSaveSuccess() {
+    console.log('success');
+    this.previousState();
+  }
+
+  protected onSaveError() {
+    console.log('error');
+  }
+
+  validateAgain() {
+    //upload.fileName
+    this.subscribeToSaveResponse(this.uploadService.revalidate(this.upload));
   }
 }

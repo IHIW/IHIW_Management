@@ -182,7 +182,8 @@ public class UploadResource {
                     fileRepository.renameFile(dbUpload.get().getFileName(), concatFileName);
                 }
             }
-            Upload result = uploadRepository.save(upload);
+            fileRepository.updateFile(upload.getFileName());
+            Upload result = uploadRepository.save(dbUpload.get());
 
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))
@@ -191,6 +192,32 @@ public class UploadResource {
         return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
     }
 
+
+    @PutMapping("/revalidates")
+    public ResponseEntity<Upload> revalidateUpload(@RequestPart Upload upload) throws URISyntaxException {
+        log.debug("REST request to revalidate Upload : {}", upload);
+        if (upload.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        Optional<Upload> dbUpload = uploadRepository.findById(upload.getId());
+
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+
+            fileRepository.updateFile(upload.getFileName());
+
+            Upload result = uploadRepository.save(dbUpload.get());
+
+            return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))
+                .body(result);
+        }
+        return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
+    }
 
     /**
      * {@code PUT  /uploads/setvalidation} : Set validation status on an existing upload.
@@ -274,16 +301,16 @@ public class UploadResource {
         	log.debug("Current Lab:" + currentLab.toString());
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
         	log.debug("Colleagues Found:" + colleagues.toString());
-        	
+
         	// Project leaders need to see uploads for their own projects.
-        	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {            	
-        	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);      
+        	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
+        	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);
                 log.debug("Projects Found:" + projects.toString());
-                page = userService.getAllUploadsByUsersAndProjects(pageable, colleagues, projects);       
+                page = userService.getAllUploadsByUsersAndProjects(pageable, colleagues, projects);
             }
         	else {
-        		page = userService.getAllUploadsByUserId(pageable, colleagues);       
-        	}         
+        		page = userService.getAllUploadsByUserId(pageable, colleagues);
+        	}
         }
 
         for (UploadDTO upload : page) {

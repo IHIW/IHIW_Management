@@ -182,7 +182,6 @@ public class UploadResource {
                     fileRepository.renameFile(dbUpload.get().getFileName(), concatFileName);
                 }
             }
-            fileRepository.updateFile(upload.getFileName());
             Upload result = uploadRepository.save(dbUpload.get());
 
             return ResponseEntity.ok()
@@ -193,7 +192,7 @@ public class UploadResource {
     }
 
 
-    @PutMapping("/revalidates")
+    @PutMapping("/revalidate")
     public ResponseEntity<Upload> revalidateUpload(@RequestPart Upload upload) throws URISyntaxException {
         log.debug("REST request to revalidate Upload : {}", upload);
         if (upload.getId() == null) {

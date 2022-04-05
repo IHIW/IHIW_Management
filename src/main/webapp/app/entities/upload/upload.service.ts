@@ -64,13 +64,13 @@ export class UploadService {
 
   revalidate(upload: IUpload): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(upload);
-
+    const revalidateUrl = SERVER_API_URL + 'api/revalidate';
     const uploadMultipartFormParam = 'upload';
     const formData: FormData = new FormData();
     const uploadAsJsonBlob: Blob = new Blob([JSON.stringify(copy)], { type: 'application/json' });
     formData.append(uploadMultipartFormParam, uploadAsJsonBlob);
     return this.http
-      .put<IUpload>(this.resourceUrl, formData, { observe: 'response' })
+      .put<IUpload>(revalidateUrl, formData, { observe: 'response' })
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 

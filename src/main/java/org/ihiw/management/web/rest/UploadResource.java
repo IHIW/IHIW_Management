@@ -209,6 +209,7 @@ public class UploadResource {
 
             fileRepository.updateFile(upload.getFileName());
 
+            dbUpload.get().setModifiedAt(ZonedDateTime.now());
             Upload result = uploadRepository.save(dbUpload.get());
 
             return ResponseEntity.ok()

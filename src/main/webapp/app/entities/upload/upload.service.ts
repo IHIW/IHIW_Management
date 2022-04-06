@@ -62,6 +62,18 @@ export class UploadService {
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
+  revalidate(upload: IUpload): Observable<EntityResponseType> {
+    const copy = this.convertDateFromClient(upload);
+    const revalidateUrl = SERVER_API_URL + 'api/revalidate';
+    const uploadMultipartFormParam = 'upload';
+    const formData: FormData = new FormData();
+    const uploadAsJsonBlob: Blob = new Blob([JSON.stringify(copy)], { type: 'application/json' });
+    formData.append(uploadMultipartFormParam, uploadAsJsonBlob);
+    return this.http
+      .put<IUpload>(revalidateUrl, formData, { observe: 'response' })
+      .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
+  }
+
   find(id: number): Observable<EntityResponseType> {
     return this.http
       .get<IUpload>(`${this.resourceUrl}/${id}`, { observe: 'response' })

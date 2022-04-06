@@ -2,10 +2,7 @@ package org.ihiw.management.repository;
 
 import com.amazonaws.services.s3.AbstractAmazonS3;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CopyObjectRequest;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,6 +34,12 @@ public class FileRepository {
         s3.putObject(objectRequest);
 
         log.debug("Stored file " + fileName + " with length " + data.length + " in bucket " + bucket);
+    }
+
+    public void updateFile(String fileName){
+        S3Object myfile = s3.getObject(bucket, fileName);
+        PutObjectRequest objectRequest = new PutObjectRequest(bucket, fileName,myfile.getObjectContent(),myfile.getObjectMetadata());
+        s3.putObject(objectRequest);
     }
 
     public void deleteFile(String fileName) {

@@ -127,7 +127,7 @@ public class UploadResource {
         }
 
         return ResponseEntity.created(new URI("/api/uploads/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
             .body(result);
     }
 
@@ -159,7 +159,6 @@ public class UploadResource {
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
 
-
             if (file != null){
                 try {
                     upload.setFileName(getFileName(currentIhiwUser, upload, file));
@@ -188,18 +187,51 @@ public class UploadResource {
                     fileRepository.renameFile(dbUpload.get().getFileName(), concatFileName);
                 }
             }
+
             UploadDTO uploadDTO = new UploadDTO(upload);
-            //Upload result = uploadRepository.save(upload)   ;         //uploadRepository.save(uploadDTO);     //save(upload);
             Optional<UploadDTO> updatedUpload = uploadService.updateUpload(uploadDTO);
-            /*return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString()))
-                .body(result);*/
+
             return ResponseUtil.wrapOrNotFound(updatedUpload,
-                HeaderUtil.createAlert(applicationName, "uploadManagement.updated", uploadDTO.getFileName()));
+            		HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, upload.getId().toString()));
         }
-        return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
+        return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, upload.getId().toString())).build();
     }
 
+    /**
+     * {@code PUT  /revalidate} : Touch the data file in storage to re-trigger the validation pipeline
+     *
+     * @param upload the upload to revalidate.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the revalidated upload,
+     * or with status {@code 400 (Bad Request)} if the upload is not valid or an error occurs
+     * or with status {@code 500 (Internal Server Error)} if the upload couldn't be revalidated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
+    @PutMapping("/revalidate")
+    public ResponseEntity<Upload> revalidateUpload(@RequestPart Upload upload) throws URISyntaxException {
+        log.debug("REST request to revalidate Upload : {}", upload);
+        if (upload.getId() == null) {
+            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        }
+
+        Optional<Upload> dbUpload = uploadRepository.findById(upload.getId());
+
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+            dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
+
+            fileRepository.updateFile(upload.getFileName());
+
+            dbUpload.get().setModifiedAt(ZonedDateTime.now());
+            Upload result = uploadRepository.save(dbUpload.get());
+
+            return ResponseEntity.ok()
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, upload.getId().toString()))
+                .body(result);
+        }
+        return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, upload.getId().toString())).build();
+    }
 
     /**
      * {@code PUT  /uploads/setvalidation} : Set validation status on an existing upload.
@@ -247,7 +279,7 @@ public class UploadResource {
 
         log.debug("Validation saved:" + updated.getValidator());
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, updated.getValidator()))
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, updated.getValidator()))
             .body(updated);
     }
 
@@ -281,7 +313,7 @@ public class UploadResource {
         } else {
         	IhiwLab currentLab = currentIhiwUser.getLab();
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
-            
+
         	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
         	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);
                 page = uploadService.getParentlessUploadsByUsersAndProjects(pageable, colleagues, projects);
@@ -332,7 +364,7 @@ public class UploadResource {
             upload.get().setRawDownload(fileRepository.rawUrl(upload.get().getFileName()));
             return ResponseUtil.wrapOrNotFound(upload);
         }
-        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
     }
     
     
@@ -429,9 +461,9 @@ public class UploadResource {
             fileRepository.deleteFile(upload.get().getFileName());
             uploadRepository.deleteById(id);
 
-            return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+            return ResponseEntity.noContent().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
         }
-        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString())).build();
+        return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
     }
 
     /**
@@ -451,10 +483,10 @@ public class UploadResource {
         List<Upload> uploads = uploadRepository.findByFileName(fileName);
 
         if(uploads.size()==0) {
-        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, fileName.toString())).build();
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, fileName.toString())).build();
         }
         else if(uploads.size() > 1) {
-        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, "Multiple Uploads Found:" + fileName.toString())).build();
+        	return ResponseEntity.notFound().headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, "Multiple Uploads Found:" + fileName.toString())).build();
         }
         else {
         	Optional<Upload> upload = Optional.of(uploads.get(0));

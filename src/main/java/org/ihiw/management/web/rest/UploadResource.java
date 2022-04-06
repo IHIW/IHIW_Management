@@ -230,7 +230,7 @@ public class UploadResource {
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, upload.getId().toString()))
                 .body(result);
         }
-        return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
+        return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, upload.getId().toString())).build();
     }
 
     /**

@@ -71,7 +71,6 @@ export class UploadDetailComponent implements OnInit, OnDestroy {
   }
 
   validateAgain() {
-    //upload.fileName
     this.subscribeToSaveResponse(this.uploadService.revalidate(this.upload));
   }
 }

@@ -191,7 +191,15 @@ public class UploadResource {
         return ResponseEntity.badRequest().headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, upload.getId().toString())).build();
     }
 
-
+    /**
+     * {@code PUT  /revalidate} : Touch the data file in storage to re-trigger the validation pipeline
+     *
+     * @param upload the upload to revalidate.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the revalidated upload,
+     * or with status {@code 400 (Bad Request)} if the upload is not valid or an error occurs
+     * or with status {@code 500 (Internal Server Error)} if the upload couldn't be revalidated.
+     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     */
     @PutMapping("/revalidate")
     public ResponseEntity<Upload> revalidateUpload(@RequestPart Upload upload) throws URISyntaxException {
         log.debug("REST request to revalidate Upload : {}", upload);

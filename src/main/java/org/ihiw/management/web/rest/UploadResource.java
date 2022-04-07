@@ -221,10 +221,11 @@ public class UploadResource {
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             dbUpload.get().getCreatedBy().getLab().equals(currentIhiwUser.getLab())) {
 
-            fileRepository.updateFile(upload.getFileName());
-
+            dbUpload.get().setValidations(new HashSet<Validation>());
             dbUpload.get().setModifiedAt(ZonedDateTime.now());
             Upload result = uploadRepository.save(dbUpload.get());
+            
+            fileRepository.updateFile(upload.getFileName());
 
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, upload.getId().toString()))
@@ -492,9 +493,7 @@ public class UploadResource {
         	Optional<Upload> upload = Optional.of(uploads.get(0));
         	return ResponseUtil.wrapOrNotFound(upload);
         }
-
-    }
-    
+    }    
     
     /**
      * {@code GET  /uploads/getbyproject/:projectId} : get the "projectId" uploads.
@@ -520,7 +519,5 @@ public class UploadResource {
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, projectId.toString()))
                 .body(uploads);    
         }
-
-    }
-    
+    }    
 }

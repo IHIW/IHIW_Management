@@ -38,9 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import static org.ihiw.management.security.AuthoritiesConstants.ADMIN;
-import static org.ihiw.management.security.AuthoritiesConstants.VALIDATION;
-import static org.ihiw.management.security.AuthoritiesConstants.PROJECT_LEADER;
+import static org.ihiw.management.security.AuthoritiesConstants.*;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.Upload}.
@@ -224,7 +222,7 @@ public class UploadResource {
             dbUpload.get().setValidations(new HashSet<Validation>());
             dbUpload.get().setModifiedAt(ZonedDateTime.now());
             Upload result = uploadRepository.save(dbUpload.get());
-            
+
             fileRepository.updateFile(upload.getFileName());
 
             return ResponseEntity.ok()
@@ -307,7 +305,7 @@ public class UploadResource {
         } else {
             pageable = Pageable.unpaged();
         }
-                
+
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN))
         		|| currentUser.get().getAuthorities().contains(new Authority(VALIDATION))) {
             page = uploadService.getParentlessUploads(pageable);
@@ -315,7 +313,8 @@ public class UploadResource {
         	IhiwLab currentLab = currentIhiwUser.getLab();
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
 
-        	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
+        	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))
+                || currentUser.get().getAuthorities().contains(new Authority(PI))) {
         	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);
                 page = uploadService.getParentlessUploadsByUsersAndProjects(pageable, colleagues, projects);
             }
@@ -323,16 +322,16 @@ public class UploadResource {
         		page = uploadService.getParentlessUploadsByUserId(pageable, colleagues);
         	}
         }
-        
-        // Iterate children to create a new "Page" including the Parents with their Children  
+
+        // Iterate children to create a new "Page" including the Parents with their Children
         List<UploadDTO> allChildren = new ArrayList<UploadDTO>();
         for (UploadDTO upload : page) {
         	List<Upload> childUploads = uploadService.getAllUploadsByParentId(upload.getId());
             for (Upload childUpload : childUploads) {
             	allChildren.add(new UploadDTO(childUpload));
-            }        	
+            }
         }
-        
+
         // The Content page contains combined Parent and Children uploads.
         allChildren.addAll(page.getContent());
         Page<UploadDTO> pageWithChildren = new PageImpl<UploadDTO>(allChildren, Pageable.unpaged(), allChildren.size());
@@ -367,9 +366,9 @@ public class UploadResource {
         }
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
     }
-    
-    
-    
+
+
+
     /**
      * {@code GET  /uploads/children/:id} : get the children of the parent "id" upload.
      *
@@ -385,7 +384,7 @@ public class UploadResource {
 
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, childUploads.toString()))
-            .body(childUploads);        
+            .body(childUploads);
     }
 
     /**
@@ -493,8 +492,8 @@ public class UploadResource {
         	Optional<Upload> upload = Optional.of(uploads.get(0));
         	return ResponseUtil.wrapOrNotFound(upload);
         }
-    }    
-    
+    }
+
     /**
      * {@code GET  /uploads/getbyproject/:projectId} : get the "projectId" uploads.
      *
@@ -517,7 +516,7 @@ public class UploadResource {
         else {
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, projectId.toString()))
-                .body(uploads);    
+                .body(uploads);
         }
-    }    
+    }
 }

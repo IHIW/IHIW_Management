@@ -13,6 +13,10 @@
                 <dd>
                     {{ihiwUser.user?.id}}
                 </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.name">Name</span></dt>
+                <dd>
+                    <span>{{ihiwUser.user.firstName}}</span>
+                </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.lab">Lab</span></dt>
                 <dd>
                     <div *ngIf="ihiwUser.lab">

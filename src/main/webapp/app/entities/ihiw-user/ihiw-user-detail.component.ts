@@ -15,6 +15,9 @@ export class IhiwUserDetailComponent implements OnInit {
   ngOnInit() {
     this.activatedRoute.data.subscribe(({ ihiwUser }) => {
       this.ihiwUser = ihiwUser;
+      if (ihiwUser.lab.institution == null) {
+        this.ihiwUser.lab.institution = '<<No institution available>>';
+      }
     });
   }
 

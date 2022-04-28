@@ -108,9 +108,7 @@ public class IhiwUserResource {
      */
     @Transactional
     @GetMapping("/ihiw-users/{id}")
-    @PreAuthorize("hasAnyRole(\"ROLE_ADMIN\",\"PI\",\"ProjectLeader\")"    )   /* "hasRole(\"" + AuthoritiesConstants.ADMIN + "\")" +
-        " || hasRole('" + AuthoritiesConstants.PROJECT_LEADER + "')" +
-        " || hasRole('" + AuthoritiesConstants.PI + "')"*/
+    @PreAuthorize("hasAnyRole(\"ROLE_ADMIN\",\"ProjectLeader\")"    )
     public ResponseEntity<IhiwUser> getIhiwUser(@PathVariable Long id) {
         boolean found = false;
         log.debug("REST request to get IhiwUser tam : {}", id);
@@ -119,7 +117,7 @@ public class IhiwUserResource {
             Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(id);
             return ResponseUtil.wrapOrNotFound(ihiwUser);
         }
-        if (auth != null && (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("PI")) || auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ProjectLeader")))) {
+        if (auth != null && (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ProjectLeader")))) {
             Optional<IhiwUser> ihiwUserToFind = ihiwUserRepository.findById(id);
             if (ihiwUserToFind== null){
                 return ResponseUtil.wrapOrNotFound(null);

@@ -17,6 +17,10 @@
                 <dd>
                     <span>{{ihiwUser.user.firstName + " " + ihiwUser.user.lastName}}</span>
                 </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.email">E-mail</span></dt>
+                <dd>
+                    <span>{{ihiwUser.user.email}}</span>
+                </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.lab">Lab</span></dt>
                 <dd>
                     <div *ngIf="ihiwUser.lab">
@@ -26,6 +30,10 @@
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.labname">Lab name from Institution</span></dt>
                 <dd>
                     <span>{{ihiwUser.lab.title  +  " from " +  ihiwUser.lab.institution }}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.labPI">Lab PI</span></dt>
+                <dd>
+                    <span>{{ihiwUser.lab.director }}</span>
                 </dd>
             </dl>
 

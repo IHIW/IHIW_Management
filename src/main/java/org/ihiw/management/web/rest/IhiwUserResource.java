@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.IhiwUser}.
@@ -109,9 +108,9 @@ public class IhiwUserResource {
      */
     @Transactional
     @GetMapping("/ihiw-users/{id}")
-    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")" +
+    @PreAuthorize("hasAnyRole(\"ROLE_ADMIN\",\"PI\",\"ProjectLeader\")"    )   /* "hasRole(\"" + AuthoritiesConstants.ADMIN + "\")" +
         " || hasRole('" + AuthoritiesConstants.PROJECT_LEADER + "')" +
-        " || hasRole('" + AuthoritiesConstants.PI + "')")
+        " || hasRole('" + AuthoritiesConstants.PI + "')"*/
     public ResponseEntity<IhiwUser> getIhiwUser(@PathVariable Long id) {
         boolean found = false;
         log.debug("REST request to get IhiwUser tam : {}", id);
@@ -119,31 +118,6 @@ public class IhiwUserResource {
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
             Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(id);
             return ResponseUtil.wrapOrNotFound(ihiwUser);
-            /*Optional<IhiwUser> ihiwUserToFind = ihiwUserRepository.findById(id);    this is correct?!?!
-            if (ihiwUserToFind== null){
-                return ResponseUtil.wrapOrNotFound(null);
-            }
-
-            IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-            Set<Upload> a = null;
-            if (ihiwUserToFind.isPresent()){
-                a = Collections.unmodifiableSet(ihiwUserToFind.get().getUploads());
-            }
-            else {
-                log.debug(" object not available");
-            }
-            for(Upload upload : a){
-                Project proj = upload.getProject();
-                Set<IhiwUser> b = proj.getLeaders();
-                if (b.contains(currentIhiwUser)){
-                    found =true;
-                    break;
-                }
-            }
-            if(found){
-                Optional<IhiwUser> ihiwUser2 = ihiwUserRepository.findById(ihiwUserToFind.get().getId());
-                return ResponseUtil.wrapOrNotFound(ihiwUser2);
-            }*/
         }
         if (auth != null && (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("PI")) || auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ProjectLeader")))) {
             Optional<IhiwUser> ihiwUserToFind = ihiwUserRepository.findById(id);
@@ -152,12 +126,18 @@ public class IhiwUserResource {
             }
 
             IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-            Set<Upload> a = (Set<Upload>) ihiwUserToFind.map(o -> (Consumer<Object>) c -> o.getUploads())
-                .orElse(o -> log.debug(" object not available"));
-            for(Upload upload : a){
+            Set<Upload> uploadsOfToFindUser = null;
+            if (ihiwUserToFind.isPresent()){
+                uploadsOfToFindUser = Collections.unmodifiableSet(ihiwUserToFind.get().getUploads());
+            }
+            else {
+                log.debug(" object not available");
+            }
+            Set<IhiwUser> leadersOfContributingProjects;
+            for(Upload upload : uploadsOfToFindUser){
                 Project proj = upload.getProject();
-                Set<IhiwUser> b = proj.getLeaders();
-                if (b.contains(currentIhiwUser)){
+                leadersOfContributingProjects = Collections.unmodifiableSet(proj.getLeaders());
+                if (leadersOfContributingProjects.contains(currentIhiwUser)){
                     return ResponseUtil.wrapOrNotFound(ihiwUserToFind);
                 }
             }

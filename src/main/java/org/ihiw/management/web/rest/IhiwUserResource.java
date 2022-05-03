@@ -108,7 +108,6 @@ public class IhiwUserResource {
      */
     @Transactional
     @GetMapping("/ihiw-users/{id}")
-    @PreAuthorize("hasAnyRole(\"ROLE_ADMIN\",\"ProjectLeader\")"    )
     public ResponseEntity<IhiwUser> getIhiwUser(@PathVariable Long id) {
         log.debug("REST request to get IhiwUser : {}", id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -116,7 +115,7 @@ public class IhiwUserResource {
             Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(id);
             return ResponseUtil.wrapOrNotFound(ihiwUser);
         }
-        if (auth != null && (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ProjectLeader")))) {
+        else if (auth != null && (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ProjectLeader")))) {
             Optional<IhiwUser> ihiwUserToFind = ihiwUserRepository.findById(id);
             if (ihiwUserToFind== null){
                 return ResponseUtil.wrapOrNotFound(null);
@@ -128,7 +127,7 @@ public class IhiwUserResource {
                 uploadsOfToFindUser = Collections.unmodifiableSet(ihiwUserToFind.get().getUploads());
             }
             else {
-                log.debug(" object not available");
+                log.debug("object not available");
             }
             Set<IhiwUser> leadersOfContributingProjects;
             for(Upload upload : uploadsOfToFindUser){
@@ -139,8 +138,10 @@ public class IhiwUserResource {
                 }
             }
         }
-
-        return ResponseUtil.wrapOrNotFound(null);
+        else {
+        	log.debug("Current User does not have permission to view this IHIW_USER");
+        }
+        return ResponseUtil.wrapOrNotFound(null);   
     }
 
     @GetMapping("/ihiw-user")

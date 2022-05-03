@@ -27,4 +27,7 @@ public interface IhiwUserRepository extends JpaRepository<IhiwUser, Long> {
     Optional<IhiwUser> findById(@Param("id") Long id);
 
     List<IhiwUser> findByLab(IhiwLab ihiwLab);
+
+
+
 }

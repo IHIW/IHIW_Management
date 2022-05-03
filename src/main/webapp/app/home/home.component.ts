@@ -18,11 +18,12 @@ import { AccountService, Account } from 'app/core';
 export class HomeComponent implements OnInit, AfterViewInit {
   account: Account;
   authenticationError: boolean;
-
+  highlightConsent: boolean;
   loginForm = this.fb.group({
     username: [''],
     password: [''],
-    rememberMe: [false]
+    rememberMe: [false],
+    consent: [false]
   });
 
   constructor(
@@ -34,7 +35,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     private renderer: Renderer,
     private router: Router,
     private fb: FormBuilder
-  ) {}
+  ) {
+    this.highlightConsent = false;
+  }
 
   ngOnInit() {
     this.accountService.identity().then((account: Account) => {
@@ -68,34 +71,39 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   login() {
-    this.loginService
-      .login({
-        username: this.loginForm.get('username').value,
-        password: this.loginForm.get('password').value,
-        rememberMe: this.loginForm.get('rememberMe').value
-      })
-      .then(() => {
-        this.authenticationError = false;
-        if (this.router.url === '/register' || /^\/activate\//.test(this.router.url) || /^\/reset\//.test(this.router.url)) {
-          this.router.navigate(['']);
-        }
+    if (this.loginForm.get('consent').value) {
+      this.highlightConsent = false;
+      this.loginService
+        .login({
+          username: this.loginForm.get('username').value,
+          password: this.loginForm.get('password').value,
+          rememberMe: this.loginForm.get('rememberMe').value
+        })
+        .then(() => {
+          this.authenticationError = false;
+          if (this.router.url === '/register' || /^\/activate\//.test(this.router.url) || /^\/reset\//.test(this.router.url)) {
+            this.router.navigate(['']);
+          }
 
-        this.eventManager.broadcast({
-          name: 'authenticationSuccess',
-          content: 'Sending Authentication Success'
+          this.eventManager.broadcast({
+            name: 'authenticationSuccess',
+            content: 'Sending Authentication Success'
+          });
+
+          // previousState was set in the authExpiredInterceptor before being redirected to login modal.
+          // since login is successful, go to stored previousState and clear previousState
+          const redirect = this.stateStorageService.getUrl();
+          if (redirect) {
+            this.stateStorageService.storeUrl(null);
+            this.router.navigateByUrl(redirect);
+          }
+        })
+        .catch(() => {
+          this.authenticationError = true;
         });
-
-        // previousState was set in the authExpiredInterceptor before being redirected to login modal.
-        // since login is successful, go to stored previousState and clear previousState
-        const redirect = this.stateStorageService.getUrl();
-        if (redirect) {
-          this.stateStorageService.storeUrl(null);
-          this.router.navigateByUrl(redirect);
-        }
-      })
-      .catch(() => {
-        this.authenticationError = true;
-      });
+    } else {
+      this.highlightConsent = true;
+    }
   }
 
   register() {

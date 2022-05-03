@@ -1,4 +1,9 @@
 <div class="row justify-content-center">
+    <style>
+        #myDiv {
+            margin: 0cm 0cm 0cm 91%;
+        }
+    </style>
     <div class="col-8">
         <div *ngIf="upload">
             <h2><span jhiTranslate="ihiwManagementApp.upload.detail.title">Upload</span> {{upload.id}}</h2>
@@ -21,10 +26,43 @@
                 <dd>
                     <span>{{upload.fileName}}</span>
                 </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.upload.valid">Valid</span></dt>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.valid">Validation</span>
+				</dt>			
+              
                 <dd>
-                    <span class="badge badge-info">{{upload.valid}}</span>
+                    <div class="table-responsive">
+                        <table class="table table-striped break-line-breaks">
+                            <thead>
+                            <tr>
+                                <th><span>Validator</span></th>
+                                <th><span>Valid</span></th>
+                                <th><span>Feedback</span></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let validation of sortBy(this.upload.validations,'validator')">
+                                <td>
+                                    <span class="badge badge-info">{{validation.validator}}</span>
+                                </td>
+                                <td>
+                                    <span class="badge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}" *ngIf="validation.valid !== null">{{validation.valid}}</span>
+                                    <span class="badge badge-warning" *ngIf="validation.valid === null">validating...</span>
+                                </td>
+                                <td>
+                                    {{validation.validationFeedback}}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </dd>
+			
+				<dt>
+                <button type="button" class="btn btn-primary" (click)="validateAgain()">
+                    <div jhiTranslate="ihiwManagementApp.upload.revalidate"> Revalidate </div>
+                </button>
+				</dt>
+
                 <dt><span jhiTranslate="ihiwManagementApp.upload.enabled">Enabled</span></dt>
                 <dd>
                     <span class="badge badge-info">{{upload.enabled}}</span>
@@ -32,7 +70,13 @@
                 <dt><span jhiTranslate="ihiwManagementApp.upload.createdBy">Created By</span></dt>
                 <dd>
                     <div *ngIf="upload.createdBy">
-                        <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view']">{{upload.createdBy?.id}}</a>
+                        <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view']">{{upload.createdBy?.user.firstName}} {{upload.createdBy?.user.lastName}}</a>
+                    </div>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.upload.project">Project</span></dt>
+                <dd>
+                    <div *ngIf="upload.project">
+                        <a [routerLink]="['/project', upload.project?.id, 'view']">{{upload.project?.name}}</a>
                     </div>
                 </dd>
             </dl>

@@ -16,36 +16,171 @@
     <div class="table-responsive" *ngIf="uploads?.length > 0">
         <table class="table table-striped">
             <thead>
-            <tr>
-            <th><span jhiTranslate="global.field.id">ID</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.upload.type">Type</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.upload.createdAt">Created At</span></th>
-<!--            <th><span jhiTranslate="ihiwManagementApp.upload.modifiedAt">Modified At</span></th>-->
-            <th><span jhiTranslate="ihiwManagementApp.upload.fileName">File Name</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.upload.valid">Valid</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.upload.enabled">Enabled</span></th>
-            <th><span jhiTranslate="ihiwManagementApp.upload.createdBy">Created By</span></th>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="transition.bind(this)">
+                <th class="" jhiSortBy="id"><div class="upload-id-column"><span jhiTranslate="global.field.id">ID</span> <fa-icon [icon]="'sort'"></fa-icon></div></th>
+                <th jhiSortBy="type"><span jhiTranslate="ihiwManagementApp.upload.type">Type</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="createdAt"><span jhiTranslate="ihiwManagementApp.upload.createdAt">Created At</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="fileName"><span jhiTranslate="ihiwManagementApp.upload.fileName">File Name</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th><span jhiTranslate="ihiwManagementApp.upload.valid">Valid</span></th>
+                <th jhiSortBy="enabled"><span jhiTranslate="ihiwManagementApp.upload.enabled">Enabled</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="project"><span jhiTranslate="ihiwManagementApp.upload.project">Project</span> <fa-icon [icon]="'sort'"></fa-icon></th>
+                <th jhiSortBy="createdBy"><span jhiTranslate="ihiwManagementApp.upload.createdBy">Created By</span> <fa-icon [icon]="'sort'"></fa-icon></th>
             <th><span >Download</span></th>
             <th></th>
             </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let upload of uploads ;trackBy: trackId">
-                <td><a [routerLink]="['/upload', upload.id, 'view' ]">{{upload.id}}</a></td>
+            <tr *ngFor="let upload of topUploadParents ;trackBy: trackId">
+                <td>
+                    <a [routerLink]="['/upload', upload.id, 'view' ]">{{upload.id}}</a>
+                    <a *ngIf="upload.hasChildren != null" class="badge badge-info no-link" (click)="toggleChildren(upload)"><fa-icon *ngIf="upload.id != openedUpload" [icon]="'plus'"></fa-icon><fa-icon *ngIf="upload.id === openedUpload" [icon]="'minus'"></fa-icon></a>
+                </td>
                 <td><span class="badge badge-info" jhiTranslate="{{'ihiwManagementApp.FileType.' + upload.type}}">{{upload.type}}</span></td>
                 <td>{{upload.createdAt | date:'short'}}</td>
 <!--                <td>{{upload.modifiedAt | date:'short'}}</td>-->
-                <td>{{upload.fileName}}</td>
-                <td><span class="badge" [ngClass]="{'badge-danger': !upload.valid, 'badge-success': upload.valid}">{{upload.valid}}</span></td>
+                <td class="long-text">{{upload.fileName}}</td>
+                <td>
+                    <span *ngFor="let validation of sortBy(upload.validations, 'validator')" class="badge squarebadge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}">
+                        <span *ngIf="validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">
+                            V
+                        </span>
+                        <span *ngIf="!validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">
+                            I
+                        </span>
+                    </span>
+                    <span class="badge badge-warning" *ngIf="upload.validations.length < 1">validating...</span>
+                </td>
                 <td><span class="badge" [ngClass]="{'badge-danger': !upload.enabled, 'badge-success': upload.enabled}">{{upload.enabled}}</span></td>
+                <td>
+                    <div *ngIf="upload.project">
+                        <a [routerLink]="['/project', upload.project?.id, 'view' ]" >{{upload.project?.name}}</a>
+                    </div>
+                </td>
                 <td>
                     <div *ngIf="upload.createdBy">
                         <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view' ]" >{{upload.createdBy?.user.firstName}} {{upload.createdBy?.user.lastName}}</a>
                     </div>
                 </td>
                 <td>
-                    <a *ngIf="upload.rawDownload != null" class="badge badge-info" [href]="upload.rawDownload"><fa-icon [icon]="'file-download'"></fa-icon> RAW</a>
-                    <a *ngIf="upload.convertedDownload != null" class="badge badge-info" [href]="upload.convertedDownload"><fa-icon [icon]="'file-download'"></fa-icon> HAML</a>
+                    <a *ngIf="upload.rawDownload != null" class="badge badge-info" [href]="upload.rawDownload"><fa-icon [icon]="'file-download'"></fa-icon> Save</a>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <button type="submit"
+                                [routerLink]="['/upload', upload.id, 'view' ]"
+                                class="btn btn-info btn-sm">
+                            <fa-icon [icon]="'eye'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/upload', upload.id, 'edit']"
+                                class="btn btn-primary btn-sm">
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/upload', { outlets: { popup: upload.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <fa-icon [icon]="'times'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr *ngFor="let upload of currentUploadChildren ;trackBy: trackId" class="child-rows">
+                <td>
+                    <span class="child-element">L</span><a [routerLink]="['/upload', upload.id, 'view' ]">{{upload.id}}</a>
+                </td>
+                <td><span class="badge badge-info" jhiTranslate="{{'ihiwManagementApp.FileType.' + upload.type}}">{{upload.type}}</span></td>
+                <td>{{upload.createdAt | date:'short'}}</td>
+                <!--                <td>{{upload.modifiedAt | date:'short'}}</td>-->
+                <td class="long-text">{{upload.fileName}}</td>
+                <td>
+                    <span *ngFor="let validation of sortBy(upload.validations, 'id')" class="badge squarebadge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}">
+                        <span *ngIf="validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">
+                            V
+                        </span>
+                        <span *ngIf="!validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">
+                            I
+                        </span>
+                    </span>
+                    <span class="badge badge-warning" *ngIf="upload.validations.length < 1">validating...</span>
+                </td>
+                <td><span class="badge" [ngClass]="{'badge-danger': !upload.enabled, 'badge-success': upload.enabled}">{{upload.enabled}}</span></td>
+                <td>
+                    <div *ngIf="upload.project">
+                        <a [routerLink]="['/project', upload.project?.id, 'view' ]" >{{upload.project?.name}}</a>
+                    </div>
+                </td>
+                <td>
+                    <div *ngIf="upload.createdBy">
+                        <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view' ]" >{{upload.createdBy?.user.firstName}} {{upload.createdBy?.user.lastName}}</a>
+                    </div>
+                </td>
+                <td>
+                    <a *ngIf="upload.rawDownload != null" class="badge badge-info" [href]="upload.rawDownload"><fa-icon [icon]="'file-download'"></fa-icon> Save</a>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <button type="submit"
+                                [routerLink]="['/upload', upload.id, 'view' ]"
+                                class="btn btn-info btn-sm">
+                            <fa-icon [icon]="'eye'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/upload', upload.id, 'edit']"
+                                class="btn btn-primary btn-sm">
+                            <fa-icon [icon]="'pencil-alt'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/upload', { outlets: { popup: upload.id + '/delete'} }]"
+                                replaceUrl="true"
+                                queryParamsHandling="merge"
+                                class="btn btn-danger btn-sm">
+                            <fa-icon [icon]="'times'"></fa-icon>
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr *ngFor="let upload of bottomUploadParents ;trackBy: trackId">
+                <td>
+                    <a [routerLink]="['/upload', upload.id, 'view' ]">{{upload.id}}</a>
+                    <a *ngIf="upload.hasChildren != null" class="badge badge-info no-link" (click)="toggleChildren(upload)"><fa-icon *ngIf="upload.id != openedUpload" [icon]="'plus'"></fa-icon><fa-icon *ngIf="upload.id === openedUpload" [icon]="'minus'"></fa-icon></a>
+                </td>
+                <td><span class="badge badge-info" jhiTranslate="{{'ihiwManagementApp.FileType.' + upload.type}}">{{upload.type}}</span></td>
+                <td>{{upload.createdAt | date:'short'}}</td>
+                <!--                <td>{{upload.modifiedAt | date:'short'}}</td>-->
+                <td class="long-text">{{upload.fileName}}</td>
+                <td>
+                    <span *ngFor="let validation of sortBy(upload.validations, 'id')" class="badge squarebadge" [ngClass]="{'badge-danger': !validation.valid, 'badge-success': validation.valid}">
+                        <span *ngIf="validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">
+                            V
+                        </span>
+                        <span *ngIf="!validation.valid" title="{{validation.validator + ': ' + validation.validationFeedback}}">
+                            I
+                        </span>
+                    </span>
+                    <span class="badge badge-warning" *ngIf="upload.validations.length < 1">validating...</span>
+                </td>
+                <td><span class="badge" [ngClass]="{'badge-danger': !upload.enabled, 'badge-success': upload.enabled}">{{upload.enabled}}</span></td>
+                <td>
+                    <div *ngIf="upload.project">
+                        <a [routerLink]="['/project', upload.project?.id, 'view' ]" >{{upload.project?.name}}</a>
+                    </div>
+                </td>
+                <td>
+                    <div *ngIf="upload.createdBy">
+                        <a [routerLink]="['/ihiw-user', upload.createdBy?.id, 'view' ]" >{{upload.createdBy?.user.firstName}} {{upload.createdBy?.user.lastName}}</a>
+                    </div>
+                </td>
+                <td>
+                    <a *ngIf="upload.rawDownload != null" class="badge badge-info" [href]="upload.rawDownload"><fa-icon [icon]="'file-download'"></fa-icon> Save</a>
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
@@ -74,5 +209,13 @@
             </tr>
             </tbody>
         </table>
+    </div>
+    <div *ngIf="uploads">
+        <div class="row justify-content-center">
+            <jhi-item-count [page]="page" [total]="totalItems" [itemsPerPage]="itemsPerPage"></jhi-item-count>
+        </div>
+        <div class="row justify-content-center">
+            <ngb-pagination [collectionSize]="totalItems" [(page)]="page" [pageSize]="itemsPerPage" [maxSize]="3" [rotate]="true" [boundaryLinks]="true" (pageChange)="loadPage(page)"></ngb-pagination>
+        </div>
     </div>
 </div>

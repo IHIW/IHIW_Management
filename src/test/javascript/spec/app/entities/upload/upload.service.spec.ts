@@ -27,7 +27,7 @@ describe('Service Tests', () => {
       httpMock = injector.get(HttpTestingController);
       currentDate = moment();
 
-      elemDefault = new Upload(0, FileType.HAML, currentDate, currentDate, 'AAAAAAA', false, false);
+      elemDefault = new Upload(0, FileType.HAML, currentDate, currentDate, 'AAAAAAA', false, 'false');
     });
 
     describe('Service methods', () => {
@@ -95,7 +95,7 @@ describe('Service Tests', () => {
           returnedFromService
         );
         service
-          .update(expected)
+          .update(expected, null)
           .pipe(take(1))
           .subscribe(resp => (expectedResult = resp));
         const req = httpMock.expectOne({ method: 'PUT' });

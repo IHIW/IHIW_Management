@@ -18,6 +18,7 @@ import {
   faSave,
   faFileDownload,
   faPlus,
+  faMinus,
   faPencilAlt,
   faBars,
   faThList,
@@ -47,7 +48,8 @@ import {
   faCheck,
   faPlusSquare,
   faMinusSquare,
-  faClock
+  faClock,
+  faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons';
 
 // Adds the SVG icon to the library so you can use it in your page
@@ -62,6 +64,7 @@ library.add(faTimes);
 library.add(faArrowLeft);
 library.add(faSave);
 library.add(faPlus);
+library.add(faMinus);
 library.add(faPencilAlt);
 library.add(faBars);
 library.add(faHome);
@@ -93,5 +96,6 @@ library.add(faPlusSquare);
 library.add(faMinusSquare);
 library.add(faClock);
 library.add(faFileDownload);
+library.add(faQuestionCircle);
 
 // jhipster-needle-add-element-to-vendor - JHipster will add new menu items here

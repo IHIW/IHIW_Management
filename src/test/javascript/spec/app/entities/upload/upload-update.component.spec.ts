@@ -40,7 +40,7 @@ describe('Component Tests', () => {
         tick(); // simulate async
 
         // THEN
-        expect(service.update).toHaveBeenCalledWith(entity);
+        expect(service.update).toHaveBeenCalledWith(entity, null);
         expect(comp.isSaving).toEqual(false);
       }));
 

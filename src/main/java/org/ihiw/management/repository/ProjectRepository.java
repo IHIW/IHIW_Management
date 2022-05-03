@@ -25,4 +25,15 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findAllByLeaders(IhiwUser leader);
 
     List<Project> findAllByOrderByComponent();
+
+    Optional<Project> findById(Long id);
+
+    Page<Project> findAllById(Pageable pageable, Long id);
+
+    @Query("select project from Project project")
+    Page<Project> findAll(Pageable pageable);
+
+
+    @Query("select project from Project project WHERE project.id in (:ids)")
+    Page<Project> findByProjectInIds(Pageable pageable, @Param("ids") List<Long> ids);
 }

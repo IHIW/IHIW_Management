@@ -1,5 +1,6 @@
 import { Moment } from 'moment';
 import { IProject } from 'app/shared/model/project.model';
+import { IIhiwUser } from 'app/shared/model/ihiw-user.model';
 
 export interface IIhiwLab {
   id?: number;
@@ -31,6 +32,7 @@ export interface IIhiwLab {
   dPhone?: string;
   createdAt?: Moment;
   projects?: IProject[];
+  ihiwUsers?: IIhiwUser[];
 }
 
 export class IhiwLab implements IIhiwLab {
@@ -63,6 +65,7 @@ export class IhiwLab implements IIhiwLab {
     public dEmail?: string,
     public dPhone?: string,
     public createdAt?: Moment,
-    public projects?: IProject[]
+    public projects?: IProject[],
+    public ihiwUsers?: IIhiwUser[]
   ) {}
 }

@@ -1,7 +1,5 @@
 package org.ihiw.management.domain;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -9,11 +7,13 @@ import javax.persistence.*;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.ihiw.management.domain.enumeration.FileType;
 
 /**
- * A Upload.
+ * An Upload.
  */
 @Entity
 @Table(name = "upload")
@@ -39,23 +39,27 @@ public class Upload implements Serializable {
     @Column(name = "file_name")
     private String fileName;
 
-    @Column(name = "valid")
-    private Boolean valid;
-
     @Column(name = "enabled")
     private Boolean enabled;
+
+    @OneToMany(mappedBy = "upload", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private Set<Validation> validations = new HashSet<>();
 
     @ManyToOne
     @JsonIgnoreProperties("uploads")
     private IhiwUser createdBy;
 
-    @Transient
+    @ManyToOne
+    @JsonIgnore
+    private Project project;
+
+	@Transient
     @JsonProperty
     private String rawDownload;
 
-    @Transient
-    @JsonProperty
-    private String convertedDownload;
+    @ManyToOne
+    private Upload parentUpload;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -118,19 +122,6 @@ public class Upload implements Serializable {
         this.fileName = fileName;
     }
 
-    public Boolean isValid() {
-        return valid;
-    }
-
-    public Upload valid(Boolean valid) {
-        this.valid = valid;
-        return this;
-    }
-
-    public void setValid(Boolean valid) {
-        this.valid = valid;
-    }
-
     public Boolean isEnabled() {
         return enabled;
     }
@@ -165,12 +156,32 @@ public class Upload implements Serializable {
         this.rawDownload = rawDownload;
     }
 
-    public String getConvertedDownload() {
-        return convertedDownload;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setConvertedDownload(String convertedDownload) {
-        this.convertedDownload = convertedDownload;
+    public Set<Validation> getValidations() {
+        return validations;
+    }
+
+    public void setValidations(Set<Validation> validations) {
+        this.validations = validations;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public Upload getParentUpload() {
+        return parentUpload;
+    }
+
+    public void setParentUpload(Upload parentUpload) {
+        this.parentUpload = parentUpload;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
@@ -199,7 +210,6 @@ public class Upload implements Serializable {
             ", createdAt='" + getCreatedAt() + "'" +
             ", modifiedAt='" + getModifiedAt() + "'" +
             ", fileName='" + getFileName() + "'" +
-            ", valid='" + isValid() + "'" +
             ", enabled='" + isEnabled() + "'" +
             "}";
     }

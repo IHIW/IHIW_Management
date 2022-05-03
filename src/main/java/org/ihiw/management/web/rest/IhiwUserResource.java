@@ -1,6 +1,6 @@
 package org.ihiw.management.web.rest;
 
-import org.ihiw.management.domain.IhiwUser;
+import org.ihiw.management.domain.*;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
@@ -12,13 +12,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * REST controller for managing {@link org.ihiw.management.domain.IhiwUser}.
@@ -101,12 +106,42 @@ public class IhiwUserResource {
      * @param id the id of the ihiwUser to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the ihiwUser, or with status {@code 404 (Not Found)}.
      */
+    @Transactional
     @GetMapping("/ihiw-users/{id}")
-    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
     public ResponseEntity<IhiwUser> getIhiwUser(@PathVariable Long id) {
         log.debug("REST request to get IhiwUser : {}", id);
-        Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(ihiwUser);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(id);
+            return ResponseUtil.wrapOrNotFound(ihiwUser);
+        }
+        else if (auth != null && (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ProjectLeader")))) {
+            Optional<IhiwUser> ihiwUserToFind = ihiwUserRepository.findById(id);
+            if (ihiwUserToFind== null){
+                return ResponseUtil.wrapOrNotFound(null);
+            }
+
+            IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+            Set<Upload> uploadsOfToFindUser = null;
+            if (ihiwUserToFind.isPresent()){
+                uploadsOfToFindUser = Collections.unmodifiableSet(ihiwUserToFind.get().getUploads());
+            }
+            else {
+                log.debug("object not available");
+            }
+            Set<IhiwUser> leadersOfContributingProjects;
+            for(Upload upload : uploadsOfToFindUser){
+                Project proj = upload.getProject();
+                leadersOfContributingProjects = Collections.unmodifiableSet(proj.getLeaders());
+                if (leadersOfContributingProjects.contains(currentIhiwUser)){
+                    return ResponseUtil.wrapOrNotFound(ihiwUserToFind);
+                }
+            }
+        }
+        else {
+        	log.debug("Current User does not have permission to view this IHIW_USER");
+        }
+        return ResponseUtil.wrapOrNotFound(null);   
     }
 
     @GetMapping("/ihiw-user")
@@ -115,6 +150,8 @@ public class IhiwUserResource {
         return ResponseEntity.ok()
             .body(currentIhiwUser);
     }
+
+
 
     /**
      * {@code DELETE  /ihiw-users/:id} : delete the "id" ihiwUser.

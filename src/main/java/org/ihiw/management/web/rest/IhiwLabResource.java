@@ -142,7 +142,7 @@ public class IhiwLabResource {
             page = userService.getAllLabs(pageable);
         } else {
             //if it is a project leader, add all his projects' labs to the list
-            if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER)) || currentUser.get().getAuthorities().contains(new Authority(PI))) {
+            if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
                 List<Project> projectsOfUser = projectRepository.findAllByLeaders(currentIhiwUser);
                 for (Project project : projectsOfUser){
                     for (ProjectIhiwLab lab : project.getLabs()){
@@ -195,7 +195,7 @@ public class IhiwLabResource {
         }
 
         //project leaders can see all labs that are part of the projects they lead
-        if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER)) || currentUser.get().getAuthorities().contains(new Authority(PI))){
+        if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))){
             List<Project> projectsOfUser = projectRepository.findAllByLeaders(currentIhiwUser);
             for (Project project : projectsOfUser){
                 for (ProjectIhiwLab lab : project.getLabs()) {

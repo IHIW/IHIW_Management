@@ -110,8 +110,7 @@ public class IhiwUserResource {
     @GetMapping("/ihiw-users/{id}")
     @PreAuthorize("hasAnyRole(\"ROLE_ADMIN\",\"ProjectLeader\")"    )
     public ResponseEntity<IhiwUser> getIhiwUser(@PathVariable Long id) {
-        boolean found = false;
-        log.debug("REST request to get IhiwUser tam : {}", id);
+        log.debug("REST request to get IhiwUser : {}", id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
             Optional<IhiwUser> ihiwUser = ihiwUserRepository.findById(id);

@@ -1,13 +1,44 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <div *ngIf="ihiwLab">
-            <h2><span jhiTranslate="ihiwManagementApp.ihiwLab.detail.title">Ihiw Lab</span> {{ihiwLab.id}}</h2>
+            <h2><span jhiTranslate="ihiwManagementApp.ihiwLab.detail.title">Ihiw Lab</span> {{ihiwLab.labCode}}</h2>
             <hr>
             <jhi-alert-error></jhi-alert-error>
             <dl class="row-md jh-entity-details">
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.labCode">Lab Code</span></dt>
                 <dd>
                     <span>{{ihiwLab.labCode}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.labMembers">Lab Members</span></dt>
+                <dd>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th><span>ID</span></th>
+                                <th><span>Name</span></th>
+                                <th><span>Roles</span></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr *ngFor="let user of this.ihiwLab.ihiwUsers">
+                                <td><a class="form-control-static" [routerLink]="['/admin/user-management', user.user.login, 'view' ]">{{user.user.id}}</a></td>
+                                <td>
+                                    <a href="mailto:{{user.user.email}}">{{user.user.firstName}} {{user.user.lastName}}</a>
+                                </td>
+                                <td>
+                                    <ul class="list-unstyled">
+                                        <li *ngFor="let authority of user.user.authorities">
+                                            <span *ngIf="!authority.name.startsWith('ROLE') && authority.name != 'PI' && authority.name != 'ProjectLeader'" class="badge badge-info">{{authority.name}}</span>
+                                            <span *ngIf="authority.name == 'PI'" class="badge badge-danger">{{authority.name}}</span>
+                                            <span *ngIf="authority.name == 'ProjectLeader'" class="badge badge-warning">{{authority.name}}</span>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.title">Title</span></dt>
                 <dd>
@@ -41,14 +72,6 @@
                 <dd>
                     <span>{{ihiwLab.address2}}</span>
                 </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sAddress1">S Address 1</span></dt>
-                <dd>
-                    <span>{{ihiwLab.sAddress1}}</span>
-                </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sAddress">S Address</span></dt>
-                <dd>
-                    <span>{{ihiwLab.sAddress}}</span>
-                </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.city">City</span></dt>
                 <dd>
                     <span>{{ihiwLab.city}}</span>
@@ -81,38 +104,55 @@
                 <dd>
                     <span>{{ihiwLab.url}}</span>
                 </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.oldLabCode">Old Lab Code</span></dt>
-                <dd>
-                    <span>{{ihiwLab.oldLabCode}}</span>
-                </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sName">S Name</span></dt>
-                <dd>
-                    <span>{{ihiwLab.sName}}</span>
-                </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sPhone">S Phone</span></dt>
-                <dd>
-                    <span>{{ihiwLab.sPhone}}</span>
-                </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sEmail">S Email</span></dt>
-                <dd>
-                    <span>{{ihiwLab.sEmail}}</span>
-                </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dName">D Name</span></dt>
-                <dd>
-                    <span>{{ihiwLab.dName}}</span>
-                </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dEmail">D Email</span></dt>
-                <dd>
-                    <span>{{ihiwLab.dEmail}}</span>
-                </dd>
-                <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dPhone">D Phone</span></dt>
-                <dd>
-                    <span>{{ihiwLab.dPhone}}</span>
-                </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.createdAt">Created At</span></dt>
                 <dd>
                     <span>{{ihiwLab.createdAt}}</span>
                 </dd>
+                <div>
+                    <a class="float-right" (click)="toggleLegacyFields()">legacy fields <fa-icon [hidden]="legacy" [icon]="'plus-square'"></fa-icon><fa-icon [hidden]="!legacy" [icon]="'minus-square'"></fa-icon></a>
+                </div>
+                <div [hidden]="!legacy">
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.labId">Database ID</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.id}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sAddress1">S Address 1</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.sAddress1}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sAddress">S Address</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.sAddress}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.oldLabCode">Old Lab Code</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.oldLabCode}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sName">S Name</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.sName}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sPhone">S Phone</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.sPhone}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.sEmail">S Email</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.sEmail}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dName">D Name</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.dName}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dEmail">D Email</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.dEmail}}</span>
+                    </dd>
+                    <dt><span jhiTranslate="ihiwManagementApp.ihiwLab.dPhone">D Phone</span></dt>
+                    <dd>
+                        <span>{{ihiwLab.dPhone}}</span>
+                    </dd>
+                </div>
             </dl>
 
             <button type="submit"

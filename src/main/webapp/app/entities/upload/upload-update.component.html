@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <form name="editForm" role="form" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-            <h2 id="jhi-upload-heading" jhiTranslate="ihiwManagementApp.upload.home.createOrEditLabel">Create or edit a Upload</h2>
+            <h2 id="jhi-upload-heading" jhiTranslate="ihiwManagementApp.upload.home.createOrEditLabel">Create or edit an Upload</h2>
             <div>
                 <jhi-alert-error></jhi-alert-error>
                 <div class="form-group" [hidden]="!editForm.get('id').value">
@@ -12,14 +12,16 @@
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.upload.type" for="field_type">Type</label>
                     <select class="form-control" name="type" formControlName="type" id="field_type">
-                        <option value="HAML">HAML</option>
+                        <option value="ANTIBODY_CSV">Antibody CSV</option>
+						<option value="FASTQ">FASTQ</option>
+						<option value="HAML">HAML</option>
                         <option value="HML">HML</option>
+                        <option value="INFO_CSV">INFO.csv</option>
+						<option value="PED">Pedigree File</option>
+						<option value="PROJECT_DATA_MATRIX">Project Data Matrix</option>
+						<option value="OTHER">Other</option>
+						
                     </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.upload.fileName" for="field_fileName">File Name</label>
-                    <input type="text" class="form-control" name="fileName" id="field_fileName"
-                           formControlName="fileName" [readonly]="editForm.get('createdBy').value"/>
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" jhiTranslate="ihiwManagementApp.upload.enabled" for="field_enabled">Enabled</label>
@@ -27,15 +29,23 @@
                            formControlName="enabled"/>
                 </div>
                 <div class="form-group">
+                    <label class="form-control-label" jhiTranslate="ihiwManagementApp.project.lab" for="field_project">Project</label>
+                    <select class="form-control" id="field_project" name="project" (change)="setProject($event)">
+                        <option>Select project</option>
+                        <option *ngFor="let project of projects" [attr.selected]="(editForm.get('project').value && project.id === editForm.get('project').value.id) ? true : null" >{{project.name}}</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label class="form-control-label" for="field_file">File</label>
-                    <input id="field_file" type="file" (change)="onFileChange($event)"/>
+                    <input *ngIf="editForm.get('id').value === undefined" id="field_files" type="file" (change)="onFileChange($event)" multiple/>
+                    <input *ngIf="editForm.get('id').value !== undefined" id="field_file" type="file" (change)="onFileChange($event)"/>
                 </div>
             </div>
             <div>
                 <button type="button" id="cancel-save" class="btn btn-secondary"  (click)="previousState()">
                     <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancel</span>
                 </button>
-                <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving" class="btn btn-primary">
+                <button type="submit" id="save-entity" [disabled]="editForm.invalid || isSaving || noFileSelected" class="btn btn-primary">
                     <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Save</span>
                 </button>
             </div>

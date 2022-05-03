@@ -15,6 +15,8 @@ public final class AuthoritiesConstants {
     public static final String WORKSHOP_CHAIR = "WorkshopChair";
 
     public static final String ANONYMOUS = "ROLE_ANONYMOUS";
+    
+    public static final String VALIDATION = "ROLE_VALIDATION";
 
     private AuthoritiesConstants() {
     }

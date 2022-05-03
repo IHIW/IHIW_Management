@@ -11,6 +11,7 @@ import { UploadDetailComponent } from './upload-detail.component';
 import { UploadUpdateComponent } from './upload-update.component';
 import { UploadDeletePopupComponent } from './upload-delete-dialog.component';
 import { IUpload } from 'app/shared/model/upload.model';
+import { JhiResolvePagingParams } from 'ng-jhipster';
 
 @Injectable({ providedIn: 'root' })
 export class UploadResolve implements Resolve<IUpload> {
@@ -32,6 +33,9 @@ export const uploadRoute: Routes = [
   {
     path: '',
     component: UploadComponent,
+    resolve: {
+      pagingParams: JhiResolvePagingParams
+    },
     data: {
       authorities: ['ROLE_USER'],
       pageTitle: 'ihiwManagementApp.upload.home.title'
@@ -41,9 +45,6 @@ export const uploadRoute: Routes = [
   {
     path: ':id/view',
     component: UploadDetailComponent,
-    resolve: {
-      upload: UploadResolve
-    },
     data: {
       authorities: ['ROLE_USER'],
       pageTitle: 'ihiwManagementApp.upload.home.title'

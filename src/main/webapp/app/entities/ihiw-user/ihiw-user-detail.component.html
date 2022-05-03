@@ -1,7 +1,7 @@
 <div class="row justify-content-center">
     <div class="col-8">
         <div *ngIf="ihiwUser">
-            <h2><span jhiTranslate="ihiwManagementApp.ihiwUser.detail.title">Ihiw User</span> {{ihiwUser.id}}</h2>
+            <h2><span jhiTranslate="ihiwManagementApp.ihiwUser.detail.title">User</span> {{ihiwUser.user.lastName}}</h2>
             <hr>
             <jhi-alert-error></jhi-alert-error>
             <dl class="row-md jh-entity-details">
@@ -11,13 +11,29 @@
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.user">User</span></dt>
                 <dd>
-                    {{ihiwUser.user?.id}}
+                    {{ihiwUser.id}}
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.name">Name</span></dt>
+                <dd>
+                    <span>{{ihiwUser.user.firstName + " " + ihiwUser.user.lastName}}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.email">E-mail</span></dt>
+                <dd>
+                    <span>{{ihiwUser.user.email}}</span>
                 </dd>
                 <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.lab">Lab</span></dt>
                 <dd>
                     <div *ngIf="ihiwUser.lab">
                         <a [routerLink]="['/ihiw-lab', ihiwUser.lab?.id, 'view']">{{ihiwUser.lab?.id}}</a>
                     </div>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.labname">Lab name from Institution</span></dt>
+                <dd>
+                    <span>{{ihiwUser.lab.title  +  " from " +  ihiwUser.lab.institution }}</span>
+                </dd>
+                <dt><span jhiTranslate="ihiwManagementApp.ihiwUser.labPI">Lab PI</span></dt>
+                <dd>
+                    <span>{{ihiwUser.lab.director }}</span>
                 </dd>
             </dl>
 

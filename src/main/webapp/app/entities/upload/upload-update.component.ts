@@ -3,14 +3,16 @@ import { HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { filter, isEmpty, map } from 'rxjs/operators';
 import * as moment from 'moment';
 import { DATE_TIME_FORMAT } from 'app/shared/constants/input.constants';
 import { JhiAlertService } from 'ng-jhipster';
 import { IUpload, Upload } from 'app/shared/model/upload.model';
 import { UploadService } from './upload.service';
 import { IIhiwUser } from 'app/shared/model/ihiw-user.model';
-import { IhiwUserService } from 'app/entities/ihiw-user';
+import { IProject } from 'app/shared/model/project.model';
+import { ProjectService } from 'app/entities/project';
+import { isNull } from 'util';
 
 @Component({
   selector: 'jhi-upload-update',
@@ -18,7 +20,10 @@ import { IhiwUserService } from 'app/entities/ihiw-user';
 })
 export class UploadUpdateComponent implements OnInit {
   isSaving: boolean;
-  file: File;
+  noFileSelected: boolean;
+  files: FileList;
+
+  projects: IProject[];
 
   editForm = this.fb.group({
     id: [],
@@ -26,12 +31,14 @@ export class UploadUpdateComponent implements OnInit {
     createdAt: [],
     modifiedAt: [],
     fileName: [],
-    valid: [],
     enabled: [],
-    createdBy: []
+    createdBy: [],
+    project: [null, [Validators.required]],
+    validations: []
   });
 
   constructor(
+    protected projectService: ProjectService,
     protected jhiAlertService: JhiAlertService,
     protected uploadService: UploadService,
     protected activatedRoute: ActivatedRoute,
@@ -40,9 +47,16 @@ export class UploadUpdateComponent implements OnInit {
 
   ngOnInit() {
     this.isSaving = false;
+    this.noFileSelected = true;
     this.activatedRoute.data.subscribe(({ upload }) => {
       this.updateForm(upload);
+      if (upload.id !== undefined) {
+        this.noFileSelected = false;
+      }
     });
+    this.projectService
+      .getMy()
+      .subscribe((res: HttpResponse<IProject[]>) => (this.projects = res.body), (res: HttpResponse<any>) => this.onError(res.body));
   }
 
   updateForm(upload: IUpload) {
@@ -52,9 +66,10 @@ export class UploadUpdateComponent implements OnInit {
       createdAt: upload.createdAt != null ? upload.createdAt.format(DATE_TIME_FORMAT) : null,
       modifiedAt: upload.modifiedAt != null ? upload.modifiedAt.format(DATE_TIME_FORMAT) : null,
       fileName: upload.fileName,
-      valid: upload.valid,
       enabled: upload.enabled,
-      createdBy: upload.createdBy
+      createdBy: upload.createdBy,
+      project: upload.project,
+      validations: upload.validations
     });
   }
 
@@ -64,17 +79,27 @@ export class UploadUpdateComponent implements OnInit {
 
   onFileChange(event) {
     if (event.target.files.length > 0) {
-      this.file = event.target.files[0];
+      this.files = event.target.files;
+      this.noFileSelected = false;
     }
   }
 
   save() {
     this.isSaving = true;
+
     const upload = this.createFromForm();
+
+    console.error('BENS validations: ');
+
     if (upload.id !== undefined) {
-      this.subscribeToSaveResponse(this.uploadService.update(upload));
+      let file = null;
+      if (this.files !== undefined && this.files.length > 0) {
+        file = this.files[0];
+      }
+      /*console.error(upload.project.name+upload.validations[0].validationFeedback+upload.id)*/
+      this.subscribeToSaveResponse(this.uploadService.update(upload, file));
     } else {
-      this.subscribeToSaveResponse(this.uploadService.createWithFile(upload, this.file));
+      this.subscribeToSaveResponse(this.uploadService.createWithFile(upload, this.files));
     }
   }
 
@@ -88,9 +113,10 @@ export class UploadUpdateComponent implements OnInit {
       modifiedAt:
         this.editForm.get(['modifiedAt']).value != null ? moment(this.editForm.get(['modifiedAt']).value, DATE_TIME_FORMAT) : undefined,
       fileName: this.editForm.get(['fileName']).value,
-      valid: this.editForm.get(['valid']).value,
       enabled: this.editForm.get(['enabled']).value,
-      createdBy: this.editForm.get(['createdBy']).value
+      createdBy: this.editForm.get(['createdBy']).value,
+      project: this.editForm.get(['project']).value,
+      validations: this.editForm.get(['validations']).value
     };
   }
 
@@ -110,7 +136,7 @@ export class UploadUpdateComponent implements OnInit {
     this.jhiAlertService.error(errorMessage, null, null);
   }
 
-  trackIhiwUserById(index: number, item: IIhiwUser) {
-    return item.id;
+  setProject(event: any) {
+    this.editForm.get(['project']).setValue(this.projects[event.target.selectedIndex - 1]);
   }
 }

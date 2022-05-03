@@ -93,6 +93,10 @@ Generic styles
   border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
 
+.no-link {
+  color: white !important;
+}
+
 .hand,
 [jhisortby] {
   cursor: pointer;
@@ -179,4 +183,38 @@ ui bootstrap tweaks
   white-space: nowrap;
 }
 
+/* ========= Application styles ========== */
+.squarebadge {
+  width: 18px;
+}
+
+.child-element {
+  vertical-align: super;
+}
+
+.child-rows:nth-of-type(2n) {
+  background-color: lightblue !important;
+}
+.child-rows:nth-of-type(2n + 1) {
+  background-color: lightskyblue !important;
+}
+
+.upload-id-column {
+  width: 36px;
+  min-width: 36px;
+}
+
+.break-line-breaks {
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+.long-text {
+  word-break: break-all;
+}
+
+.alert-light {
+  color: black;
+  border-color: lightgray;
+}
 /* jhipster-needle-scss-add-main JHipster will add new css style */

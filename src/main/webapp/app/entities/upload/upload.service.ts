@@ -25,7 +25,26 @@ export class UploadService {
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
-  createWithFile(upload: IUpload, file: File): Observable<EntityResponseType> {
+  createWithFile(upload: IUpload, files: FileList): Observable<EntityResponseType> {
+    const copy = this.convertDateFromClient(upload);
+
+    const uploadMultipartFormParam = 'upload';
+    const filesMultipartFormParam = 'files';
+    const formData: FormData = new FormData();
+    const uploadAsJsonBlob: Blob = new Blob([JSON.stringify(copy)], { type: 'application/json' });
+
+    formData.append(uploadMultipartFormParam, uploadAsJsonBlob);
+    if (files !== undefined) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append(filesMultipartFormParam, files.item(i));
+      }
+    }
+    return this.http
+      .post<IUpload>(this.resourceUrl, formData, { observe: 'response' })
+      .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
+  }
+
+  update(upload: IUpload, file: File): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(upload);
 
     const uploadMultipartFormParam = 'upload';
@@ -39,14 +58,19 @@ export class UploadService {
     }
 
     return this.http
-      .post<IUpload>(this.resourceUrl, formData, { observe: 'response' })
+      .put<IUpload>(this.resourceUrl, formData, { observe: 'response' })
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 
-  update(upload: IUpload): Observable<EntityResponseType> {
+  revalidate(upload: IUpload): Observable<EntityResponseType> {
     const copy = this.convertDateFromClient(upload);
+    const revalidateUrl = SERVER_API_URL + 'api/revalidate';
+    const uploadMultipartFormParam = 'upload';
+    const formData: FormData = new FormData();
+    const uploadAsJsonBlob: Blob = new Blob([JSON.stringify(copy)], { type: 'application/json' });
+    formData.append(uploadMultipartFormParam, uploadAsJsonBlob);
     return this.http
-      .put<IUpload>(this.resourceUrl, copy, { observe: 'response' })
+      .put<IUpload>(revalidateUrl, formData, { observe: 'response' })
       .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
   }
 

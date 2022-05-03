@@ -1,8 +1,5 @@
 package org.ihiw.management.domain;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -54,6 +51,7 @@ public class Upload implements Serializable {
     private IhiwUser createdBy;
 
     @ManyToOne
+    @JsonIgnore
     private Project project;
 
 	@Transient

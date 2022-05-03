@@ -67,6 +67,7 @@ public class Project implements Serializable {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @JsonIgnore
     @JoinTable(name = "project_leader",
         joinColumns = @JoinColumn(name = "project_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "ihiw_user_id", referencedColumnName = "id"))

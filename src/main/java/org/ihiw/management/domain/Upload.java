@@ -51,7 +51,6 @@ public class Upload implements Serializable {
     private IhiwUser createdBy;
 
     @ManyToOne
-    @JsonIgnore
     private Project project;
 
 	@Transient

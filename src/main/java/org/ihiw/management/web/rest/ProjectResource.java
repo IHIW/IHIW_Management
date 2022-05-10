@@ -1,31 +1,33 @@
 package org.ihiw.management.web.rest;
 
+import io.github.jhipster.web.util.HeaderUtil;
+import io.github.jhipster.web.util.PaginationUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 import org.ihiw.management.domain.*;
 import org.ihiw.management.domain.enumeration.ProjectSubscriptionStatus;
 import org.ihiw.management.repository.IhiwUserRepository;
 import org.ihiw.management.repository.ProjectIhiwLabRepository;
 import org.ihiw.management.repository.ProjectRepository;
-import org.ihiw.management.repository.UserRepository;
 import org.ihiw.management.security.AuthoritiesConstants;
-import org.ihiw.management.security.SecurityUtils;
 import org.ihiw.management.service.MailService;
 import org.ihiw.management.service.UserService;
+import org.ihiw.management.service.dto.ProjectDTO;
+import org.ihiw.management.service.mapper.ProjectMapper;
 import org.ihiw.management.web.rest.errors.BadRequestAlertException;
-
-import io.github.jhipster.web.util.HeaderUtil;
-import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,8 +94,6 @@ public class ProjectResource {
     }
 
     @PostMapping("/projects/{projectId}/subscribe")
-    //FIXME: why the heck is preauthorize not working for the PI?
-//    @PreAuthorize("hasAnyRole('" + AuthoritiesConstants.PI + "', '" + AuthoritiesConstants.PROJECT_LEADER + "')")
     public ResponseEntity<ProjectIhiwLab> subscribeProject(@PathVariable long projectId) throws URISyntaxException {
         log.debug("REST request to subscribe to Project : {}", projectId);
         Optional<User> currentUser = userService.getUserWithAuthorities();
@@ -174,6 +174,7 @@ public class ProjectResource {
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             projectFromDB.get().getLeaders().contains(currentIhiwUser)) {
+            project.setUploads(projectFromDB.get().getUploads());
             Project result = projectRepository.save(project);
             return ResponseEntity.ok()
                 .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, project.getId().toString()))
@@ -189,21 +190,56 @@ public class ProjectResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of projects in body.
      */
     @GetMapping("/projects")
-    public List<Project> getAllProjectsOrderByComponent(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
+    public ResponseEntity<List<ProjectDTO>> getAllProjects(@RequestParam(value = "page" , required = false) Integer offset,
+                                                        @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sort", required = false) String sort, @RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all Projects");
+
+        Page<ProjectDTO> page = null;
+        Pageable pageable;
+        List<Project> allProjects;
+        if(offset != null && size != null) {
+            Sort sorting  = Sort.by(Sort.Direction.fromString(sort.split(",")[1]), sort.split(",")[0]);
+            pageable = PageRequest.of(offset, size, sorting);
+        } else {
+            pageable = Pageable.unpaged();
+        }
+
+
         Optional<User> currentUser = userService.getUserWithAuthorities();
         if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
             currentUser.get().getAuthorities().contains(new Authority(WORKSHOP_CHAIR)) ||
                 currentUser.get().getAuthorities().contains(new Authority(PI))){
-            return projectRepository.findAllByOrderByComponent();
+                    page = userService.getAllProjects(pageable);
         }
+
+        if (page == null) {
+            IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+            List<ProjectIhiwLab> projectIhiwLabs = projectIhiwLabRepository.findByLab(currentIhiwUser.getLab());
+            List<Project> projects = new ArrayList<>();
+            for (ProjectIhiwLab pil : projectIhiwLabs) {
+                projects.add(pil.getProject());
+            }
+            allProjects = projects;
+            ProjectMapper myMap = new ProjectMapper();
+            List<ProjectDTO> entityToDto = myMap.ProjectsToProjectDTOs(allProjects);
+            page = new PageImpl<>(entityToDto);
+        }
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/projects/my")
+    public List<Project> getMyProjects() {
+        log.debug("REST request to get my Projects");
+
         IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
-        List<ProjectIhiwLab> projectIhiwLabs = projectIhiwLabRepository.findByLab(currentIhiwUser.getLab());
-        List<Project> projects = new ArrayList<>();
-        for (ProjectIhiwLab pil : projectIhiwLabs) {
-            projects.add(pil.getProject());
+        List<Project> result = new ArrayList<>();
+        for (ProjectIhiwLab pil : projectIhiwLabRepository.findByLab(currentIhiwUser.getLab())){
+            if (pil.getStatus().equals(ProjectSubscriptionStatus.SUBSCRIBED)){
+                result.add(pil.getProject());
+            }
         }
-        return projects;
+        return result;
     }
 
     /**

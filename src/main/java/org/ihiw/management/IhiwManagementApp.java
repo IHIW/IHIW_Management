@@ -6,6 +6,7 @@ import org.ihiw.management.config.DefaultProfileUtil;
 import io.github.jhipster.config.JHipsterConstants;
 
 import org.apache.commons.lang3.StringUtils;
+import org.ihiw.management.security.BlacklistManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -13,12 +14,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 
 @SpringBootApplication
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
@@ -62,6 +65,12 @@ public class IhiwManagementApp implements InitializingBean {
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
         logApplicationStartup(env);
+        blacklistManager(env);
+    }
+
+    @Bean
+    public static BlacklistManager blacklistManager(Environment env) {
+        return new BlacklistManager(Integer.parseInt(env.getProperty("server.blacklist.request-repeats")), 1000 * Long.parseLong(env.getProperty("server.blacklist.timeout")));
     }
 
     private static void logApplicationStartup(Environment env) {

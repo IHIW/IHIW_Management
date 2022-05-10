@@ -29,6 +29,12 @@
     <include file="config/liquibase/changelog/20191216130101_fix_migration.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191210133500_project_component.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20191210160201_project_subscription_status.xml" relativeToChangelogFile="false"/>
-
+    <include file="config/liquibase/changelog/20200406120000_upload_validation_column.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200420120000_upload_validation_role.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200424120000_multiple_validations.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200429120000_multiple_validations_foreign_key.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200623120000_project_upload_relationship.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200625120000_increase_validation_feedback.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20200701120000_upload_parent_relationship.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
 </databaseChangeLog>

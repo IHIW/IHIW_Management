@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet author="mniemann" id="addMultipleValidations">
+        <createTable tableName="validation">
+            <column name="id" type="bigint" autoIncrement="${autoIncrement}">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="upload_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="validator" type="varchar(255)" defaultValue=""/>
+            <column name="validation_feedback" type="varchar(255)" defaultValue=""/>
+            <column name="valid" type="boolean">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="mniemann" id="removeOldValidationColumns">
+        <dropColumn tableName="upload">
+            <column name="valid"/>
+        </dropColumn>
+        <dropColumn tableName="upload">
+            <column name="validation_feedback"/>
+        </dropColumn>
+    </changeSet>
+
+</databaseChangeLog>

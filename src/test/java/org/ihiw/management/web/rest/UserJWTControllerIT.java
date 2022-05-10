@@ -3,6 +3,7 @@ package org.ihiw.management.web.rest;
 import org.ihiw.management.IhiwManagementApp;
 import org.ihiw.management.domain.User;
 import org.ihiw.management.repository.UserRepository;
+import org.ihiw.management.security.BlacklistManager;
 import org.ihiw.management.security.jwt.TokenProvider;
 import org.ihiw.management.web.rest.errors.ExceptionTranslator;
 import org.ihiw.management.web.rest.vm.LoginVM;
@@ -49,7 +50,7 @@ public class UserJWTControllerIT {
 
     @BeforeEach
     public void setup() {
-        UserJWTController userJWTController = new UserJWTController(tokenProvider, authenticationManager);
+        UserJWTController userJWTController = new UserJWTController(tokenProvider, authenticationManager, new BlacklistManager(10000, 10000L));
         this.mockMvc = MockMvcBuilders.standaloneSetup(userJWTController)
             .setControllerAdvice(exceptionTranslator)
             .build();

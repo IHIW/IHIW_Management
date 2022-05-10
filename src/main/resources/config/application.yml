@@ -107,9 +107,15 @@ spring:
 
 server:
   servlet:
+    multipart:
+      max-file-size: 150MB
+      max-request-size: 150MB
     session:
       cookie:
         http-only: true
+  blacklist:
+    request-repeats: 5
+    timeout: 3600 # in seconds
 
 # Properties to be exposed on the /info management endpoint
 info:

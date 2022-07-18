@@ -313,9 +313,8 @@ public class UploadResource {
         	IhiwLab currentLab = currentIhiwUser.getLab();
             List<IhiwUser> colleagues = ihiwUserRepository.findByLab(currentLab);
 
-        	if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))
-                || currentUser.get().getAuthorities().contains(new Authority(PI))) {
-        	    List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);
+    		if (currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))) {
+        		List<Project> projects = projectRepository.findAllByLeaders(currentIhiwUser);
                 page = uploadService.getParentlessUploadsByUsersAndProjects(pageable, colleagues, projects);
             }
         	else {

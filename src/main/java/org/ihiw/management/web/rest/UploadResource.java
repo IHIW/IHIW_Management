@@ -460,62 +460,59 @@ public class UploadResource {
         	 return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, "project", projectId.toString())).build();
         }
 
-        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
-        		currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER)))         
-        {	        
-	        List<Upload> existingUploads = uploadRepository.findByFileName(summaryFileName);       
-	        
+        if ( currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+        		( currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))
+        			& currentProject.getLeaders().contains(currentIhiwUser) ) )         
+        {	                 	
+
+        	Upload currentUpload = new Upload();    
 	        Upload result = null;
-	        Set<IhiwUser> projectLeaders = currentProject.getLeaders();
-	        for(IhiwUser projectLeader : projectLeaders)
-	        {        
-	        	Upload currentUpload = new Upload();     
-	            currentUpload.setFileName(summaryFileName);
-	            currentUpload.setCreatedBy(projectLeader);
-	            currentUpload.setCreatedAt(timeNow);
-		
-	            //Does this upload already exist? Use that.
-	            for(Upload existingUpload : existingUploads)
-	            {       
-	            	if(existingUpload.getCreatedBy().equals(projectLeader) & existingUpload.getProject().equals(currentProject))
-	            	{
-	            		log.debug("Project Summary Upload already exists for project leader : {}", projectLeader.getId());
-	            		currentUpload = existingUpload;
-	            	}            		
-	            }
-	            
-	            if (currentUpload.getModifiedAt() == null)
-        		{
-	            	recentlyModified = false;
-        		}
-	            else
-	            {
-	            	Long age = Duration.between(currentUpload.getModifiedAt(), timeNow).getSeconds();
-	            	recentlyModified = (age > 0 & age < 60*5);
-	            }
-	            	
-	            if (!recentlyModified)
-	            {
-	            	log.debug("Saving new upload for projectLeader : {}", projectLeader.getId());
-		            currentUpload.setModifiedAt(timeNow);
-		            currentUpload.setEnabled(true);
-		            currentUpload.setType(summaryFileType);
-		            currentUpload.setProject(currentProject);           
-		            currentUpload.setValidations(new HashSet<>());
-	            	result = uploadRepository.save(currentUpload);
-	            }
-	            else
-	            {
-	            	 log.debug("I am not saving a file for this project leader because it was modified recently (<5 mins) : {}", projectLeader.getId());
-	            }
-	        }
-	        	        
-	    	
+	
+            //Does this upload already exist? Use that.
+	        List<Upload> existingUploads = uploadRepository.findByFileName(summaryFileName);    
+            for(Upload existingUpload : existingUploads)
+            {       
+            	if(existingUpload.getCreatedBy().equals(currentIhiwUser) & existingUpload.getProject().equals(currentProject))
+            	{
+            		log.debug("Project Summary Upload already exists for project leader : {}", currentIhiwUser.getId());
+            		currentUpload = existingUpload;
+            	}
+            	else
+            	{
+                    currentUpload.setFileName(summaryFileName);
+                    currentUpload.setCreatedBy(currentIhiwUser);
+                    currentUpload.setCreatedAt(timeNow);
+            	}
+            }
+            
+            // Was this upload recently modified (Avoid spamming...)            
+            if (currentUpload.getModifiedAt() == null)
+    		{
+            	recentlyModified = false;
+    		}
+            else
+            {
+            	Long age = Duration.between(currentUpload.getModifiedAt(), timeNow).getSeconds();
+            	recentlyModified = (age > 0 & age < 60*5);
+            }
+            	
             if (!recentlyModified)
             {
-		        //Drop an Empty file onto AWS, file creation and validation will be handled by AWS Lambda in the background
+            	log.debug("Saving upload for projectLeader : {}", currentIhiwUser.getId());
+	            currentUpload.setModifiedAt(timeNow);
+	            currentUpload.setEnabled(true);
+	            currentUpload.setType(summaryFileType);
+	            currentUpload.setProject(currentProject);           
+	            currentUpload.setValidations(new HashSet<>());
+            	result = uploadRepository.save(currentUpload);
+            	
+    	        //Drop an Empty file onto AWS, file creation and validation will be handled by AWS Lambda in the background
 		        byte[] emptyFile = new byte[0];
-		        fileRepository.storeFile(summaryFileName, emptyFile);
+		        fileRepository.storeFile(summaryFileName + ".TEMP", emptyFile);
+            }
+            else
+            {
+            	 log.debug("I am not saving a file for this project leader because it was modified recently (<5 mins) : {}", currentIhiwUser.getId());
             }
 	
 	        return ResponseEntity.ok()

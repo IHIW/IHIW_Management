@@ -76,7 +76,7 @@ export class ProjectService {
     const createProjectUrl = SERVER_API_URL + 'api/uploads/projectsummary';
     const formData: FormData = new FormData();
     formData.append('projectId', String(project.id));
-    formData.append('summaryFileName', 'Project.'.concat(String(project.id), '.Downloads.zip.TEMP'));
+    formData.append('summaryFileName', 'Project.'.concat(String(project.id), '.Downloads.zip'));
     formData.append('summaryFileType', String('OTHER'));
 
     return this.http

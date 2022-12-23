@@ -31,12 +31,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.ihiw.management.security.AuthoritiesConstants.*;
 
@@ -62,7 +64,6 @@ public class UploadResource {
     private final UploadService uploadService;
     private final ProjectRepository projectRepository;
     private final ProjectIhiwLabRepository projectIhiwLabRepository;
-
 
     public UploadResource(UploadRepository uploadRepository, UploadService uploadService, FileRepository fileRepository, IhiwUserRepository ihiwUserRepository, ValidationRepository validationRepository, UserService userService, ProjectRepository projectRepository, ProjectIhiwLabRepository projectIhiwLabRepository) {
         this.uploadRepository = uploadRepository;
@@ -282,7 +283,6 @@ public class UploadResource {
             .body(updated);
     }
 
-
     /**
      * {@code GET  /uploads} : get all the uploads.
      *
@@ -366,8 +366,6 @@ public class UploadResource {
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
     }
 
-
-
     /**
      * {@code GET  /uploads/children/:id} : get the children of the parent "id" upload.
      *
@@ -432,6 +430,107 @@ public class UploadResource {
     }
 
     /**
+     * {@code PUT  /uploads/projectsummary} : For a given project, create an upload with this filename. Assign it to each project leader for this project.
+     *
+     * @param projectId the Identifier of the project that this should be assigned to.
+     * @param newFileName the name of the new (child) upload
+     * @param newType the FileType of the new child upload, to assign the new extension.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body of the new upload, or with status {@code 404 (Not Found)}.
+     */
+    @PutMapping("/uploads/projectsummary")
+    public ResponseEntity<Upload> createProjectSummary(@RequestParam Long projectId, @RequestParam String summaryFileName, @RequestParam FileType summaryFileType) {
+
+        log.debug("REST request to create a project summary Upload : {}", summaryFileName);
+        
+        Optional<User> currentUser = userService.getUserWithAuthorities();
+        IhiwUser currentIhiwUser = ihiwUserRepository.findByUserIsCurrentUser();
+        
+        Optional<Project> projects = projectRepository.findOneById(projectId);
+        Project currentProject = null;        
+        
+        ZonedDateTime timeNow = ZonedDateTime.now();
+        boolean recentlyModified = false;
+        
+        if (projects.isPresent())
+        {
+        	currentProject = projects.get();
+        }
+        else
+        {
+        	 return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, "project", projectId.toString())).build();
+        }
+
+        if (currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
+        		currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER)))         
+        {	        
+	        List<Upload> existingUploads = uploadRepository.findByFileName(summaryFileName);       
+	        
+	        Upload result = null;
+	        Set<IhiwUser> projectLeaders = currentProject.getLeaders();
+	        for(IhiwUser projectLeader : projectLeaders)
+	        {        
+	        	Upload currentUpload = new Upload();     
+	            currentUpload.setFileName(summaryFileName);
+	            currentUpload.setCreatedBy(projectLeader);
+	            currentUpload.setCreatedAt(timeNow);
+		
+	            //Does this upload already exist? Use that.
+	            for(Upload existingUpload : existingUploads)
+	            {       
+	            	if(existingUpload.getCreatedBy().equals(projectLeader) & existingUpload.getProject().equals(currentProject))
+	            	{
+	            		log.debug("Project Summary Upload already exists for project leader : {}", projectLeader.getId());
+	            		currentUpload = existingUpload;
+	            	}            		
+	            }
+	            
+	            if (currentUpload.getModifiedAt() == null)
+        		{
+	            	recentlyModified = false;
+        		}
+	            else
+	            {
+	            	Long age = Duration.between(currentUpload.getModifiedAt(), timeNow).getSeconds();
+	            	recentlyModified = (age > 0 & age < 60*5);
+	            }
+	            	
+	            if (!recentlyModified)
+	            {
+	            	log.debug("Saving new upload for projectLeader : {}", projectLeader.getId());
+		            currentUpload.setModifiedAt(timeNow);
+		            currentUpload.setEnabled(true);
+		            currentUpload.setType(summaryFileType);
+		            currentUpload.setProject(currentProject);           
+		            currentUpload.setValidations(new HashSet<>());
+	            	result = uploadRepository.save(currentUpload);
+	            }
+	            else
+	            {
+	            	 log.debug("I am not saving a file for this project leader because it was modified recently (<5 mins) : {}", projectLeader.getId());
+	            }
+	        }
+	        	        
+	    	
+            if (!recentlyModified)
+            {
+		        //Drop an Empty file onto AWS, file creation and validation will be handled by AWS Lambda in the background
+		        byte[] emptyFile = new byte[0];
+		        fileRepository.storeFile(summaryFileName, emptyFile);
+            }
+	
+	        return ResponseEntity.ok()
+	            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, "project", summaryFileName))
+	            .body(result);
+        }
+        else
+        {
+        	//return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, "project", projectId.toString())).build();
+        	log.debug("Current User does not have sufficient permission to create a project summary: {}", currentIhiwUser.getId());
+        	return ResponseEntity.badRequest().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, "project", projectId.toString())).build();
+        }
+    }
+    
+    /**
      * {@code DELETE  /uploads/:id} : delete the "id" upload.
      *
      * @param id the id of the upload to delete.
@@ -465,6 +564,7 @@ public class UploadResource {
         return ResponseEntity.notFound().headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString())).build();
     }
 
+
     /**
      * {@code GET  /uploads/getbyfilename/:fileName} : get the "fileName" upload.
      *
@@ -493,6 +593,7 @@ public class UploadResource {
         }
     }
 
+    
     /**
      * {@code GET  /uploads/getbyproject/:projectId} : get the "projectId" uploads.
      *

@@ -60,6 +60,16 @@
                     </span>
                 </dd>
             </dl>
+            
+            <dt>
+                <button type="button" 
+                	class="btn btn-primary" 
+                	(click)="createProjectZip()" 
+                	*jhiHasAnyAuthority="['ROLE_ADMIN', 'ProjectLeader']">
+                    <div jhiTranslate="ihiwManagementApp.project.createzip"> Create Project Summary Zip </div>
+                </button>
+			</dt>
+			<hr>			   
 
             <button type="submit"
                     (click)="previousState()"

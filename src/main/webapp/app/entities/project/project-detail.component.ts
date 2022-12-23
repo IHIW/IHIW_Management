@@ -2,7 +2,11 @@ import { Component, OnInit, NgModule } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MarkdownModule } from 'ngx-markdown';
 
-import { IProject } from 'app/shared/model/project.model';
+import { IProject, Project } from 'app/shared/model/project.model';
+import { JhiEventManager } from 'ng-jhipster';
+import { Observable, Subscription } from 'rxjs';
+import { ProjectService } from 'app/entities/project/project.service';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'jhi-project-detail',
@@ -14,7 +18,11 @@ import { IProject } from 'app/shared/model/project.model';
 export class ProjectDetailComponent implements OnInit {
   project: IProject;
 
-  constructor(protected activatedRoute: ActivatedRoute) {}
+  constructor(
+    protected projectService: ProjectService,
+    protected activatedRoute: ActivatedRoute,
+    protected eventManager: JhiEventManager
+  ) {}
 
   ngOnInit() {
     this.activatedRoute.data.subscribe(({ project }) => {
@@ -24,5 +32,23 @@ export class ProjectDetailComponent implements OnInit {
 
   previousState() {
     window.history.back();
+  }
+
+  protected subscribeToSaveResponse(result: Observable<HttpResponse<IProject>>) {
+    result.subscribe(() => this.onSaveSuccess(), () => this.onSaveError());
+  }
+
+  protected onSaveSuccess() {
+    console.log('success!');
+    this.previousState();
+  }
+
+  protected onSaveError() {
+    console.log('error!');
+    this.previousState();
+  }
+
+  createProjectZip() {
+    this.subscribeToSaveResponse(this.projectService.createProjectZip(this.project));
   }
 }

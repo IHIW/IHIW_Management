@@ -71,6 +71,19 @@ export class ProjectService {
     return this.http.put<any>(`${this.resourceUrl}/${project}/projectleader/${leader}`, { observe: 'response' });
   }
 
+  createProjectZip(project: IProject): Observable<EntityResponseType> {
+    const copy = this.convertDateFromClient(project);
+    const createProjectUrl = SERVER_API_URL + 'api/uploads/projectsummary';
+    const formData: FormData = new FormData();
+    formData.append('projectId', String(project.id));
+    formData.append('summaryFileName', 'Project.'.concat(String(project.id), '.Downloads.zip'));
+    formData.append('summaryFileType', String('OTHER'));
+
+    return this.http
+      .put<IProject>(createProjectUrl, formData, { observe: 'response' })
+      .pipe(map((res: EntityResponseType) => this.convertDateFromServer(res)));
+  }
+
   protected convertDateFromClient(project: IProject): IProject {
     const copy: IProject = Object.assign({}, project, {
       createdAt: project.createdAt != null && project.createdAt.isValid() ? project.createdAt.toJSON() : null,

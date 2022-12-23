@@ -463,10 +463,11 @@ public class UploadResource {
         if ( currentUser.get().getAuthorities().contains(new Authority(ADMIN)) ||
         		( currentUser.get().getAuthorities().contains(new Authority(PROJECT_LEADER))
         			& currentProject.getLeaders().contains(currentIhiwUser) ) )         
-        {	                 	
-
-        	Upload currentUpload = new Upload();    
-	        Upload result = null;
+        {	          
+        	Upload currentUpload = new Upload();    	        
+            currentUpload.setFileName(summaryFileName);
+            currentUpload.setCreatedBy(currentIhiwUser);
+            currentUpload.setCreatedAt(timeNow);
 	
             //Does this upload already exist? Use that.
 	        List<Upload> existingUploads = uploadRepository.findByFileName(summaryFileName);    
@@ -476,12 +477,6 @@ public class UploadResource {
             	{
             		log.debug("Project Summary Upload already exists for project leader : {}", currentIhiwUser.getId());
             		currentUpload = existingUpload;
-            	}
-            	else
-            	{
-                    currentUpload.setFileName(summaryFileName);
-                    currentUpload.setCreatedBy(currentIhiwUser);
-                    currentUpload.setCreatedAt(timeNow);
             	}
             }
             
@@ -496,6 +491,7 @@ public class UploadResource {
             	recentlyModified = (age > 0 & age < 60*5);
             }
             	
+            Upload result = null;
             if (!recentlyModified)
             {
             	log.debug("Saving upload for projectLeader : {}", currentIhiwUser.getId());
